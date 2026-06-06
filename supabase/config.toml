@@ -1,0 +1,27 @@
+[api]
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+
+[studio]
+port = 54323
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = [
+  "http://localhost:3000/api/auth/callback",
+  "chrome-extension://*",
+  "http://localhost:19006"
+]
+
+[auth.external.google]
+enabled = true
+client_id = "mock-client-id"
+secret = "mock-client-secret"
+redirect_uri = "http://localhost:54321/auth/v1/callback"
