@@ -14,12 +14,35 @@ PromptPilot Extension brings advanced LLM capabilities directly into your daily 
 
 ## 📖 Table of Contents
 
-1. [Key Features](#-key-features)
-2. [Technical Stack](#-technical-stack)
-3. [Deep-Dive Architecture & Security](#-deep-dive-architecture--security)
-4. [How It Works](#-how-it-works)
-5. [Getting Started & Installation](#-getting-started--installation)
-6. [Production Build & Publishing](#-production-build--publishing)
+1. [Product Walkthrough & Visual Proof](#-product-walkthrough--visual-proof)
+2. [Key Features](#-key-features)
+3. [Technical Stack](#-technical-stack)
+4. [Deep-Dive Architecture & Security](#-deep-dive-architecture--security)
+5. [How It Works](#-how-it-works)
+6. [Getting Started & Installation](#-getting-started--installation)
+7. [Production Build & Publishing](#-production-build--publishing)
+
+---
+
+## 📸 Product Walkthrough & Visual Proof
+
+### 1. Secure Authentication Connection
+The extension pop-up monitors auth state and confirms an **Active Connection** once synced with the Next.js web application. It displays the connected user's email, indicating the overlay panels are ready to write.
+<p align="center">
+  <img src="assets/extension_popup.png" width="350" alt="Extension Connection Sync"/>
+</p>
+
+### 2. Universal Inline Rewrite Panel
+Whenever an input field or text area is focused, the PromptPilot action bubble appears. Clicking it triggers the overlay rewrite modal. Here, users can adjust optimization guidelines such as Tone (Professional, Casual, etc.), Length bounds, and LLM Platform specifications before processing.
+<p align="center">
+  <img src="assets/extension_panel_empty.png" width="550" alt="Universal Rewrite Panel Draft"/>
+</p>
+
+### 3. Real-time Variations & Optimization Scores
+Upon executing rewrite or optimization pipelines, PromptPilot grades the prompt draft out of 100, displaying the original and improved versions side-by-side. Users can choose between multiple generated variation styles (Default, Option A, Option B, Option C) and insert the text directly into the page DOM in one click.
+<p align="center">
+  <img src="assets/extension_panel_score.png" width="550" alt="Rewrite Processing and Real-Time Scoring"/>
+</p>
 
 ---
 
