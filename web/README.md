@@ -215,7 +215,7 @@ This workflow guarantees privacy while preventing accidental loss of user prompt
 stateDiagram-v2
     [*] --> ActiveState: User Signup
     ActiveState --> ScheduledDeleteState: User Clicks "Delete My Account" in Settings
-    note right of ScheduledDeleteState : DB Table: users.deleted_at = NOW()
+    note right of ScheduledDeleteState : DB Table - users.deleted_at = NOW()
     ScheduledDeleteState --> BlockedUI: User Attempts Navigation
     note right of BlockedUI : Dashboard layout displays Deletion Alert Screen
     
@@ -229,7 +229,7 @@ stateDiagram-v2
     SignOut --> [*]: User Exits Session
     
     ScheduledDeleteState --> HardDelete: 30 Days Pass
-    note right of HardDelete : DB Daemon: purge_soft_deleted_users() runs
+    note right of HardDelete : DB Daemon - purge_soft_deleted_users() runs
     HardDelete --> [*]: Auth User record deleted (Cascades delete all data)
 ```
 
@@ -303,7 +303,14 @@ Features pre-built system templates (e.g., Resume Builder, Cover Letter Generato
 
 ### Account Settings and Credentials Override
 Users configure display names, upload profile avatars, choose default models, and configure custom API keys.
-![Account Settings UI](../assets/settings_keys.png)
+
+#### Account Settings Page
+Provides general settings including profile name update, avatar upload, and account deletion options.
+![Account Settings UI](../assets/dashboard_settings.png)
+
+#### API Credentials Override
+Allows configuring custom API keys for Google Gemini, OpenAI, Anthropic, and OpenRouter directly in local settings.
+![API Keys Override](../assets/settings_keys.png)
 
 ---
 
