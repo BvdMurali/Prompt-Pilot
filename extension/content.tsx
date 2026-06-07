@@ -18,7 +18,6 @@ export const getStyle = () => {
 
 export default function ContentScriptUI() {
   const [activeEl, setActiveEl] = useState<HTMLInputElement | HTMLTextAreaElement | HTMLElement | null>(null);
-  const [bubbleCoords, setBubbleCoords] = useState<{ top: number; left: number } | null>(null);
   const [showBubble, setShowBubble] = useState(false);
   const [showModal, setShowModal] = useState(false);
   
@@ -100,13 +99,6 @@ export default function ContentScriptUI() {
       }
 
       setActiveEl(target);
-      const rect = target.getBoundingClientRect();
-      
-      // Calculate coordinates relative to screen viewports (fixed viewport-relative)
-      setBubbleCoords({
-        top: rect.bottom - 36,
-        left: rect.right - 44
-      });
       setShowBubble(true);
     };
 
@@ -128,27 +120,7 @@ export default function ContentScriptUI() {
     };
   }, [showModal]);
 
-  // Keep floating bubble anchored to the text box during scrolling and window resizing
-  useEffect(() => {
-    if (!activeEl || !showBubble || showModal) return;
 
-    const handleScrollOrResize = () => {
-      const rect = activeEl.getBoundingClientRect();
-      setBubbleCoords({
-        top: rect.bottom - 36,
-        left: rect.right - 44
-      });
-    };
-
-    // Use capture phase (true) to catch scroll events from any nested scroll containers
-    window.addEventListener("scroll", handleScrollOrResize, true);
-    window.addEventListener("resize", handleScrollOrResize);
-
-    return () => {
-      window.removeEventListener("scroll", handleScrollOrResize, true);
-      window.removeEventListener("resize", handleScrollOrResize);
-    };
-  }, [activeEl, showBubble, showModal]);
 
   const getInputText = () => {
     if (!activeEl) return "";
@@ -239,7 +211,7 @@ export default function ContentScriptUI() {
     setError("");
   };
 
-  if (!showBubble || !bubbleCoords) return null;
+  if (!showBubble) return null;
 
   return (
     <div className="promptpilot-shadow-dom text-slate-100 font-sans">
@@ -251,13 +223,9 @@ export default function ContentScriptUI() {
             if (hideBubbleTimeout.current) clearTimeout(hideBubbleTimeout.current);
             setShowModal(true);
           }}
-          className="fixed z-[99999] flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-500 hover:from-violet-500 hover:to-indigo-400 text-white border border-indigo-400/20 shadow-xl transition-all scale-100 active:scale-95"
-          style={{
-            top: `${bubbleCoords.top}px`,
-            left: `${bubbleCoords.left}px`
-          }}
+          className="fixed bottom-6 right-6 z-[99999] flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-500 hover:from-violet-500 hover:to-indigo-400 text-white border border-indigo-400/20 shadow-xl transition-all scale-100 active:scale-95"
         >
-          <Sparkles className="w-4 h-4 text-white animate-pulse" />
+          <Sparkles className="w-5 h-5 text-white animate-pulse" />
         </button>
       )}
 
