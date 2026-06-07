@@ -5,7 +5,7 @@ import { Sparkles, RefreshCw, Check, X, ArrowRight, BarChart2, Star } from "luci
 
 // Configure Plasmo content script injection targets
 export const config: PlasmoCSConfig = {
-  matches: ["<all_urls>"],
+  matches: ["https://*/*", "http://*/*"],
   all_frames: true
 };
 
@@ -47,21 +47,41 @@ export default function ContentScriptUI() {
       }
     });
 
-    // Check if we are on PromptPilot dashboard to capture session
+    // Check if we are on PromptPilot dashboard to capture session (supports local and deployed Vercel apps)
     const isDashboard = 
-      window.location.origin.includes("localhost:3000") || 
-      window.location.origin.includes("promptpilot.vercel.app");
+      window.location.origin.includes("localhost:") || 
+      window.location.origin.includes("vercel.app");
 
     if (isDashboard) {
       const handleSessionMessage = (event: MessageEvent) => {
         if (event.data?.type === "PROMPTPILOT_SESSION") {
           const newSession = event.data.session;
           setSession(newSession);
-          chrome.storage.local.set({ promptpilot_session: newSession });
+          if (newSession) {
+            const apiUrl = `${window.location.origin}/api/prompt/process`;
+            chrome.storage.local.set({ 
+              promptpilot_session: newSession,
+              promptpilot_api_url: apiUrl
+            });
+          } else {
+            chrome.storage.local.remove(["promptpilot_session", "promptpilot_api_url"]);
+          }
         }
       };
       window.addEventListener("message", handleSessionMessage);
-      return () => window.removeEventListener("message", handleSessionMessage);
+
+      // Active request session from the dashboard (resolves startup race conditions)
+      window.postMessage({ type: "PROMPTPILOT_REQUEST_SESSION" }, "*");
+
+      // Also request it again after a short delay in case React is still initializing
+      const timeoutId = setTimeout(() => {
+        window.postMessage({ type: "PROMPTPILOT_REQUEST_SESSION" }, "*");
+      }, 1000);
+
+      return () => {
+        window.removeEventListener("message", handleSessionMessage);
+        clearTimeout(timeoutId);
+      };
     }
   }, []);
 
@@ -144,39 +164,43 @@ export default function ContentScriptUI() {
     setResult(null);
     setActiveVariation(null);
 
-    // Call API through background script proxy
-    chrome.runtime.sendMessage(
-      {
-        type: "PROMPTPILOT_API_REQUEST",
-        payload: {
-          url: "http://localhost:3000/api/prompt/process",
-          method: "POST",
-          token: session.access_token,
-          body: {
-            text: originalText,
-            action: actionType,
-            tone: tone || undefined,
-            length: length || undefined,
-            platform: platform || undefined
+    // Call API through background script proxy using dynamic URL matching session origin
+    chrome.storage.local.get(["promptpilot_api_url"], (storageRes) => {
+      const targetUrl = storageRes.promptpilot_api_url || "http://localhost:3000/api/prompt/process";
+
+      chrome.runtime.sendMessage(
+        {
+          type: "PROMPTPILOT_API_REQUEST",
+          payload: {
+            url: targetUrl,
+            method: "POST",
+            token: session.access_token,
+            body: {
+              text: originalText,
+              action: actionType,
+              tone: tone || undefined,
+              length: length || undefined,
+              platform: platform || undefined
+            }
           }
-        }
-      },
-      (res) => {
-        setLoading(false);
-        if (!res || !res.success) {
-          setError(res?.error || "Failed to connect to API proxy service.");
-          return;
-        }
+        },
+        (res) => {
+          setLoading(false);
+          if (!res || !res.success) {
+            setError(res?.error || "Failed to connect to API proxy service.");
+            return;
+          }
 
-        const apiRes = res.result;
-        if (!apiRes.ok) {
-          setError(apiRes.data?.error || "Backend returned processing error.");
-          return;
-        }
+          const apiRes = res.result;
+          if (!apiRes.ok) {
+            setError(apiRes.data?.error || "Backend returned processing error.");
+            return;
+          }
 
-        setResult(apiRes.data);
-      }
-    );
+          setResult(apiRes.data);
+        }
+      );
+    });
   };
 
   const handleApply = () => {

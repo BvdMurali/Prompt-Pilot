@@ -4,11 +4,18 @@ import { Sparkles, ExternalLink, ShieldAlert, ShieldCheck } from "lucide-react"
 
 function IndexPopup() {
   const [session, setSession] = useState<any>(null)
+  const [dashboardUrl, setDashboardUrl] = useState("http://localhost:3000/dashboard/editor")
+  const [homeUrl, setHomeUrl] = useState("http://localhost:3000")
 
   useEffect(() => {
-    chrome.storage.local.get(["promptpilot_session"], (res) => {
+    chrome.storage.local.get(["promptpilot_session", "promptpilot_api_url"], (res) => {
       if (res.promptpilot_session) {
         setSession(res.promptpilot_session)
+      }
+      if (res.promptpilot_api_url) {
+        const baseOrigin = res.promptpilot_api_url.replace("/api/prompt/process", "")
+        setDashboardUrl(`${baseOrigin}/dashboard/editor`)
+        setHomeUrl(baseOrigin)
       }
     })
   }, [])
@@ -46,7 +53,7 @@ function IndexPopup() {
       {/* Call to Actions */}
       <div className="flex flex-col gap-2.5">
         <a
-          href="http://localhost:3000/dashboard/editor"
+          href={dashboardUrl}
           target="_blank"
           className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-650 hover:bg-indigo-550 text-white text-xs font-bold transition-all shadow-md shadow-indigo-600/10"
         >
@@ -54,7 +61,7 @@ function IndexPopup() {
           <ExternalLink className="w-3.5 h-3.5" />
         </a>
         <a
-          href="http://localhost:3000"
+          href={homeUrl}
           target="_blank"
           className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-800 hover:bg-slate-900 text-slate-400 hover:text-white text-xs font-semibold transition-all"
         >

@@ -36,7 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
 
       // Handle token exchange with Chrome Extension if visible in window
-      if (session && typeof window !== 'undefined') {
+      if (typeof window !== 'undefined') {
         window.postMessage({ type: 'PROMPTPILOT_SESSION', session }, '*');
       }
     });
@@ -45,6 +45,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       subscription.unsubscribe();
     };
   }, []);
+
+  // Sync session with the extension when requested (resolves late load race condition)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleExtensionRequest = (event: MessageEvent) => {
+      if (event.data?.type === 'PROMPTPILOT_REQUEST_SESSION') {
+        window.postMessage({ type: 'PROMPTPILOT_SESSION', session }, '*');
+      }
+    };
+
+    window.addEventListener('message', handleExtensionRequest);
+    return () => {
+      window.removeEventListener('message', handleExtensionRequest);
+    };
+  }, [session]);
 
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
