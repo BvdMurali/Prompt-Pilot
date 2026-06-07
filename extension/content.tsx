@@ -22,7 +22,7 @@ export default function ContentScriptUI() {
   
   // Auth & API states
   const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+  const [loadingAction, setLoadingAction] = useState<"rewrite" | "optimize" | null>(null);
   const [error, setError] = useState("");
   
   // AI Results
@@ -49,6 +49,8 @@ export default function ContentScriptUI() {
   const [modalPosition, setModalPosition] = useState({ x: -1, y: -1 });
   const isDraggingModal = useRef(false);
   const modalDragStart = useRef({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // 1. Session Synchronizer and Global Focus Listeners
   useEffect(() => {
@@ -196,6 +198,68 @@ export default function ContentScriptUI() {
     }
   }, [showModal, modalPosition]);
 
+  // Intercept and stop propagation of keyboard events to prevent affecting host webpage
+  useEffect(() => {
+    const stopPropagation = (e: KeyboardEvent) => {
+      e.stopPropagation();
+    };
+
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener("keydown", stopPropagation, true);
+      container.addEventListener("keyup", stopPropagation, true);
+      container.addEventListener("keypress", stopPropagation, true);
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener("keydown", stopPropagation, true);
+        container.removeEventListener("keyup", stopPropagation, true);
+        container.removeEventListener("keypress", stopPropagation, true);
+      }
+    };
+  }, []);
+
+  // Recover modal state from chrome.storage.local on mount
+  useEffect(() => {
+    chrome.storage.local.get(["promptpilot_modal_state"], (res) => {
+      if (res.promptpilot_modal_state) {
+        const state = res.promptpilot_modal_state;
+        if (state.inputText !== undefined) setInputTextVal(state.inputText);
+        if (state.showModal !== undefined) setShowModal(state.showModal);
+        if (state.isMinimized !== undefined) setIsMinimized(state.isMinimized);
+        if (state.modalPosition !== undefined) setModalPosition(state.modalPosition);
+        if (state.tone !== undefined) setTone(state.tone);
+        if (state.length !== undefined) setLength(state.length);
+        if (state.platform !== undefined) setPlatform(state.platform);
+        if (state.result !== undefined) setResult(state.result);
+      }
+      setIsLoaded(true);
+    });
+  }, []);
+
+  // Auto-save modal state to chrome.storage.local on changes
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    if (showModal) {
+      chrome.storage.local.set({
+        promptpilot_modal_state: {
+          inputText,
+          showModal,
+          isMinimized,
+          modalPosition,
+          tone,
+          length,
+          platform,
+          result
+        }
+      });
+    } else {
+      chrome.storage.local.remove(["promptpilot_modal_state"]);
+    }
+  }, [isLoaded, inputText, showModal, isMinimized, modalPosition, tone, length, platform, result]);
+
 
 
   const getInputText = () => {
@@ -229,7 +293,7 @@ export default function ContentScriptUI() {
       return;
     }
 
-    setLoading(true);
+    setLoadingAction(actionType);
     setError("");
     setResult(null);
     setActiveVariation(null);
@@ -255,7 +319,7 @@ export default function ContentScriptUI() {
           }
         },
         (res) => {
-          setLoading(false);
+          setLoadingAction(null);
           const lastError = chrome.runtime.lastError;
           if (lastError) {
             setError(`Extension Error: ${lastError.message}. Please reload the extension on chrome://extensions page and refresh this tab.`);
@@ -290,6 +354,7 @@ export default function ContentScriptUI() {
     setIsMinimized(false);
     setResult(null);
     setError("");
+    chrome.storage.local.remove(["promptpilot_modal_state"]);
   };
 
   const handleModalMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -317,7 +382,7 @@ export default function ContentScriptUI() {
   };
 
   return (
-    <div className="promptpilot-shadow-dom text-slate-100 font-sans">
+    <div ref={containerRef} className="promptpilot-shadow-dom text-slate-100 font-sans">
       
       {/* FLOATING ACTION TRIGGER BUBBLE */}
       {!showModal && (
@@ -562,18 +627,18 @@ export default function ContentScriptUI() {
                   <div className="flex gap-3">
                     <button
                       onClick={() => handleAction("rewrite")}
-                      disabled={loading || !session}
+                      disabled={loadingAction !== null || !session}
                       className="px-4 py-2 rounded-xl border border-indigo-500/20 bg-indigo-500/5 hover:bg-indigo-500/10 text-indigo-400 text-xs font-bold disabled:opacity-50 flex items-center gap-1.5"
                     >
-                      {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                      {loadingAction === "rewrite" ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
                       <span>Rewrite text</span>
                     </button>
                     <button
                       onClick={() => handleAction("optimize")}
-                      disabled={loading || !session}
+                      disabled={loadingAction !== null || !session}
                       className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-550 text-white text-xs font-bold disabled:opacity-50 flex items-center gap-1.5"
                     >
-                      {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                      {loadingAction === "optimize" ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
                       <span>Optimize Prompt</span>
                     </button>
                   </div>

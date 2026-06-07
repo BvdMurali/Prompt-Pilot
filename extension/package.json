@@ -1,6 +1,6 @@
 {
-  "name": "extension",
-  "displayName": "Extension",
+  "name": "promptpilot-extension",
+  "displayName": "PromptPilot",
   "version": "0.0.1",
   "description": "Universal AI Prompt Optimization & Writing Assistant",
   "author": "PromptPilot Team <support@promptpilot.com>",
