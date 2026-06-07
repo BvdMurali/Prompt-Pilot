@@ -1,7 +1,7 @@
 import type { PlasmoCSConfig } from "plasmo";
 import React, { useState, useEffect, useRef } from "react";
 import styleText from "data-text:./style.css";
-import { Sparkles, RefreshCw, Check, X, ArrowRight, BarChart2, Star } from "lucide-react";
+import { Sparkles, RefreshCw, Check, X, ArrowRight, BarChart2, Star, Minus } from "lucide-react";
 
 // Configure Plasmo content script injection targets
 export const config: PlasmoCSConfig = {
@@ -18,7 +18,6 @@ export const getStyle = () => {
 
 export default function ContentScriptUI() {
   const [activeEl, setActiveEl] = useState<HTMLInputElement | HTMLTextAreaElement | HTMLElement | null>(null);
-  const [showModal, setShowModal] = useState(false);
   const [inputText, setInputTextVal] = useState("");
   
   // Auth & API states
@@ -43,6 +42,13 @@ export default function ContentScriptUI() {
   const isDragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0 });
   const hasDragged = useRef(false);
+
+  // Modal drag & minimize states
+  const [showModal, setShowModal] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [modalPosition, setModalPosition] = useState({ x: -1, y: -1 });
+  const isDraggingModal = useRef(false);
+  const modalDragStart = useRef({ x: 0, y: 0 });
 
   // 1. Session Synchronizer and Global Focus Listeners
   useEffect(() => {
@@ -113,26 +119,39 @@ export default function ContentScriptUI() {
   // Handle dragging mechanics and constraint bounds
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging.current) return;
-      
-      const newX = e.clientX - dragStart.current.x;
-      const newY = e.clientY - dragStart.current.y;
-      
-      // Check if it's a drag or a click
-      if (Math.abs(newX - position.x) > 3 || Math.abs(newY - position.y) > 3) {
-        hasDragged.current = true;
+      if (isDragging.current) {
+        const newX = e.clientX - dragStart.current.x;
+        const newY = e.clientY - dragStart.current.y;
+        
+        // Check if it's a drag or a click
+        if (Math.abs(newX - position.x) > 3 || Math.abs(newY - position.y) > 3) {
+          hasDragged.current = true;
+        }
+
+        // Constrain inside viewport boundaries
+        const buttonSize = 40;
+        const boundedX = Math.max(10, Math.min(window.innerWidth - buttonSize - 10, newX));
+        const boundedY = Math.max(10, Math.min(window.innerHeight - buttonSize - 10, newY));
+
+        setPosition({ x: boundedX, y: boundedY });
+      } else if (isDraggingModal.current) {
+        const newX = e.clientX - modalDragStart.current.x;
+        const newY = e.clientY - modalDragStart.current.y;
+
+        const modalWidth = Math.min(672, window.innerWidth - 40);
+        const modalHeight = 450; // estimated height
+
+        // Constrain inside viewport boundaries
+        const boundedX = Math.max(10, Math.min(window.innerWidth - modalWidth - 10, newX));
+        const boundedY = Math.max(10, Math.min(window.innerHeight - modalHeight - 10, newY));
+
+        setModalPosition({ x: boundedX, y: boundedY });
       }
-
-      // Constrain inside viewport boundaries
-      const buttonSize = 40;
-      const boundedX = Math.max(10, Math.min(window.innerWidth - buttonSize - 10, newX));
-      const boundedY = Math.max(10, Math.min(window.innerHeight - buttonSize - 10, newY));
-
-      setPosition({ x: boundedX, y: boundedY });
     };
 
     const handleMouseUp = () => {
       isDragging.current = false;
+      isDraggingModal.current = false;
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -142,7 +161,7 @@ export default function ContentScriptUI() {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [position]);
+  }, [position, modalPosition]);
 
   // Keep inside bounds on resize
   useEffect(() => {
@@ -153,10 +172,29 @@ export default function ContentScriptUI() {
         const boundedY = Math.max(10, Math.min(window.innerHeight - buttonSize - 10, prev.y));
         return { x: boundedX, y: boundedY };
       });
+      setModalPosition((prev) => {
+        if (prev.x === -1) return prev;
+        const modalWidth = Math.min(672, window.innerWidth - 40);
+        const modalHeight = 450;
+        const boundedX = Math.max(10, Math.min(window.innerWidth - modalWidth - 10, prev.x));
+        const boundedY = Math.max(10, Math.min(window.innerHeight - modalHeight - 10, prev.y));
+        return { x: boundedX, y: boundedY };
+      });
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Center modal initially on open
+  useEffect(() => {
+    if (showModal && modalPosition.x === -1) {
+      const modalWidth = Math.min(672, window.innerWidth - 40);
+      setModalPosition({
+        x: (window.innerWidth - modalWidth) / 2,
+        y: 100
+      });
+    }
+  }, [showModal, modalPosition]);
 
 
 
@@ -218,6 +256,11 @@ export default function ContentScriptUI() {
         },
         (res) => {
           setLoading(false);
+          const lastError = chrome.runtime.lastError;
+          if (lastError) {
+            setError(`Extension Error: ${lastError.message}. Please reload the extension on chrome://extensions page and refresh this tab.`);
+            return;
+          }
           if (!res || !res.success) {
             setError(res?.error || "Failed to connect to API proxy service.");
             return;
@@ -244,8 +287,23 @@ export default function ContentScriptUI() {
 
   const handleClose = () => {
     setShowModal(false);
+    setIsMinimized(false);
     setResult(null);
     setError("");
+  };
+
+  const handleModalMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return;
+    const target = e.target as HTMLElement;
+    if (target.closest("button") || target.closest("select") || target.closest("textarea")) {
+      return;
+    }
+    isDraggingModal.current = true;
+    modalDragStart.current = {
+      x: e.clientX - modalPosition.x,
+      y: e.clientY - modalPosition.y
+    };
+    e.preventDefault();
   };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -280,26 +338,77 @@ export default function ContentScriptUI() {
         </button>
       )}
 
-      {/* OVERLAY PANEL MODAL */}
-      {showModal && (
-        <div className="fixed inset-0 bg-slate-950/45 backdrop-blur-sm z-[999999] flex items-center justify-center p-4">
-          <div className="w-full max-w-2xl bg-slate-950/90 border border-slate-900 rounded-2xl p-6 flex flex-col gap-5 shadow-2xl relative">
-            
-            {/* Modal Header */}
-            <div className="flex justify-between items-center border-b border-slate-900 pb-3">
-              <div className="flex items-center gap-2 font-bold text-white text-sm">
-                <div className="w-6 h-6 rounded bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center shadow">
-                  <Sparkles className="w-3.5 h-3.5 text-white" />
-                </div>
-                <span>PromptPilot universal rewrite panel</span>
+      {/* OVERLAY PANEL MODAL - MINIMIZED STATE */}
+      {showModal && isMinimized && (
+        <div
+          onMouseDown={handleModalMouseDown}
+          className="fixed z-[999999] bg-slate-950 border border-slate-900/80 rounded-xl shadow-2xl p-3 flex items-center gap-4 cursor-move select-none animate-in fade-in zoom-in-95 duration-150"
+          style={{
+            left: `${modalPosition.x}px`,
+            top: `${modalPosition.y}px`
+          }}
+        >
+          <div className="flex items-center gap-2 pointer-events-none">
+            <div className="w-5 h-5 rounded bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center shadow">
+              <Sparkles className="w-3 h-3 text-white animate-pulse" />
+            </div>
+            <span className="text-xs font-bold text-white">PromptPilot (Minimized)</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setIsMinimized(false)}
+              className="px-2.5 py-1.5 rounded-lg bg-indigo-650 hover:bg-indigo-550 text-white text-[10px] font-bold transition-all active:scale-95"
+            >
+              Restore
+            </button>
+            <button
+              onClick={handleClose}
+              className="p-1 rounded-lg hover:bg-slate-900 text-slate-455 hover:text-white transition-all"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* OVERLAY PANEL MODAL - ACTIVE STATE */}
+      {showModal && !isMinimized && (
+        <div 
+          className="fixed z-[999999] w-full max-w-2xl bg-slate-950/95 border border-slate-900 rounded-2xl p-6 flex flex-col gap-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+          style={{
+            left: `${modalPosition.x}px`,
+            top: `${modalPosition.y}px`
+          }}
+        >
+          
+          {/* Modal Header */}
+          <div 
+            onMouseDown={handleModalMouseDown}
+            className="flex justify-between items-center border-b border-slate-900 pb-3 cursor-move select-none"
+          >
+            <div className="flex items-center gap-2 font-bold text-white text-sm pointer-events-none">
+              <div className="w-6 h-6 rounded bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center shadow">
+                <Sparkles className="w-3.5 h-3.5 text-white" />
               </div>
+              <span>PromptPilot universal rewrite panel</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setIsMinimized(true)}
+                className="text-slate-450 hover:text-white p-1 rounded hover:bg-slate-900 transition-all"
+                title="Minimize"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
               <button 
                 onClick={handleClose}
-                className="text-slate-450 hover:text-white"
+                className="text-slate-450 hover:text-white p-1 rounded hover:bg-slate-900 transition-all"
+                title="Close"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
+          </div>
 
             {/* Error notifications */}
             {error && (
@@ -472,7 +581,6 @@ export default function ContentScriptUI() {
               </div>
             )}
 
-          </div>
         </div>
       )}
     </div>
