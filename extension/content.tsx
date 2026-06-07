@@ -20,6 +20,7 @@ export default function ContentScriptUI() {
   const [activeEl, setActiveEl] = useState<HTMLInputElement | HTMLTextAreaElement | HTMLElement | null>(null);
   const [showBubble, setShowBubble] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [inputText, setInputTextVal] = useState("");
   
   // Auth & API states
   const [session, setSession] = useState<any>(null);
@@ -142,7 +143,7 @@ export default function ContentScriptUI() {
   };
 
   const handleAction = async (actionType: "optimize" | "rewrite") => {
-    const originalText = getInputText();
+    const originalText = inputText;
     if (!originalText.trim()) {
       setError("Please type some text first.");
       return;
@@ -221,6 +222,7 @@ export default function ContentScriptUI() {
         <button
           onClick={() => {
             if (hideBubbleTimeout.current) clearTimeout(hideBubbleTimeout.current);
+            setInputTextVal(getInputText());
             setShowModal(true);
           }}
           className="fixed bottom-6 right-6 z-[99999] flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-500 hover:from-violet-500 hover:to-indigo-400 text-white border border-indigo-400/20 shadow-xl transition-all scale-100 active:scale-95"
@@ -265,7 +267,7 @@ export default function ContentScriptUI() {
                   <div className="flex flex-col gap-1.5">
                     <span className="text-[10px] uppercase font-bold text-slate-500">Original Text</span>
                     <div className="p-3 rounded-xl bg-slate-900/50 border border-slate-900 font-mono text-[11px] text-slate-400 leading-relaxed max-h-36 overflow-y-auto whitespace-pre-wrap">
-                      {getInputText()}
+                      {inputText}
                     </div>
                   </div>
 
@@ -331,6 +333,18 @@ export default function ContentScriptUI() {
             ) : (
               /* Settings & Options Setup Form */
               <div className="flex flex-col gap-5">
+                {/* Input Text Area Dialogue Box */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] uppercase font-bold text-slate-500">Input / Prompt Draft</label>
+                  <textarea
+                    value={inputText}
+                    onChange={(e) => setInputTextVal(e.target.value)}
+                    placeholder="Type, edit or paste your prompt/text here..."
+                    rows={4}
+                    className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-600 outline-none resize-none font-mono leading-relaxed transition-all focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20"
+                  />
+                </div>
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[10px] uppercase font-bold text-slate-500">Tone Adjust</label>
