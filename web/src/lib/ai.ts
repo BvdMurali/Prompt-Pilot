@@ -77,8 +77,8 @@ Your output must be a JSON object with this EXACT structure (do not include mark
 
 Ensure the output is pure JSON. Do not include markdown code block formatting (like \`\`\`json) in the response. Return raw JSON text.`;
 
-async function callGemini(prompt: string, apiKey: string): Promise<string> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+async function callGemini(prompt: string, apiKey: string, model: string = 'gemini-3.1-flash-lite'): Promise<string> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -155,8 +155,38 @@ async function callOpenRouter(prompt: string, apiKey: string, model: string = 'g
   return data.choices?.[0]?.message?.content || '';
 }
 
+async function callAnthropic(prompt: string, apiKey: string, model: string = 'claude-3-5-sonnet'): Promise<string> {
+  const url = 'https://api.anthropic.com/v1/messages';
+  const modelId = model === 'claude-3-5-sonnet' ? 'claude-3-5-sonnet-20241022' : model;
+  
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: modelId,
+      max_tokens: 4000,
+      system: DEFAULT_SYSTEM_PROMPT,
+      messages: [
+        { role: 'user', content: prompt }
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Anthropic API error: ${response.status} - ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data.content?.[0]?.text || '';
+}
+
 export async function callLLM(params: CallParams): Promise<AIResult> {
-  const { text, action, tone, length, platform, preferredModel = 'gemini-2.5-flash', apiKeys } = params;
+  const { text, action, tone, length, platform, preferredModel = 'gemini-3.1-flash-lite', apiKeys } = params;
 
   // 1. Build prompt context
   const userInstructions = `
@@ -179,6 +209,7 @@ ${text}
   // Decrypt/Read API keys (override first, then default Env vars)
   const geminiKey = apiKeys?.gemini || process.env.GEMINI_API_KEY || '';
   const openaiKey = apiKeys?.openai || process.env.OPENAI_API_KEY || '';
+  const anthropicKey = apiKeys?.anthropic || process.env.ANTHROPIC_API_KEY || '';
   const openrouterKey = apiKeys?.openrouter || process.env.OPENROUTER_API_KEY || '';
 
   // Retry configuration
@@ -188,12 +219,19 @@ ${text}
 
   while (attempt <= maxRetries) {
     try {
-      if (preferredModel.startsWith('gpt') && openaiKey) {
+      const isOpenAIModel = preferredModel.startsWith('gpt') || 
+                            preferredModel.startsWith('o1') || 
+                            preferredModel.startsWith('o3');
+      if (isOpenAIModel && openaiKey) {
         responseText = await callOpenAI(fullPrompt, openaiKey, preferredModel);
-      } else if (preferredModel.includes('openrouter') && openrouterKey) {
+      } else if (preferredModel.startsWith('claude') && anthropicKey) {
+        responseText = await callAnthropic(fullPrompt, anthropicKey, preferredModel);
+      } else if ((preferredModel.includes('/') || preferredModel.includes('openrouter')) && openrouterKey) {
         responseText = await callOpenRouter(fullPrompt, openrouterKey, preferredModel);
+      } else if (preferredModel.startsWith('gemini') && geminiKey) {
+        responseText = await callGemini(fullPrompt, geminiKey, preferredModel);
       } else if (geminiKey) {
-        responseText = await callGemini(fullPrompt, geminiKey);
+        responseText = await callGemini(fullPrompt, geminiKey, preferredModel);
       } else if (openrouterKey) {
         // Fallback to free OpenRouter Gemini if direct key is missing
         responseText = await callOpenRouter(fullPrompt, openrouterKey, 'google/gemini-2.5-flash:free');

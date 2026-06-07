@@ -1,11 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseServerClient } from '@/lib/supabaseServer';
+import { cookies } from 'next/headers';
+import { createClient as createServerClient } from '@/utils/supabase/server';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { callLLM } from '@/lib/ai';
 
 export async function POST(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
-    const supabase = getSupabaseServerClient(authHeader);
+    let supabase;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      supabase = createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+        {
+          global: {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        }
+      );
+    } else {
+      const cookieStore = await cookies();
+      supabase = createServerClient(cookieStore);
+    }
 
     // 1. Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -39,7 +59,7 @@ export async function POST(request: NextRequest) {
       console.error('Error fetching settings:', settingsError);
     }
 
-    const preferredModel = settings?.preferred_model || 'gemini-2.5-flash';
+    const preferredModel = settings?.preferred_model || 'gemini-3.1-flash-lite';
     const apiKeys = settings?.api_key_override || {};
 
     // 4. Invoke LLM layer

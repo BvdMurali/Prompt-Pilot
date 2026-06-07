@@ -2,14 +2,78 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-import { Sparkles, ArrowRight, Zap, Layout, Globe, ChevronRight, CheckCircle, Menu, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Sparkles, ArrowRight, Zap, Layout, Globe, ChevronRight, CheckCircle, Menu, X, Loader2, Eye, EyeOff } from 'lucide-react';
 
 export default function LandingPage() {
-  const { user, signInWithGoogle, loading } = useAuth();
+  const { user, signInWithGoogle, signInWithEmail, signUpWithEmail, loading } = useAuth();
+  const router = useRouter();
   const [selectedExample, setSelectedExample] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Auth Modal state
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const openAuthModal = (mode: 'signin' | 'signup') => {
+    setAuthMode(mode);
+    setIsAuthModalOpen(true);
+    setAuthError(null);
+    setMessage(null);
+    setEmail('');
+    setPassword('');
+    setShowPassword(false);
+  };
+
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    setMessage(null);
+    setAuthLoading(true);
+    try {
+      if (authMode === 'signin') {
+        // 1. Check if email exists in database
+        const { data: emailExists, error: rpcError } = await supabase.rpc('check_email_exists', { email_to_check: email });
+        if (rpcError) throw rpcError;
+
+        if (!emailExists) {
+          throw new Error('User email does not exist');
+        }
+
+        await signInWithEmail(email, password);
+        setIsAuthModalOpen(false);
+        router.push('/dashboard/editor');
+      } else {
+        await signUpWithEmail(email, password);
+        setMessage('Registration successful! Please check your email for confirmation or sign in.');
+        setAuthMode('signin');
+      }
+    } catch (err: any) {
+      setAuthError(err.message || 'An error occurred during authentication.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setAuthError(null);
+    setAuthLoading(true);
+    try {
+      await signInWithGoogle();
+    } catch (err: any) {
+      setAuthError(err.message || 'Failed to initialize Google sign-in.');
+      setAuthLoading(false);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,7 +118,7 @@ export default function LandingPage() {
           ? 'border-slate-900 bg-slate-950/80 backdrop-blur-md shadow-lg shadow-slate-950/20' 
           : 'border-slate-900 bg-slate-950'
       }`}>
-        <div className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[95rem] mx-auto px-6 xl:px-12 h-16 xl:h-20 flex items-center justify-between">
+        <div className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 h-16 xl:h-20 2xl:h-24 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight text-white">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <Sparkles className="w-4 h-4 text-white animate-pulse" />
@@ -62,20 +126,20 @@ export default function LandingPage() {
             <span>Prompt<span className="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">Pilot</span></span>
           </Link>
 
-          <nav className="hidden sm:flex items-center gap-6">
-            <a href="#features" className="text-sm text-slate-400 hover:text-white transition-colors">Features</a>
-            <a href="#demo" className="text-sm text-slate-400 hover:text-white transition-colors">Interactive Demo</a>
+          <nav className="hidden sm:flex items-center gap-6 2xl:gap-8">
+            <a href="#features" className="text-sm 2xl:text-base text-slate-400 hover:text-white transition-colors">Features</a>
+            <a href="#demo" className="text-sm 2xl:text-base text-slate-400 hover:text-white transition-colors">Interactive Demo</a>
             {loading ? (
-              <div className="w-20 h-8 rounded-lg bg-slate-900 animate-pulse" />
+              <div className="w-20 h-8 2xl:w-24 2xl:h-10 rounded-lg bg-slate-900 animate-pulse" />
             ) : user ? (
-              <Link href="/dashboard/editor" className="inline-flex items-center gap-1.5 px-4 h-9 xl:px-5 xl:h-10 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-sm xl:text-base font-semibold text-white transition-all shadow-md shadow-indigo-600/10">
+              <Link href="/dashboard/editor" className="inline-flex items-center gap-1.5 px-4 h-9 xl:px-5 xl:h-10 2xl:px-6 2xl:h-12 rounded-lg 2xl:rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-sm xl:text-base 2xl:text-lg font-semibold text-white transition-all shadow-md shadow-indigo-600/10">
                 <span>Dashboard</span>
-                <ArrowRight className="w-4 h-4 xl:w-5 xl:h-5" />
+                <ArrowRight className="w-4 h-4 xl:w-5 xl:h-5 2xl:w-6 2xl:h-6" />
               </Link>
             ) : (
               <button 
-                onClick={signInWithGoogle}
-                className="px-4 h-9 xl:px-5 xl:h-10 rounded-lg bg-slate-900 hover:bg-slate-800 text-sm xl:text-base font-semibold text-white border border-slate-800 hover:border-slate-700 transition-all flex items-center gap-2"
+                onClick={() => openAuthModal('signin')}
+                className="px-4 h-9 xl:px-5 xl:h-10 2xl:px-6 2xl:h-12 rounded-lg 2xl:rounded-xl bg-slate-900 hover:bg-slate-800 text-sm xl:text-base 2xl:text-lg font-semibold text-white border border-slate-800 hover:border-slate-700 transition-all flex items-center gap-2"
               >
                 <span>Sign In</span>
               </button>
@@ -121,10 +185,7 @@ export default function LandingPage() {
                 </Link>
               ) : (
                 <button 
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    signInWithGoogle();
-                  }}
+                  onClick={() => { setMobileMenuOpen(false); openAuthModal('signin'); }}
                   className="w-full px-4 h-10 rounded-lg bg-slate-900 hover:bg-slate-800 text-sm font-semibold text-white border border-slate-800 hover:border-slate-700 transition-all flex items-center justify-center gap-2"
                 >
                   <span>Sign In</span>
@@ -136,42 +197,42 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[95rem] mx-auto px-6 xl:px-12 pt-20 xl:pt-32 pb-16 flex flex-col items-center text-center relative z-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-xs xl:text-sm font-semibold text-violet-300 mb-8 animate-fade-in">
-          <Globe className="w-3.5 h-3.5 xl:w-4 xl:h-4" />
+      <section className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 pt-20 xl:pt-32 2xl:pt-40 pb-16 2xl:pb-24 flex flex-col items-center text-center relative z-10">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 2xl:px-4 2xl:py-2.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-xs xl:text-sm 2xl:text-base font-semibold text-violet-300 mb-8 2xl:mb-12 animate-fade-in">
+          <Globe className="w-3.5 h-3.5 xl:w-4 xl:h-4 2xl:w-5 2xl:h-5" />
           <span>Universal Browser Extension Available Now</span>
         </div>
 
-        <h1 className="text-5xl md:text-7xl xl:text-8xl 2xl:text-[5.5rem] font-extrabold tracking-tight max-w-4xl xl:max-w-6xl leading-tight md:leading-none 2xl:leading-[1.15] text-white mb-6">
+        <h1 className="text-5xl md:text-7xl xl:text-8xl 2xl:text-[7rem] font-extrabold tracking-tight max-w-4xl xl:max-w-6xl 2xl:max-w-7xl leading-tight md:leading-none 2xl:leading-[1.1] text-white mb-6 2xl:mb-8">
           The Intelligent AI Layer for <br />
           <span className="bg-gradient-to-r from-violet-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">
             Every Text Box on the Web
           </span>
         </h1>
 
-        <p className="text-lg md:text-xl xl:text-2xl text-slate-400 max-w-2xl xl:max-w-4xl mb-10 xl:mb-14 leading-relaxed">
+        <p className="text-lg md:text-xl xl:text-2xl 2xl:text-3xl text-slate-400 max-w-2xl xl:max-w-4xl 2xl:max-w-5xl mb-10 xl:mb-14 2xl:mb-20 leading-relaxed">
           PromptPilot sits invisibly between you and any input field. Instantly rewrite messages, transform tones, and optimize complex prompts without leaving the page.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 xl:gap-6 justify-center items-center w-full max-w-2xl xl:max-w-4xl">
+        <div className="flex flex-col sm:flex-row gap-4 xl:gap-6 2xl:gap-8 justify-center items-center w-full max-w-2xl xl:max-w-4xl 2xl:max-w-5xl">
           {user ? (
-            <Link href="/dashboard/editor" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 xl:px-10 h-12 xl:h-14 rounded-xl xl:rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-base xl:text-lg font-bold text-white shadow-xl shadow-indigo-500/20 transition-all">
+            <Link href="/dashboard/editor" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 xl:px-10 2xl:px-12 h-12 xl:h-14 2xl:h-16 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-base xl:text-lg 2xl:text-xl font-bold text-white shadow-xl shadow-indigo-500/20 transition-all">
               <span>Go to Editor Dashboard</span>
-              <ArrowRight className="w-4 h-4 xl:w-5 xl:h-5" />
+              <ArrowRight className="w-4 h-4 xl:w-5 xl:h-5 2xl:w-6 2xl:h-6" />
             </Link>
           ) : (
             <button 
-              onClick={signInWithGoogle}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 xl:px-10 h-12 xl:h-14 rounded-xl xl:rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-bold shadow-lg transition-all text-base xl:text-lg"
+              onClick={() => openAuthModal('signin')}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 xl:px-10 2xl:px-12 h-12 xl:h-14 2xl:h-16 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-white hover:bg-slate-100 text-slate-950 font-bold shadow-lg transition-all text-base xl:text-lg 2xl:text-xl"
             >
               <span>Continue with Google</span>
-              <ChevronRight className="w-5 h-5 xl:w-6 xl:h-6 text-slate-500" />
+              <ChevronRight className="w-5 h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 text-slate-500" />
             </button>
           )}
 
           <a 
             href="#demo"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 xl:px-10 h-12 xl:h-14 rounded-xl xl:rounded-2xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-base xl:text-lg font-semibold text-slate-350 transition-all"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 xl:px-10 2xl:px-12 h-12 xl:h-14 2xl:h-16 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-base xl:text-lg 2xl:text-xl font-semibold text-slate-350 transition-all"
           >
             <span>See Interactive Demo</span>
           </a>
@@ -179,41 +240,41 @@ export default function LandingPage() {
       </section>
 
       {/* Feature Grid */}
-      <section id="features" className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[95rem] mx-auto px-6 xl:px-12 py-20 xl:py-32 relative z-10 w-full scroll-mt-16">
-        <h2 className="text-3xl xl:text-5xl font-bold text-center text-white mb-16 xl:mb-24">
+      <section id="features" className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 py-20 xl:py-32 2xl:py-40 relative z-10 w-full scroll-mt-16">
+        <h2 className="text-3xl xl:text-5xl 2xl:text-6xl font-bold text-center text-white mb-16 xl:mb-24 2xl:mb-28">
           Powerful Utilities Built for Modern AI Productivity
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 xl:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 xl:gap-12 2xl:gap-16">
           {/* Card 1 */}
-          <div className="p-8 xl:p-12 rounded-2xl xl:rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-sm hover:border-slate-700/80 transition-all group">
-            <div className="w-12 h-12 xl:w-16 xl:h-16 rounded-xl xl:rounded-2xl bg-violet-500/10 flex items-center justify-center mb-6 xl:mb-8 group-hover:scale-110 transition-transform">
-              <Sparkles className="w-6 h-6 xl:w-8 xl:h-8 text-violet-400" />
+          <div className="p-8 xl:p-12 2xl:p-16 rounded-2xl xl:rounded-3xl 2xl:rounded-[2rem] bg-slate-900/40 border border-slate-800/80 backdrop-blur-sm hover:border-slate-700/80 transition-all group">
+            <div className="w-12 h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-violet-500/10 flex items-center justify-center mb-6 xl:mb-8 2xl:mb-10 group-hover:scale-110 transition-transform">
+              <Sparkles className="w-6 h-6 xl:w-8 xl:h-8 2xl:w-10 2xl:h-10 text-violet-400" />
             </div>
-            <h3 className="text-xl xl:text-2xl font-bold text-white mb-3 xl:mb-4">Prompt Optimization</h3>
-            <p className="text-slate-400 xl:text-lg leading-relaxed">
+            <h3 className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-white mb-3 xl:mb-4 2xl:mb-5">Prompt Optimization</h3>
+            <p className="text-slate-400 xl:text-lg 2xl:text-xl leading-relaxed">
               Injects context, specificity, and constraints to turn a single-line request into a structured prompt that gets premium results.
             </p>
           </div>
 
           {/* Card 2 */}
-          <div className="p-8 xl:p-12 rounded-2xl xl:rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-sm hover:border-slate-700/80 transition-all group">
-            <div className="w-12 h-12 xl:w-16 xl:h-16 rounded-xl xl:rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-6 xl:mb-8 group-hover:scale-110 transition-transform">
-              <Zap className="w-6 h-6 xl:w-8 xl:h-8 text-indigo-400" />
+          <div className="p-8 xl:p-12 2xl:p-16 rounded-2xl xl:rounded-3xl 2xl:rounded-[2rem] bg-slate-900/40 border border-slate-800/80 backdrop-blur-sm hover:border-slate-700/80 transition-all group">
+            <div className="w-12 h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-indigo-500/10 flex items-center justify-center mb-6 xl:mb-8 2xl:mb-10 group-hover:scale-110 transition-transform">
+              <Zap className="w-6 h-6 xl:w-8 xl:h-8 2xl:w-10 2xl:h-10 text-indigo-400" />
             </div>
-            <h3 className="text-xl xl:text-2xl font-bold text-white mb-3 xl:mb-4">Tone & Length Control</h3>
-            <p className="text-slate-400 xl:text-lg leading-relaxed">
+            <h3 className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-white mb-3 xl:mb-4 2xl:mb-5">Tone & Length Control</h3>
+            <p className="text-slate-400 xl:text-lg 2xl:text-xl leading-relaxed">
               Instantly rewrite text into professional, persuasive, friendly, or executive tones. Shorten, expand, or simplify on the fly.
             </p>
           </div>
 
           {/* Card 3 */}
-          <div className="p-8 xl:p-12 rounded-2xl xl:rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-sm hover:border-slate-700/80 transition-all group">
-            <div className="w-12 h-12 xl:w-16 xl:h-16 rounded-xl xl:rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-6 xl:mb-8 group-hover:scale-110 transition-transform">
-              <Layout className="w-6 h-6 xl:w-8 xl:h-8 text-emerald-400" />
+          <div className="p-8 xl:p-12 2xl:p-16 rounded-2xl xl:rounded-3xl 2xl:rounded-[2rem] bg-slate-900/40 border border-slate-800/80 backdrop-blur-sm hover:border-slate-700/80 transition-all group">
+            <div className="w-12 h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-emerald-500/10 flex items-center justify-center mb-6 xl:mb-8 2xl:mb-10 group-hover:scale-110 transition-transform">
+              <Layout className="w-6 h-6 xl:w-8 xl:h-8 2xl:w-10 2xl:h-10 text-emerald-400" />
             </div>
-            <h3 className="text-xl xl:text-2xl font-bold text-white mb-3 xl:mb-4">Universal Browser Injection</h3>
-            <p className="text-slate-400 xl:text-lg leading-relaxed">
+            <h3 className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-white mb-3 xl:mb-4 2xl:mb-5">Universal Browser Injection</h3>
+            <p className="text-slate-400 xl:text-lg 2xl:text-xl leading-relaxed">
               Integrates directly with Chrome, Brave, Edge, and Firefox to capture inputs on any page and apply replacements instantly.
             </p>
           </div>
@@ -221,81 +282,234 @@ export default function LandingPage() {
       </section>
 
       {/* Interactive Demo Section */}
-      <section id="demo" className="max-w-5xl xl:max-w-7xl mx-auto px-6 xl:px-12 py-20 xl:py-32 relative z-10 w-full scroll-mt-16">
-        <div className="text-center mb-12 xl:mb-16">
-          <h2 className="text-3xl xl:text-5xl font-bold text-white mb-4 xl:mb-6">See PromptPilot in Action</h2>
-          <p className="text-slate-400 xl:text-xl max-w-xl xl:max-w-2xl mx-auto">
-            Compare original text with PromptPilot enhanced outputs. Select a mode below to test.
-          </p>
-        </div>
-
-        {/* Demo Controller Tabs */}
-        <div className="flex justify-center gap-4 xl:gap-6 mb-8 xl:mb-12">
-          {examples.map((ex, index) => (
-            <button
-              key={index}
-              onClick={() => setSelectedExample(index)}
-              className={`px-5 py-2.5 xl:px-8 xl:py-3.5 rounded-xl xl:rounded-2xl font-semibold text-sm xl:text-base transition-all ${
-                selectedExample === index
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-              }`}
-            >
-              {ex.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Interactive Comparison Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 xl:gap-12 bg-slate-900/30 border border-slate-800/80 backdrop-blur-sm rounded-3xl xl:rounded-[2rem] p-8 xl:p-12 relative">
-          <div className="absolute top-3 right-6 text-xs text-indigo-400 font-bold flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{examples[selectedExample].action}</span>
+      <section id="demo" className="w-full bg-slate-950 border-t border-slate-900/60 py-20 xl:py-32 2xl:py-40 relative z-10 scroll-mt-16">
+        <div className="max-w-5xl xl:max-w-7xl 2xl:max-w-[90rem] mx-auto px-6 xl:px-12 2xl:px-16">
+          <div className="text-center mb-12 xl:mb-16 2xl:mb-20">
+            <h2 className="text-3xl xl:text-5xl 2xl:text-6xl font-bold text-white mb-4 xl:mb-6">See PromptPilot in Action</h2>
+            <p className="text-slate-400 xl:text-xl 2xl:text-2xl max-w-xl xl:max-w-2xl 2xl:max-w-4xl mx-auto">
+              Compare original text with PromptPilot enhanced outputs. Select a mode below to test.
+            </p>
           </div>
 
-          {/* Before Column */}
-          <div className="flex flex-col">
-            <div className="flex items-center justify-between mb-4 xl:mb-6">
-              <span className="text-sm xl:text-base font-semibold text-slate-500 uppercase tracking-wider">Before</span>
-              <span className="text-xs xl:text-sm px-2.5 py-1 xl:px-4 xl:py-1.5 rounded bg-red-500/10 border border-red-500/20 text-red-400 font-bold">
-                Score: {examples[selectedExample].scoreBefore}/100
-              </span>
-            </div>
-            <div className="flex-1 p-5 xl:p-8 rounded-2xl xl:rounded-[1.5rem] bg-slate-950 border border-slate-900 font-mono text-sm xl:text-base text-slate-400 whitespace-pre-line leading-relaxed min-h-[160px] xl:min-h-[240px]">
-              {examples[selectedExample].before}
-            </div>
+          {/* Demo Controller Tabs */}
+          <div className="flex justify-center gap-4 xl:gap-6 2xl:gap-8 mb-8 xl:mb-12 2xl:mb-16">
+            {examples.map((ex, index) => (
+              <button
+                key={index}
+                onClick={() => setSelectedExample(index)}
+                className={`px-5 py-2.5 xl:px-8 xl:py-3.5 2xl:px-10 2xl:py-4.5 rounded-xl xl:rounded-2xl 2xl:rounded-3xl font-semibold text-sm xl:text-base 2xl:text-lg transition-all ${
+                  selectedExample === index
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
+                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                }`}
+              >
+                {ex.label}
+              </button>
+            ))}
           </div>
 
-          {/* After Column */}
-          <div className="flex flex-col">
-            <div className="flex items-center justify-between mb-4 xl:mb-6">
-              <span className="text-sm xl:text-base font-semibold text-white flex items-center gap-1.5">
-                <CheckCircle className="w-4 h-4 xl:w-5 xl:h-5 text-emerald-400" />
-                <span>After (PromptPilot)</span>
-              </span>
-              <span className="text-xs xl:text-sm px-2.5 py-1 xl:px-4 xl:py-1.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold animate-pulse">
-                Score: {examples[selectedExample].scoreAfter}/100
-              </span>
+          {/* Interactive Comparison Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 xl:gap-12 2xl:gap-16 bg-slate-900/30 border border-slate-800/80 backdrop-blur-sm rounded-3xl xl:rounded-[2rem] 2xl:rounded-[2.5rem] p-8 xl:p-12 2xl:p-16 relative w-full">
+            <div className="absolute top-3 right-6 2xl:top-4 2xl:right-8 text-xs 2xl:text-sm text-indigo-400 font-bold flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 2xl:w-4 2xl:h-4" />
+              <span>{examples[selectedExample].action}</span>
             </div>
-            <div className="flex-1 p-5 xl:p-8 rounded-2xl xl:rounded-[1.5rem] bg-slate-950 border border-slate-800/50 font-mono text-sm xl:text-base text-slate-100 whitespace-pre-line leading-relaxed min-h-[160px] xl:min-h-[240px] relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl pointer-events-none" />
-              {examples[selectedExample].after}
+
+            {/* Before Column */}
+            <div className="flex flex-col w-full">
+              <div className="flex items-center justify-between mb-4 xl:mb-6 2xl:mb-8">
+                <span className="text-sm xl:text-base 2xl:text-lg font-semibold text-slate-500 uppercase tracking-wider">Before</span>
+                <span className="text-xs xl:text-sm 2xl:text-base px-2.5 py-1 xl:px-4 xl:py-1.5 2xl:px-5 2xl:py-2 rounded bg-red-500/10 border border-red-500/20 text-red-400 font-bold">
+                  Score: {examples[selectedExample].scoreBefore}/100
+                </span>
+              </div>
+              <div className="flex-1 p-5 xl:p-8 2xl:p-10 rounded-2xl xl:rounded-[1.5rem] 2xl:rounded-[2rem] bg-slate-950 border border-slate-900 font-mono text-sm xl:text-base 2xl:text-lg text-slate-400 whitespace-pre-line leading-relaxed min-h-[160px] xl:min-h-[240px] 2xl:min-h-[300px] w-full">
+                {examples[selectedExample].before}
+              </div>
+            </div>
+
+            {/* After Column */}
+            <div className="flex flex-col w-full">
+              <div className="flex items-center justify-between mb-4 xl:mb-6 2xl:mb-8">
+                <span className="text-sm xl:text-base 2xl:text-lg font-semibold text-white flex items-center gap-1.5 2xl:gap-2">
+                  <CheckCircle className="w-4 h-4 xl:w-5 xl:h-5 2xl:w-6 2xl:h-6 text-emerald-400" />
+                  <span>After (PromptPilot)</span>
+                </span>
+                <span className="text-xs xl:text-sm 2xl:text-base px-2.5 py-1 xl:px-4 xl:py-1.5 2xl:px-5 2xl:py-2 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold animate-pulse">
+                  Score: {examples[selectedExample].scoreAfter}/100
+                </span>
+              </div>
+              <div className="flex-1 p-5 xl:p-8 2xl:p-10 rounded-2xl xl:rounded-[1.5rem] 2xl:rounded-[2rem] bg-slate-950 border border-slate-800/50 font-mono text-sm xl:text-base 2xl:text-lg text-slate-100 whitespace-pre-line leading-relaxed min-h-[160px] xl:min-h-[240px] 2xl:min-h-[300px] relative overflow-hidden w-full">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl pointer-events-none" />
+                {examples[selectedExample].after}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 py-12 mt-auto relative z-10 bg-slate-950">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-          <p className="text-sm text-slate-500">&copy; 2026 PromptPilot. Built for elite productivity. Privacy First.</p>
-          <div className="flex gap-6 text-sm text-slate-500">
+      <footer className="border-t border-slate-900 py-12 2xl:py-16 mt-auto relative z-10 bg-slate-950 w-full">
+        <div className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 flex flex-col md:flex-row items-center justify-between gap-6 xl:gap-8">
+          <p className="text-sm 2xl:text-base text-slate-500">&copy; 2026 PromptPilot. Built for elite productivity. Privacy First.</p>
+          <div className="flex gap-6 2xl:gap-8 text-sm 2xl:text-base text-slate-500">
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
             <a href="#" className="hover:text-white transition-colors">Security</a>
           </div>
         </div>
       </footer>
+
+      {/* Auth Modal */}
+      {isAuthModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity duration-300 animate-fade-in"
+            onClick={() => setIsAuthModalOpen(false)}
+          />
+          
+          {/* Modal Content */}
+          <div className="relative w-full max-w-md bg-slate-900/90 border border-slate-800/80 rounded-2xl p-8 shadow-2xl backdrop-blur-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Decorative Glow */}
+            <div className="absolute -top-12 -left-12 w-40 h-40 rounded-full bg-violet-600/10 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-12 -right-12 w-40 h-40 rounded-full bg-indigo-600/10 blur-3xl pointer-events-none" />
+
+            {/* Close button */}
+            <button 
+              onClick={() => setIsAuthModalOpen(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg border border-slate-800/60 text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Header */}
+            <div className="text-center mb-6">
+              <div className="inline-flex w-10 h-10 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-500 items-center justify-center shadow-lg shadow-indigo-500/20 mb-3">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white">
+                {authMode === 'signin' ? 'Welcome Back' : 'Create Account'}
+              </h3>
+              <p className="text-slate-400 text-sm mt-1">
+                {authMode === 'signin' 
+                  ? 'Sign in to access your PromptPilot workspace' 
+                  : 'Get started with PromptPilot today'}
+              </p>
+            </div>
+
+            {authError && (
+              <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center font-medium">
+                {authError}
+              </div>
+            )}
+
+            {message && (
+              <div className="mb-4 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs text-center font-medium">
+                {message}
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleAuthSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="you@example.com"
+                  className="w-full px-4 py-2.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    placeholder="••••••••"
+                    className="w-full pl-4 pr-10 py-2.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-350 transition-colors p-1 cursor-pointer flex items-center justify-center"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={authLoading}
+                className="w-full inline-flex items-center justify-center h-10 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-sm font-semibold text-white shadow-md shadow-indigo-600/10 transition-all disabled:opacity-50 cursor-pointer"
+              >
+                {authLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : authMode === 'signin' ? (
+                  'Sign In'
+                ) : (
+                  'Create Account'
+                )}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-800/60" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-slate-900 px-3 text-slate-500">Or continue with</span>
+              </div>
+            </div>
+
+            {/* Google OAuth Button */}
+            <button
+              onClick={handleGoogleSignIn}
+              disabled={authLoading}
+              className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-lg bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-sm font-semibold text-white transition-all disabled:opacity-50 cursor-pointer"
+            >
+              <svg className="w-4.5 h-4.5 mr-1" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
+              </svg>
+              <span>Google</span>
+            </button>
+
+            {/* Switch mode */}
+            <div className="text-center mt-6">
+              <button
+                onClick={() => {
+                  setAuthMode(authMode === 'signin' ? 'signup' : 'signin');
+                  setShowPassword(false);
+                }}
+                className="text-xs text-slate-400 hover:text-indigo-400 transition-colors"
+              >
+                {authMode === 'signin' 
+                  ? "Don't have an account? Sign Up" 
+                  : 'Already have an account? Sign In'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

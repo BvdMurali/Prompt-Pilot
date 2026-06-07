@@ -1,28 +1,77 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Sparkles, Copy, Save, AlertCircle, RefreshCw, BarChart2, HelpCircle, Check, Zap } from 'lucide-react';
 import { AIResult } from '@/lib/ai';
+import { globalCache } from '@/lib/cache';
 
 export default function EditorPage() {
   const { session } = useAuth();
-  const [text, setText] = useState('');
-  const [action, setAction] = useState<'optimize' | 'rewrite'>('optimize');
+  const [text, setText] = useState(() => globalCache.editor.text);
+  const [action, setAction] = useState<'optimize' | 'rewrite'>(() => globalCache.editor.action);
   
   // Custom optimization options
-  const [tone, setTone] = useState('');
-  const [length, setLength] = useState('');
-  const [platform, setPlatform] = useState('');
+  const [tone, setTone] = useState(() => globalCache.editor.tone);
+  const [length, setLength] = useState(() => globalCache.editor.length);
+  const [platform, setPlatform] = useState(() => globalCache.editor.platform);
   
   // Processing States
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [result, setResult] = useState<AIResult | null>(null);
+  const [result, setResult] = useState<AIResult | null>(() => globalCache.editor.result);
   const [copied, setCopied] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [activeVariation, setActiveVariation] = useState<number | null>(null);
+  const [saved, setSaved] = useState(() => globalCache.editor.saved);
+  const [activeVariation, setActiveVariation] = useState<number | null>(() => globalCache.editor.activeVariation);
+
+  // Check for scratch prompt loaded from templates page
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const scratch = localStorage.getItem('promptpilot_scratch');
+      if (scratch) {
+        setText(scratch);
+        globalCache.editor.text = scratch;
+        localStorage.removeItem('promptpilot_scratch');
+      }
+    }
+  }, []);
+
+  // Load settings default tone if not already cached
+  useEffect(() => {
+    if (!session?.user) return;
+    if (globalCache.editor.tone !== '') return;
+    
+    const userId = session.user.id;
+    async function loadDefaultSettings() {
+      try {
+        const { data } = await supabase
+          .from('settings')
+          .select('default_tone')
+          .eq('user_id', userId)
+          .single();
+        if (data?.default_tone) {
+          setTone(data.default_tone);
+          globalCache.editor.tone = data.default_tone;
+        }
+      } catch (e) {
+        console.error('Failed to load default settings in editor:', e);
+      }
+    }
+    loadDefaultSettings();
+  }, [session]);
+
+  // Sync state back to the cache
+  useEffect(() => {
+    globalCache.editor.text = text;
+    globalCache.editor.action = action;
+    globalCache.editor.tone = tone;
+    globalCache.editor.length = length;
+    globalCache.editor.platform = platform;
+    globalCache.editor.result = result;
+    globalCache.editor.activeVariation = activeVariation;
+    globalCache.editor.saved = saved;
+  }, [text, action, tone, length, platform, result, activeVariation, saved]);
 
   // Tones list
   const tones = [

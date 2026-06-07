@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Library, Search, Star, Trash2, Edit3, Copy, Plus, X, Save, AlertCircle } from 'lucide-react';
+import { globalCache } from '@/lib/cache';
 
 type PromptItem = {
   id: string;
@@ -18,9 +19,9 @@ export default function LibraryPage() {
   const { session } = useAuth();
   
   // Data State
-  const [prompts, setPrompts] = useState<PromptItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [prompts, setPrompts] = useState<PromptItem[]>(() => globalCache.library.prompts);
+  const [loading, setLoading] = useState(() => globalCache.library.prompts.length === 0);
+  const [search, setSearch] = useState(() => globalCache.library.search);
   
   // Form State
   const [isEditing, setIsEditing] = useState(false);
@@ -33,6 +34,11 @@ export default function LibraryPage() {
   // Status states
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  // Sync search query to cache
+  useEffect(() => {
+    globalCache.library.search = search;
+  }, [search]);
+
   const loadLibrary = async () => {
     if (!session?.user) return;
     try {
@@ -44,6 +50,7 @@ export default function LibraryPage() {
 
       if (error) throw error;
       setPrompts(data || []);
+      globalCache.library.prompts = data || [];
     } catch (err) {
       setError('Failed to load library: ' + (err instanceof Error ? err.message : String(err)));
     } finally {

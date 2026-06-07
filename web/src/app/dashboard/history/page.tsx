@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { History, Calendar, Copy, AlertCircle, ChevronRight } from 'lucide-react';
+import { globalCache } from '@/lib/cache';
 
 type HistoryItem = {
   id: string;
@@ -34,11 +35,16 @@ export default function HistoryPage() {
   const { session } = useAuth();
   
   // Data state
-  const [historyList, setHistoryList] = useState<HistoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [historyList, setHistoryList] = useState<HistoryItem[]>(() => globalCache.history.historyList);
+  const [loading, setLoading] = useState(() => globalCache.history.historyList.length === 0);
+  const [selectedId, setSelectedId] = useState<string | null>(() => globalCache.history.selectedId);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
+
+  // Sync selected item selection back to cache
+  useEffect(() => {
+    globalCache.history.selectedId = selectedId;
+  }, [selectedId]);
 
   const loadHistory = async () => {
     if (!session?.user) return;
@@ -51,8 +57,10 @@ export default function HistoryPage() {
 
       if (error) throw error;
       setHistoryList(data || []);
-      if (data && data.length > 0) {
+      globalCache.history.historyList = data || [];
+      if (data && data.length > 0 && !selectedId) {
         setSelectedId(data[0].id);
+        globalCache.history.selectedId = data[0].id;
       }
     } catch (err) {
       setError('Failed to load history logs: ' + (err instanceof Error ? err.message : String(err)));

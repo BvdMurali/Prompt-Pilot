@@ -3,14 +3,19 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-import { Sparkles, Library, Layout, History, Settings, LogOut, Loader2, Menu, X } from 'lucide-react';
+import { Sparkles, Library, Layout, History, Settings, LogOut, Loader2, Menu, X, AlertTriangle } from 'lucide-react';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [deletedAt, setDeletedAt] = useState<string | null>(null);
+  const [checkingSoftDelete, setCheckingSoftDelete] = useState(true);
+  const [restoring, setRestoring] = useState(false);
+  const [profile, setProfile] = useState<{ name: string | null; avatarUrl: string | null } | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -19,14 +24,146 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [user, loading, router]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsSidebarOpen(false);
   }, [pathname]);
 
-  if (loading || !user) {
+  useEffect(() => {
+    if (loading) return;
+    if (!user) {
+      setCheckingSoftDelete(false);
+      return;
+    }
+
+    const loadProfile = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('name, avatar_url, deleted_at')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          if (error.code !== 'PGRST116') {
+            console.error('Error loading profile:', error);
+          }
+        } else if (data) {
+          setDeletedAt(data.deleted_at);
+          setProfile({
+            name: data.name,
+            avatarUrl: data.avatar_url,
+          });
+        }
+      } catch (err) {
+        console.error('Error loading profile:', err);
+      } finally {
+        setCheckingSoftDelete(false);
+      }
+    };
+
+    loadProfile();
+
+    // Subscribe to realtime profile updates for the logged in user
+    const channel = supabase
+      .channel(`user-profile-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'users',
+          filter: `id=eq.${user.id}`,
+        },
+        (payload: any) => {
+          if (payload.new) {
+            setDeletedAt(payload.new.deleted_at);
+            setProfile({
+              name: payload.new.name,
+              avatarUrl: payload.new.avatar_url,
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, loading]);
+
+  const handleRestore = async () => {
+    if (!user) return;
+    setRestoring(true);
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ deleted_at: null })
+        .eq('id', user.id);
+
+      if (error) throw error;
+      setDeletedAt(null);
+    } catch (err) {
+      alert('Failed to restore account: ' + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setRestoring(false);
+    }
+  };
+
+  if (loading || checkingSoftDelete || !user) {
     return (
       <div className="flex-1 bg-slate-950 flex flex-col items-center justify-center min-h-screen">
         <Loader2 className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
         <p className="text-slate-400 text-sm">Verifying secure session...</p>
+      </div>
+    );
+  }
+
+  if (deletedAt) {
+    const deletedDate = new Date(deletedAt);
+    const expiryDate = new Date(deletedDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const diffTime = expiryDate.getTime() - Date.now();
+    const daysRemaining = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+
+    return (
+      <div className="flex-1 bg-slate-950 flex items-center justify-center min-h-screen p-4 sm:p-6 relative overflow-hidden">
+        {/* Background glows */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[35rem] h-[35rem] bg-indigo-900/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/3 left-1/4 w-[25rem] h-[25rem] bg-red-900/5 rounded-full blur-[100px] pointer-events-none" />
+
+        <div className="max-w-md w-full bg-slate-900/40 border border-slate-800/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl sm:rounded-3xl flex flex-col items-center text-center shadow-2xl relative z-10">
+          <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-6 shadow-lg shadow-red-500/5">
+            <AlertTriangle className="w-8 h-8 text-red-400" />
+          </div>
+
+          <h2 className="text-xl sm:text-2xl font-black text-white mb-2 tracking-tight">Account Deletion Scheduled</h2>
+          <p className="text-slate-400 text-xs sm:text-sm mb-6 leading-relaxed">
+            Your account is scheduled for deletion. All your prompts, templates, configuration preferences, and history logs will be permanently deleted in <span className="font-bold text-red-400">{daysRemaining} days</span>.
+          </p>
+
+          <div className="w-full flex flex-col gap-3">
+            <button
+              onClick={handleRestore}
+              disabled={restoring}
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 disabled:scale-100 text-white rounded-xl text-sm font-extrabold shadow-lg shadow-indigo-500/10 active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
+            >
+              {restoring ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Restoring Account...</span>
+                </>
+              ) : (
+                <span>Restore Account</span>
+              )}
+            </button>
+
+            <button
+              onClick={() => signOut()}
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 border border-slate-800 hover:border-slate-700 bg-slate-950/20 hover:bg-slate-950 text-slate-300 rounded-xl text-sm font-semibold transition-all cursor-pointer"
+            >
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -57,7 +194,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <aside className={`w-64 xl:w-72 2xl:w-80 border-r border-slate-900 bg-slate-950/85 backdrop-blur-md flex flex-col z-40 md:z-20 fixed md:sticky top-0 h-full transition-transform duration-300 ease-in-out ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
       }`}>
-        <div className="p-6 border-b border-slate-900 flex items-center justify-between">
+        <div className="h-16 xl:h-20 px-6 border-b border-slate-900 flex items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-lg text-white">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <Sparkles className="w-3.5 h-3.5 text-white" />
@@ -96,12 +233,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* User Profile Bar */}
         <div className="p-4 border-t border-slate-900 flex flex-col gap-3">
           <div className="flex items-center gap-3">
-            {user.user_metadata?.avatar_url ? (
+            {profile?.avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img 
+                src={profile.avatarUrl} 
+                alt={user.email} 
+                className="w-10 h-10 rounded-full border border-slate-800 object-cover"
+              />
+            ) : user.user_metadata?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img 
                 src={user.user_metadata.avatar_url} 
                 alt={user.email} 
-                className="w-10 h-10 rounded-full border border-slate-800"
+                className="w-10 h-10 rounded-full border border-slate-800 object-cover"
               />
             ) : (
               <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-bold text-white uppercase border border-slate-800">
@@ -110,7 +254,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             )}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-white truncate">
-                {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                {profile?.name || user.user_metadata?.full_name || user.email?.split('@')[0]}
               </p>
               <p className="text-xs text-slate-500 truncate">{user.email}</p>
             </div>
@@ -127,7 +271,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       <main className="flex-1 flex flex-col h-full relative z-10 overflow-y-auto">
-        <header className="h-16 xl:h-20 border-b border-slate-900 flex items-center justify-between px-4 sm:px-8 xl:px-12 bg-slate-950/40 backdrop-blur-sm sticky top-0 z-30">
+        <header className="h-16 xl:h-20 border-b border-slate-900 flex items-center justify-between p-4 bg-slate-950/40 backdrop-blur-sm sticky top-0 z-30">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsSidebarOpen(true)}
@@ -135,16 +279,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               <Menu className="w-4.5 h-4.5" />
             </button>
-            <h1 className="text-base xl:text-lg font-bold text-white">
+            <h1 className="text-lg xl:text-xl font-extrabold text-white tracking-tight">
               {navItems.find(n => n.href === pathname)?.name || 'Dashboard'}
             </h1>
           </div>
-          <div className="text-xs xl:text-sm text-slate-500">
-            Session active
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Session active</span>
           </div>
         </header>
 
-        <div className="p-4 sm:p-8 flex-1 flex flex-col max-w-7xl xl:max-w-[90rem] 2xl:max-w-[95rem] mx-auto w-full">
+        <div className="p-4 sm:p-8 xl:p-12 flex-1 flex flex-col w-full">
           {children}
         </div>
       </main>
