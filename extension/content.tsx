@@ -18,7 +18,6 @@ export const getStyle = () => {
 
 export default function ContentScriptUI() {
   const [activeEl, setActiveEl] = useState<HTMLInputElement | HTMLTextAreaElement | HTMLElement | null>(null);
-  const [showBubble, setShowBubble] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [inputText, setInputTextVal] = useState("");
   
@@ -36,7 +35,14 @@ export default function ContentScriptUI() {
   const [length, setLength] = useState("");
   const [platform, setPlatform] = useState("");
 
-  const hideBubbleTimeout = useRef<NodeJS.Timeout | null>(null);
+  // Position and drag states for floating action button
+  const [position, setPosition] = useState({
+    x: typeof window !== "undefined" ? window.innerWidth - 64 : 500,
+    y: typeof window !== "undefined" ? window.innerHeight - 64 : 500
+  });
+  const isDragging = useRef(false);
+  const dragStart = useRef({ x: 0, y: 0 });
+  const hasDragged = useRef(false);
 
   // 1. Session Synchronizer and Global Focus Listeners
   useEffect(() => {
@@ -93,33 +99,64 @@ export default function ContentScriptUI() {
         target.tagName === "TEXTAREA" || 
         target.getAttribute("contenteditable") === "true";
       
-      if (!isInput) return;
-
-      if (hideBubbleTimeout.current) {
-        clearTimeout(hideBubbleTimeout.current);
+      if (isInput) {
+        setActiveEl(target);
       }
-
-      setActiveEl(target);
-      setShowBubble(true);
-    };
-
-    const handleBlur = () => {
-      // Delay hiding to allow clicking the floating bubble
-      hideBubbleTimeout.current = setTimeout(() => {
-        if (!showModal) {
-          setShowBubble(false);
-        }
-      }, 350);
     };
 
     document.addEventListener("focusin", handleFocus);
-    document.addEventListener("focusout", handleBlur);
-
     return () => {
       document.removeEventListener("focusin", handleFocus);
-      document.removeEventListener("focusout", handleBlur);
     };
-  }, [showModal]);
+  }, []);
+
+  // Handle dragging mechanics and constraint bounds
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+      
+      const newX = e.clientX - dragStart.current.x;
+      const newY = e.clientY - dragStart.current.y;
+      
+      // Check if it's a drag or a click
+      if (Math.abs(newX - position.x) > 3 || Math.abs(newY - position.y) > 3) {
+        hasDragged.current = true;
+      }
+
+      // Constrain inside viewport boundaries
+      const buttonSize = 40;
+      const boundedX = Math.max(10, Math.min(window.innerWidth - buttonSize - 10, newX));
+      const boundedY = Math.max(10, Math.min(window.innerHeight - buttonSize - 10, newY));
+
+      setPosition({ x: boundedX, y: boundedY });
+    };
+
+    const handleMouseUp = () => {
+      isDragging.current = false;
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [position]);
+
+  // Keep inside bounds on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setPosition((prev) => {
+        const buttonSize = 40;
+        const boundedX = Math.max(10, Math.min(window.innerWidth - buttonSize - 10, prev.x));
+        const boundedY = Math.max(10, Math.min(window.innerHeight - buttonSize - 10, prev.y));
+        return { x: boundedX, y: boundedY };
+      });
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
 
 
@@ -207,12 +244,19 @@ export default function ContentScriptUI() {
 
   const handleClose = () => {
     setShowModal(false);
-    setShowBubble(false);
     setResult(null);
     setError("");
   };
 
-  if (!showBubble) return null;
+  const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+    isDragging.current = true;
+    hasDragged.current = false;
+    dragStart.current = {
+      x: e.clientX - position.x,
+      y: e.clientY - position.y
+    };
+    e.preventDefault();
+  };
 
   return (
     <div className="promptpilot-shadow-dom text-slate-100 font-sans">
@@ -220,14 +264,19 @@ export default function ContentScriptUI() {
       {/* FLOATING ACTION TRIGGER BUBBLE */}
       {!showModal && (
         <button
+          onMouseDown={handleMouseDown}
           onClick={() => {
-            if (hideBubbleTimeout.current) clearTimeout(hideBubbleTimeout.current);
+            if (hasDragged.current) return;
             setInputTextVal(getInputText());
             setShowModal(true);
           }}
-          className="fixed bottom-6 right-6 z-[99999] flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-500 hover:from-violet-500 hover:to-indigo-400 text-white border border-indigo-400/20 shadow-xl transition-all scale-100 active:scale-95"
+          className="fixed z-[99999] flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-500 hover:from-violet-500 hover:to-indigo-400 text-white border border-indigo-400/20 shadow-xl transition-all scale-100 cursor-move active:scale-95 select-none"
+          style={{
+            left: `${position.x}px`,
+            top: `${position.y}px`
+          }}
         >
-          <Sparkles className="w-5 h-5 text-white animate-pulse" />
+          <Sparkles className="w-5 h-5 text-white animate-pulse pointer-events-none" />
         </button>
       )}
 
