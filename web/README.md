@@ -8,6 +8,8 @@
 
 > **A Production-Grade Prompt Engineering Workspace, Multi-Model LLM Orchestration Engine, and Universal Contextual Rewriting Platform.**
 
+**Live Production Deployment**: [prompt-pilot-ochre.vercel.app](https://prompt-pilot-ochre.vercel.app)
+
 This directory contains the core **PromptPilot Web Application**. Built on Next.js 16.2 (App Router) and integrated with a Supabase PostgreSQL serverless backend, this module provides the central database access controls, user session management, database migrations, security controls, and edge API completion routes that orchestrate LLM requests. It serves as the single source of truth and auth provider for downstream client interfaces (like browser extensions and mobile apps).
 
 ---
@@ -213,9 +215,9 @@ This workflow guarantees privacy while preventing accidental loss of user prompt
 stateDiagram-v2
     [*] --> ActiveState: User Signup
     ActiveState --> ScheduledDeleteState: User Clicks "Delete My Account" in Settings
-    Note over ScheduledDeleteState: DB Table: users.deleted_at = NOW()
+    note right of ScheduledDeleteState : DB Table: users.deleted_at = NOW()
     ScheduledDeleteState --> BlockedUI: User Attempts Navigation
-    Note over BlockedUI: Dashboard layout displays Deletion Alert Screen
+    note right of BlockedUI : Dashboard layout displays Deletion Alert Screen
     
     state BlockedUI {
         [*] --> ChoicePending
@@ -227,7 +229,7 @@ stateDiagram-v2
     SignOut --> [*]: User Exits Session
     
     ScheduledDeleteState --> HardDelete: 30 Days Pass
-    Note over HardDelete: DB Daemon: purge_soft_deleted_users() runs
+    note right of HardDelete : DB Daemon: purge_soft_deleted_users() runs
     HardDelete --> [*]: Auth User record deleted (Cascades delete all data)
 ```
 
@@ -265,7 +267,7 @@ It maps out structured adjustments (Actions, Why, How) so users learn how to wri
 
 #### Score Metrics Interface
 Provides a detailed visual breakdown of prompt quality scores, along with explanations and suggestions.
-![Scoring Details](../assets/dashboard_history.png)
+![Scoring Details](../assets/quality_score.png)
 
 ---
 
@@ -275,6 +277,15 @@ Users save optimized outputs directly to their Prompt Library. The database main
 #### Prompt Library Page
 Contains saved prompts organized by category (e.g., Coding, Social, Social Media), with quick copy, edit, and delete controls.
 ![Prompt Library UI](../assets/dashboard_library.png)
+
+---
+
+### Execution History Logs
+PromptPilot keeps a historical ledger of all prompt engineering iterations in the `history` table. Users can review past draft variations, compare execution performance, and examine quality score evolutions over time.
+
+#### History Logs Interface
+Provides a chronological list of optimized prompts with overall scores and access to execution details.
+![History Logs UI](../assets/dashboard_history.png)
 
 ---
 
@@ -566,7 +577,12 @@ erDiagram
 
 ### Production Setup
 * **Web App Hosting**: Deployed on Vercel's global Edge network, utilizing edge routing and serverless cold-start optimization.
+  * **Live URL**: [prompt-pilot-ochre.vercel.app](https://prompt-pilot-ochre.vercel.app)
 * **Database Hosting**: Deployed on Supabase Cloud.
+
+#### Deployed Dashboard Interface
+Allows managing and optimizing prompt requests in the live Vercel cloud environment.
+![Vercel Live Deployment](../assets/vercel_deployment.png)
 
 ### Core Environment Variables (`web/.env.local`)
 ```env
