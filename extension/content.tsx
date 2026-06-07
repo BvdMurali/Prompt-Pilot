@@ -102,10 +102,10 @@ export default function ContentScriptUI() {
       setActiveEl(target);
       const rect = target.getBoundingClientRect();
       
-      // Calculate coordinates relative to screen viewports
+      // Calculate coordinates relative to screen viewports (fixed viewport-relative)
       setBubbleCoords({
-        top: window.scrollY + rect.bottom - 36,
-        left: window.scrollX + rect.right - 44
+        top: rect.bottom - 36,
+        left: rect.right - 44
       });
       setShowBubble(true);
     };
@@ -127,6 +127,28 @@ export default function ContentScriptUI() {
       document.removeEventListener("focusout", handleBlur);
     };
   }, [showModal]);
+
+  // Keep floating bubble anchored to the text box during scrolling and window resizing
+  useEffect(() => {
+    if (!activeEl || !showBubble || showModal) return;
+
+    const handleScrollOrResize = () => {
+      const rect = activeEl.getBoundingClientRect();
+      setBubbleCoords({
+        top: rect.bottom - 36,
+        left: rect.right - 44
+      });
+    };
+
+    // Use capture phase (true) to catch scroll events from any nested scroll containers
+    window.addEventListener("scroll", handleScrollOrResize, true);
+    window.addEventListener("resize", handleScrollOrResize);
+
+    return () => {
+      window.removeEventListener("scroll", handleScrollOrResize, true);
+      window.removeEventListener("resize", handleScrollOrResize);
+    };
+  }, [activeEl, showBubble, showModal]);
 
   const getInputText = () => {
     if (!activeEl) return "";
