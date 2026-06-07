@@ -206,11 +206,12 @@ ${text}
   // 2. Select Provider
   let responseText = '';
   
-  // Decrypt/Read API keys (override first, then default Env vars)
-  const geminiKey = apiKeys?.gemini || process.env.GEMINI_API_KEY || '';
-  const openaiKey = apiKeys?.openai || process.env.OPENAI_API_KEY || '';
-  const anthropicKey = apiKeys?.anthropic || process.env.ANTHROPIC_API_KEY || '';
-  const openrouterKey = apiKeys?.openrouter || process.env.OPENROUTER_API_KEY || '';
+  // Use only user-supplied API keys from their Settings (api_key_override in DB)
+  // No server-side fallbacks — each user must configure their own keys
+  const geminiKey = apiKeys?.gemini || '';
+  const openaiKey = apiKeys?.openai || '';
+  const anthropicKey = apiKeys?.anthropic || '';
+  const openrouterKey = apiKeys?.openrouter || '';
 
   // Retry configuration
   const maxRetries = 2;
@@ -233,12 +234,14 @@ ${text}
       } else if (geminiKey) {
         responseText = await callGemini(fullPrompt, geminiKey, preferredModel);
       } else if (openrouterKey) {
-        // Fallback to free OpenRouter Gemini if direct key is missing
+        // Fallback to free OpenRouter Gemini if direct Gemini key is missing
         responseText = await callOpenRouter(fullPrompt, openrouterKey, 'google/gemini-2.5-flash:free');
       } else if (openaiKey) {
         responseText = await callOpenAI(fullPrompt, openaiKey, 'gpt-4o-mini');
+      } else if (anthropicKey) {
+        responseText = await callAnthropic(fullPrompt, anthropicKey, 'claude-3-5-sonnet');
       } else {
-        throw new Error('No valid API keys configured for processing request.');
+        throw new Error('No API key configured. Please add your API key in Settings → API Key Overrides to start using PromptPilot.');
       }
       break; // Success! Exit retry loop
     } catch (err) {
