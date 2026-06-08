@@ -86,12 +86,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   //   - promptpilot://           in standalone build
   // This listener catches both and establishes the session.
   useEffect(() => {
+    console.log('[AuthContext] Registering deep link listener...');
     const handleDeepLink = (event: { url: string }) => {
       const { url } = event;
+      console.log('[AuthContext] Received deep link URL:', url);
       if (!url) return;
 
       // Only handle URLs that contain OAuth tokens (have access_token param)
-      if (!url.includes('access_token=')) return;
+      if (!url.includes('access_token=')) {
+        console.log('[AuthContext] Deep link ignored: no access_token found in URL.');
+        return;
+      }
 
       console.log('[AuthContext] Deep link with tokens received:', url.substring(0, 100) + '...');
       const params = parseUrlParams(url);
@@ -103,6 +108,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loginWithOAuth(accessToken, refreshToken).catch((e) =>
           console.error('[AuthContext] Deep link login failed:', e)
         );
+      } else {
+        console.warn('[AuthContext] Failed to extract accessToken and/or refreshToken from URL.');
       }
     };
 
@@ -111,10 +118,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Handle the case where the app was launched via a deep link (cold start)
     Linking.getInitialURL().then((url) => {
+      console.log('[AuthContext] Initial deep link URL:', url);
       if (url) handleDeepLink({ url });
     });
 
-    return () => sub.remove();
+    return () => {
+      console.log('[AuthContext] Cleaning up deep link listener...');
+      sub.remove();
+    };
   }, [supabaseUrl, supabaseAnonKey]);
 
   const loadSession = async () => {

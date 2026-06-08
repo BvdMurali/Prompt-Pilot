@@ -85,6 +85,7 @@ export async function GET(request: NextRequest) {
     }
     .btn:hover { background: #4f46e5; }
     .status { font-size: 12px; color: #64748b; margin-top: 16px; }
+    .debug { font-size: 10px; color: #475569; margin-top: 24px; word-break: break-all; }
   </style>
 </head>
 <body>
@@ -94,16 +95,66 @@ export async function GET(request: NextRequest) {
     <p>You have signed in with Google. Tap the button below to return to PromptPilot.</p>
     <a class="btn" id="openBtn" href="${deepLink}">Open PromptPilot App</a>
     <p class="status" id="status">Attempting to open app automatically...</p>
+    <p class="debug" id="debug"></p>
   </div>
   <script>
-    // Try auto-redirect immediately
-    window.location.href = ${JSON.stringify(deepLink)};
-    
-    // Update status after a moment
-    setTimeout(function() {
-      document.getElementById('status').textContent = 
-        'If the app did not open, tap the button above.';
-    }, 2500);
+    (function() {
+      var deepLink = ${JSON.stringify(deepLink)};
+      var isAndroid = /Android/i.test(navigator.userAgent);
+      var finalUrl = deepLink;
+
+      if (isAndroid) {
+        // Parse the deep link to construct an Android Intent URL
+        // e.g. exp://10.66.53.216:8081#access_token=...
+        // or promptpilot://#access_token=...
+        var match = deepLink.match(/^([^:]+):\\/\\/([^#?]*)(.*)$/);
+        if (match) {
+          var scheme = match[1];
+          var hostAndPath = match[2];
+          var queryAndFragment = match[3];
+          
+          var packageName = 'host.exp.exponent'; // default for Expo Go
+          if (scheme === 'promptpilot') {
+            packageName = 'com.promptpilot.app';
+          }
+          
+          var params = queryAndFragment;
+          // Change fragment hash (#) to query (?) for intent data URL parameter passing
+          if (params.indexOf('#') === 0) {
+            params = '?' + params.substring(1);
+          }
+          
+          finalUrl = 'intent://' + hostAndPath + params + '#Intent;scheme=' + scheme + ';package=' + packageName + ';end;';
+        }
+      }
+
+      // Update button href
+      var openBtn = document.getElementById('openBtn');
+      if (openBtn) {
+        openBtn.href = finalUrl;
+      }
+
+      // Show debug URL
+      var debugEl = document.getElementById('debug');
+      if (debugEl) {
+        debugEl.textContent = 'Platform: ' + (isAndroid ? 'Android' : 'Other') + ' | Target: ' + finalUrl;
+      }
+
+      // Try automatic redirect
+      try {
+        window.location.href = finalUrl;
+      } catch (e) {
+        console.error('Auto redirect failed:', e);
+      }
+      
+      // Update status text if redirect doesn't trigger immediately
+      setTimeout(function() {
+        var statusEl = document.getElementById('status');
+        if (statusEl) {
+          statusEl.textContent = 'If the app did not open, tap the button above.';
+        }
+      }, 2500);
+    })();
   </script>
 </body>
 </html>`;
