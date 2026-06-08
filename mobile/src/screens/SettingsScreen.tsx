@@ -174,7 +174,7 @@ export default function SettingsScreen() {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.8,
@@ -196,16 +196,19 @@ export default function SettingsScreen() {
     try {
       setUploadingAvatar(true);
       
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      
       const fileExt = uri.split('.').pop() || 'jpg';
       const filePath = `${user.id}/avatar-${Math.floor(Math.random() * 1000000)}.${fileExt}`;
       
+      const formData = new FormData();
+      formData.append('file', {
+        uri,
+        name: `avatar-${Math.floor(Math.random() * 1000000)}.${fileExt}`,
+        type: `image/${fileExt}`,
+      } as any);
+
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, blob, { 
-          contentType: `image/${fileExt}`, 
+        .upload(filePath, formData, { 
           upsert: true 
         });
 
