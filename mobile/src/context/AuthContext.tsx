@@ -19,7 +19,9 @@ interface AuthContextType {
   isLocalMode: boolean;
   supabaseUrl: string;
   supabaseAnonKey: string;
-  login: (url: string, token: string | null) => Promise<boolean>;
+  loginWithEmail: (url: string, email: string, password: string) => Promise<boolean>;
+  signUpWithEmail: (url: string, email: string, password: string) => Promise<boolean>;
+  loginSandbox: (url: string) => Promise<void>;
   logout: () => Promise<void>;
   updateConfig: (apiUrl: string, supabaseUrl?: string, supabaseKey?: string) => Promise<void>;
 }
@@ -27,6 +29,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const TOKEN_KEY = 'pp_session_token';
+const REFRESH_TOKEN_KEY = 'pp_refresh_token';
 const API_URL_KEY = 'pp_api_url';
 const SB_URL_KEY = 'pp_supabase_url';
 const SB_KEY_KEY = 'pp_supabase_key';
@@ -60,19 +63,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       setSupabaseUrl(activeSbUrl);
       setSupabaseAnonKey(activeSbKey);
-      updateSupabaseInstance(activeSbUrl, activeSbKey);
+      const client = updateSupabaseInstance(activeSbUrl, activeSbKey);
 
-      // Load secure token
+      // Load secure tokens
       const secureToken = await SecureStore.getItemAsync(TOKEN_KEY);
+      const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+
       if (secureToken) {
-        // Attempt to sync session
-        const client = updateSupabaseInstance(activeSbUrl, activeSbKey);
+        // Restore session with access + refresh token
         const { data: sessionData, error: sessionError } = await client.auth.setSession({
           access_token: secureToken,
-          refresh_token: '',
+          refresh_token: refreshToken || '',
         });
 
-        if (!sessionError && sessionData.user) {
+        if (!sessionError && sessionData.user && sessionData.session) {
+          // Save potentially refreshed tokens
+          const newAccess = sessionData.session.access_token;
+          const newRefresh = sessionData.session.refresh_token;
+          
+          await SecureStore.setItemAsync(TOKEN_KEY, newAccess);
+          if (newRefresh) {
+            await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, newRefresh);
+          }
+
           const { data: profile } = await client
             .from('users')
             .select('*')
@@ -85,12 +98,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             name: profile?.name || '',
             avatar_url: profile?.avatar_url || '',
           });
-          setToken(secureToken);
+          setToken(newAccess);
           setIsLocalMode(false);
           setIsAuthenticated(true);
         } else {
           // Token expired or invalid
           await SecureStore.deleteItemAsync(TOKEN_KEY);
+          await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
         }
       }
     } catch (e) {
@@ -100,48 +114,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const login = async (url: string, syncToken: string | null): Promise<boolean> => {
+  const loginWithEmail = async (url: string, email: string, password: string): Promise<boolean> => {
     try {
       setLoading(true);
       await AsyncStorage.setItem(API_URL_KEY, url);
       setApiUrl(url);
 
-      if (!syncToken || !syncToken.trim()) {
-        // Enter local mode
-        setToken(null);
-        setUser(null);
-        setIsLocalMode(true);
-        setIsAuthenticated(true);
-        return true;
-      }
-
-      // Sync mode - Initialize client with token
       const client = updateSupabaseInstance(supabaseUrl, supabaseAnonKey);
-      const { data: sessionData, error: sessionError } = await client.auth.setSession({
-        access_token: syncToken,
-        refresh_token: '',
+      const { data: authData, error: authError } = await client.auth.signInWithPassword({
+        email,
+        password,
       });
 
-      if (sessionError || !sessionData.user) {
-        throw new Error(sessionError?.message || 'Invalid session token');
+      if (authError || !authData.user || !authData.session) {
+        throw new Error(authError?.message || 'Login failed. Please check your credentials.');
       }
 
       // Fetch user profile from public.users
       const { data: profile } = await client
         .from('users')
         .select('*')
-        .eq('id', sessionData.user.id)
+        .eq('id', authData.user.id)
         .single();
 
       setUser({
-        id: sessionData.user.id,
-        email: sessionData.user.email || '',
+        id: authData.user.id,
+        email: authData.user.email || '',
         name: profile?.name || '',
         avatar_url: profile?.avatar_url || '',
       });
 
-      await SecureStore.setItemAsync(TOKEN_KEY, syncToken);
-      setToken(syncToken);
+      const accessToken = authData.session.access_token;
+      const refreshToken = authData.session.refresh_token;
+
+      await SecureStore.setItemAsync(TOKEN_KEY, accessToken);
+      await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, refreshToken);
+      
+      setToken(accessToken);
       setIsLocalMode(false);
       setIsAuthenticated(true);
       return true;
@@ -153,10 +162,77 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signUpWithEmail = async (url: string, email: string, password: string): Promise<boolean> => {
+    try {
+      setLoading(true);
+      await AsyncStorage.setItem(API_URL_KEY, url);
+      setApiUrl(url);
+
+      const client = updateSupabaseInstance(supabaseUrl, supabaseAnonKey);
+      const { data: authData, error: authError } = await client.auth.signUp({
+        email,
+        password,
+      });
+
+      if (authError || !authData.user) {
+        throw new Error(authError?.message || 'Sign up failed.');
+      }
+
+      if (authData.session) {
+        const accessToken = authData.session.access_token;
+        const refreshToken = authData.session.refresh_token;
+
+        await SecureStore.setItemAsync(TOKEN_KEY, accessToken);
+        await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, refreshToken);
+        setToken(accessToken);
+        
+        setUser({
+          id: authData.user.id,
+          email: authData.user.email || '',
+        });
+        
+        setIsLocalMode(false);
+        setIsAuthenticated(true);
+        return true;
+      } else {
+        // Sign up succeeded but needs email confirmation (or is pending auth verification)
+        return false;
+      }
+    } catch (error) {
+      console.error('Sign up failed:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loginSandbox = async (url: string): Promise<void> => {
+    try {
+      setLoading(true);
+      await AsyncStorage.setItem(API_URL_KEY, url);
+      setApiUrl(url);
+      
+      await SecureStore.deleteItemAsync(TOKEN_KEY);
+      await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
+      
+      setToken(null);
+      setUser(null);
+      setIsLocalMode(true);
+      setIsAuthenticated(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = async () => {
     try {
       setLoading(true);
+      const client = updateSupabaseInstance(supabaseUrl, supabaseAnonKey);
+      await client.auth.signOut();
+      
       await SecureStore.deleteItemAsync(TOKEN_KEY);
+      await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
+      
       setToken(null);
       setUser(null);
       setIsLocalMode(true);
@@ -183,11 +259,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSupabaseUrl(newSbUrl);
         setSupabaseAnonKey(newSbKey);
         updateSupabaseInstance(newSbUrl, newSbKey);
-        
-        // Re-authenticate if token exists
-        if (token) {
-          await login(newApiUrl, token);
-        }
       }
     } catch (e) {
       console.error('Update config failed:', e);
@@ -204,7 +275,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLocalMode,
       supabaseUrl,
       supabaseAnonKey,
-      login,
+      loginWithEmail,
+      signUpWithEmail,
+      loginSandbox,
       logout,
       updateConfig,
     }}>

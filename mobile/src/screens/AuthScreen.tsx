@@ -18,10 +18,12 @@ import CustomButton from '../components/CustomButton';
 import Logo from '../components/Logo';
 
 export default function AuthScreen() {
-  const { login, loading, updateConfig, supabaseUrl, supabaseAnonKey } = useAuth();
+  const { loginWithEmail, signUpWithEmail, loginSandbox, loading, updateConfig, supabaseUrl, supabaseAnonKey } = useAuth();
   
   const [apiUrlInput, setApiUrlInput] = useState('http://localhost:3000');
-  const [tokenInput, setTokenInput] = useState('');
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
   
   // Advanced Supabase overrides
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -32,6 +34,10 @@ export default function AuthScreen() {
     try {
       if (!apiUrlInput.trim()) {
         Alert.alert('Configuration Error', 'Please specify your Dashboard API Url.');
+        return;
+      }
+      if (!emailInput.trim() || !passwordInput.trim()) {
+        Alert.alert('Configuration Error', 'Please enter both your email address and password.');
         return;
       }
 
@@ -45,16 +51,34 @@ export default function AuthScreen() {
         await updateConfig(apiUrlInput.trim());
       }
 
-      const success = await login(apiUrlInput.trim(), tokenInput.trim() || null);
-      if (success) {
-        if (!tokenInput.trim()) {
-          Alert.alert('Demo Mode Enabled', 'Running in local sandbox mode. Changes will be saved locally on your device.');
+      if (isSignUp) {
+        const success = await signUpWithEmail(apiUrlInput.trim(), emailInput.trim(), passwordInput.trim());
+        if (success) {
+          Alert.alert('Welcome to PromptPilot', 'Your cloud account has been created successfully!');
         } else {
-          Alert.alert('Session Synchronized', 'Connected to the PromptPilot Cloud Workspace.');
+          Alert.alert('Activation Pending', 'Account created! Please check your email to verify your address if required.');
+        }
+      } else {
+        const success = await loginWithEmail(apiUrlInput.trim(), emailInput.trim(), passwordInput.trim());
+        if (success) {
+          Alert.alert('Session Synced', 'Successfully connected and synced to your cloud workspace.');
         }
       }
     } catch (e: any) {
-      Alert.alert('Authentication Failed', e.message || 'Check your credentials and API endpoint.');
+      Alert.alert('Authentication Failed', e.message || 'Check your credentials and endpoint URL.');
+    }
+  };
+
+  const handleSandboxMode = async () => {
+    try {
+      if (!apiUrlInput.trim()) {
+        Alert.alert('Configuration Error', 'Please specify your Dashboard API Url.');
+        return;
+      }
+      await loginSandbox(apiUrlInput.trim());
+      Alert.alert('Demo Sandbox Mode', 'Running locally. Changes are cached on your device and will not sync to the cloud.');
+    } catch (e: any) {
+      Alert.alert('Error', e.message || 'Failed to enter sandbox mode.');
     }
   };
 
@@ -73,8 +97,33 @@ export default function AuthScreen() {
         </View>
 
         <GlassCard style={styles.card}>
-          <Text style={styles.cardHeader}>Workspace Connection</Text>
+          {/* Tab Switcher between Sign In and Sign Up */}
+          <View style={styles.tabHeader}>
+            <TouchableOpacity 
+              onPress={() => {
+                setIsSignUp(false);
+                setEmailInput('');
+                setPasswordInput('');
+              }} 
+              style={[styles.tabItem, !isSignUp && styles.tabItemActive]}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.tabText, !isSignUp && styles.tabTextActive]}>Sign In</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={() => {
+                setIsSignUp(true);
+                setEmailInput('');
+                setPasswordInput('');
+              }} 
+              style={[styles.tabItem, isSignUp && styles.tabItemActive]}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.tabText, isSignUp && styles.tabTextActive]}>Sign Up</Text>
+            </TouchableOpacity>
+          </View>
           
+          {/* Dashboard API Endpoint Input */}
           <View style={styles.formGroup}>
             <Text style={styles.label}>Dashboard API Endpoint</Text>
             <View style={styles.inputContainer}>
@@ -82,7 +131,7 @@ export default function AuthScreen() {
               <TextInput
                 value={apiUrlInput}
                 onChangeText={setApiUrlInput}
-                placeholder="http://10.0.2.2:3000 (Android) or http://localhost:3000"
+                placeholder="http://192.168.137.1:3000"
                 placeholderTextColor={THEME.colors.textMuted}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -91,27 +140,47 @@ export default function AuthScreen() {
             </View>
           </View>
 
+          {/* Email Input */}
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Access Sync Token</Text>
+            <Text style={styles.label}>Email Address</Text>
             <View style={styles.inputContainer}>
-              <Ionicons name="key-outline" size={18} color={THEME.colors.textMuted} style={styles.inputIcon} />
+              <Ionicons name="mail-outline" size={18} color={THEME.colors.textMuted} style={styles.inputIcon} />
               <TextInput
-                value={tokenInput}
-                onChangeText={setTokenInput}
-                secureTextEntry
-                placeholder="Paste token from Web Settings to sync"
+                value={emailInput}
+                onChangeText={setEmailInput}
+                placeholder="enter email..."
                 placeholderTextColor={THEME.colors.textMuted}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                autoCorrect={false}
+                style={styles.input}
+              />
+            </View>
+          </View>
+
+          {/* Password Input */}
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Password</Text>
+            <View style={styles.inputContainer}>
+              <Ionicons name="lock-closed-outline" size={18} color={THEME.colors.textMuted} style={styles.inputIcon} />
+              <TextInput
+                value={passwordInput}
+                onChangeText={setPasswordInput}
+                placeholder="enter password..."
+                placeholderTextColor={THEME.colors.textMuted}
+                secureTextEntry
                 autoCapitalize="none"
                 autoCorrect={false}
                 style={styles.input}
               />
             </View>
-            <Text style={styles.hintText}>Leave blank to evaluate local sandbox demo</Text>
           </View>
 
+          {/* Advanced Supabase Database configurations (collapsible) */}
           <TouchableOpacity 
             onPress={() => setShowAdvanced(!showAdvanced)} 
             style={styles.advancedToggle}
+            activeOpacity={0.7}
           >
             <Text style={styles.advancedToggleText}>
               {showAdvanced ? 'Hide Database Overrides' : 'Advanced Database Configuration'}
@@ -153,13 +222,23 @@ export default function AuthScreen() {
             </View>
           )}
 
+          {/* Primary Authentication Button */}
           <CustomButton
-            title="Authenticate & Sync"
+            title={isSignUp ? "Create Workspace Account" : "Authenticate & Sync"}
             onPress={handleAuthenticate}
             loading={loading}
             variant="gradient"
             style={styles.button}
           />
+
+          {/* Local Offline Sandbox Bypass Link */}
+          <TouchableOpacity 
+            onPress={handleSandboxMode} 
+            style={styles.sandboxLink}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.sandboxLinkText}>Continue with Local Sandbox (Offline Demo)</Text>
+          </TouchableOpacity>
         </GlassCard>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -178,7 +257,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: THEME.spacing.xxl,
+    marginBottom: THEME.spacing.xl,
   },
   iconCircle: {
     width: 70,
@@ -204,17 +283,32 @@ const styles = StyleSheet.create({
   card: {
     padding: THEME.spacing.xl,
   },
-  cardHeader: {
-    fontSize: THEME.typography.sizes.lg,
-    fontWeight: THEME.typography.weights.bold,
-    color: THEME.colors.textPrimary,
-    marginBottom: THEME.spacing.lg,
+  tabHeader: {
+    flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.05)',
-    paddingBottom: THEME.spacing.sm,
+    marginBottom: THEME.spacing.lg,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: THEME.spacing.sm,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  tabItemActive: {
+    borderBottomColor: THEME.colors.primaryLight,
+  },
+  tabText: {
+    fontSize: THEME.typography.sizes.sm,
+    color: THEME.colors.textMuted,
+    fontWeight: THEME.typography.weights.semibold,
+  },
+  tabTextActive: {
+    color: THEME.colors.primaryLight,
   },
   formGroup: {
-    marginBottom: THEME.spacing.lg,
+    marginBottom: THEME.spacing.md,
   },
   label: {
     fontSize: THEME.typography.sizes.xs,
@@ -243,19 +337,13 @@ const styles = StyleSheet.create({
     fontSize: THEME.typography.sizes.md,
     height: '100%',
   },
-  hintText: {
-    fontSize: THEME.typography.sizes.xxs,
-    color: THEME.colors.textMuted,
-    marginTop: 6,
-    fontStyle: 'italic',
-  },
   advancedToggle: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 6,
     paddingVertical: THEME.spacing.sm,
-    marginBottom: THEME.spacing.md,
+    marginVertical: THEME.spacing.sm,
   },
   advancedToggleText: {
     fontSize: THEME.typography.sizes.xs,
@@ -282,5 +370,16 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: THEME.spacing.sm,
+  },
+  sandboxLink: {
+    alignItems: 'center',
+    marginTop: THEME.spacing.lg,
+    paddingVertical: 6,
+  },
+  sandboxLinkText: {
+    fontSize: THEME.typography.sizes.xs,
+    color: THEME.colors.textSecondary,
+    fontWeight: THEME.typography.weights.medium,
+    textDecorationLine: 'underline',
   },
 });
