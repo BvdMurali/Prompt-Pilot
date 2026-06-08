@@ -34,6 +34,7 @@ interface AuthContextType {
   loginSandbox: (url: string) => Promise<void>;
   logout: () => Promise<void>;
   updateConfig: (apiUrl: string, supabaseUrl?: string, supabaseKey?: string) => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -416,6 +417,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const refreshUser = async () => {
+    if (isLocalMode) return;
+    try {
+      const client = updateSupabaseInstance(supabaseUrl, supabaseAnonKey);
+      const { data: { session } } = await client.auth.getSession();
+      if (session?.user) {
+        const { data: profile } = await client
+          .from('users').select('*').eq('id', session.user.id).single();
+
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          name: profile?.name || '',
+          avatar_url: profile?.avatar_url || '',
+        });
+      }
+    } catch (e) {
+      console.warn('[AuthContext] refreshUser failed:', e);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       isAuthenticated,
@@ -433,6 +455,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loginSandbox,
       logout,
       updateConfig,
+      refreshUser,
     }}>
       {children}
     </AuthContext.Provider>

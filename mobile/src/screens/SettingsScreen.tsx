@@ -6,9 +6,17 @@ import {
   ScrollView, 
   TouchableOpacity, 
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
+  TextInput,
+  Clipboard,
+  Modal,
+  Share,
+  Platform,
+  Image
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../context/AuthContext';
 import { useDatabase } from '../context/DatabaseContext';
 import { supabase } from '../services/supabase';
@@ -17,23 +25,63 @@ import GlassCard from '../components/GlassCard';
 import CustomButton from '../components/CustomButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const MODELS = [
-  { id: 'gemini-3.5-flash', name: 'Gemini 3.5 Flash (Default)', provider: 'Google' },
-  { id: 'gemini-3.5-pro', name: 'Gemini 3.5 Pro', provider: 'Google' },
-  { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', provider: 'Anthropic' },
-  { id: 'gpt-4o', name: 'GPT-4o', provider: 'OpenAI' }
+const STANDARD_MODELS = [
+  { id: 'gemini-3.1-flash-lite', name: 'Gemini 3.1 Flash Lite', group: 'Google Gemini' },
+  { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', group: 'Google Gemini' },
+  { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', group: 'Google Gemini' },
+  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', group: 'OpenAI' },
+  { id: 'gpt-4o', name: 'GPT-4o Premium', group: 'OpenAI' },
+  { id: 'o1-mini', name: 'o1 Mini', group: 'OpenAI' },
+  { id: 'o3-mini', name: 'o3 Mini', group: 'OpenAI' },
+  { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', group: 'Anthropic Claude' },
+  { id: 'claude-3-5-haiku', name: 'Claude 3.5 Haiku', group: 'Anthropic Claude' },
+  { id: 'google/gemini-2.5-flash:free', name: 'OpenRouter: Gemini Flash (Free)', group: 'OpenRouter' },
+  { id: 'deepseek/deepseek-chat', name: 'OpenRouter: DeepSeek V3 Chat', group: 'OpenRouter' },
+  { id: 'deepseek/deepseek-r1', name: 'OpenRouter: DeepSeek R1', group: 'OpenRouter' },
+  { id: 'meta-llama/llama-3.3-70b-instruct', name: 'OpenRouter: Llama 3.3 70B', group: 'OpenRouter' },
+  { id: 'custom', name: 'Custom Model...', group: 'Other' }
+];
+
+const TONES = [
+  { id: 'professional', name: 'Professional' },
+  { id: 'friendly', name: 'Friendly' },
+  { id: 'casual', name: 'Casual' },
+  { id: 'executive', name: 'Executive' }
 ];
 
 export default function SettingsScreen() {
-  const { user, logout, isLocalMode, apiUrl, token } = useAuth();
+  const { user, logout, isLocalMode, apiUrl, refreshUser } = useAuth();
   const { syncData } = useDatabase();
 
-  const [preferredModel, setPreferredModel] = useState('gemini-3.5-flash');
-  const [loadingSettings, setLoadingSettings] = useState(false);
+  const [displayName, setDisplayName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [preferredModel, setPreferredModel] = useState('gemini-3.1-flash-lite');
+  const [customModel, setCustomModel] = useState('');
+  const [defaultTone, setDefaultTone] = useState('professional');
   
-  // Soft delete tracking
+  // API Keys
+  const [geminiKey, setGeminiKey] = useState('');
+  const [openaiKey, setOpenaiKey] = useState('');
+  const [anthropicKey, setAnthropicKey] = useState('');
+  const [openrouterKey, setOpenrouterKey] = useState('');
+
+  // Show/hide keys toggles
+  const [showGemini, setShowGemini] = useState(false);
+  const [showOpenai, setShowOpenai] = useState(false);
+  const [showAnthropic, setShowAnthropic] = useState(false);
+  const [showOpenrouter, setShowOpenrouter] = useState(false);
+
+  // Statuses
+  const [loadingSettings, setLoadingSettings] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [copiedId, setCopiedId] = useState(false);
   const [deletedAt, setDeletedAt] = useState<string | null>(null);
   const [syncingDeleteState, setSyncingDeleteState] = useState(false);
+
+  // Modal visibility states
+  const [modelModalVisible, setModelModalVisible] = useState(false);
+  const [toneModalVisible, setToneModalVisible] = useState(false);
 
   useEffect(() => {
     loadUserSettings();
@@ -41,10 +89,27 @@ export default function SettingsScreen() {
 
   const loadUserSettings = async () => {
     if (isLocalMode || !user) {
-      // Local storage lookup
       try {
-        const localModel = await localStorageGet('pp_preferred_model');
-        if (localModel) setPreferredModel(localModel);
+        const localSettingsStr = await AsyncStorage.getItem('pp_settings');
+        if (localSettingsStr) {
+          const localSettings = JSON.parse(localSettingsStr);
+          const loadedModel = localSettings.preferred_model || 'gemini-3.1-flash-lite';
+          if (STANDARD_MODELS.some(m => m.id === loadedModel)) {
+            setPreferredModel(loadedModel);
+            setCustomModel('');
+          } else {
+            setPreferredModel('custom');
+            setCustomModel(loadedModel);
+          }
+          setDefaultTone(localSettings.default_tone || 'professional');
+          const keys = localSettings.api_key_override || {};
+          setGeminiKey(keys.gemini || '');
+          setOpenaiKey(keys.openai || '');
+          setAnthropicKey(keys.anthropic || '');
+          setOpenrouterKey(keys.openrouter || '');
+        }
+        const cachedName = await AsyncStorage.getItem('pp_user_name');
+        setDisplayName(cachedName || 'Sandbox User');
       } catch (e) {
         console.warn('Failed to load local model preference');
       }
@@ -53,18 +118,32 @@ export default function SettingsScreen() {
 
     try {
       setLoadingSettings(true);
-      // Fetch settings from DB
       const { data: dbSettings, error } = await supabase
         .from('settings')
-        .select('preferred_model')
+        .select('*')
         .eq('user_id', user.id)
         .single();
 
       if (!error && dbSettings) {
-        setPreferredModel(dbSettings.preferred_model);
+        const loadedModel = dbSettings.preferred_model || 'gemini-3.1-flash-lite';
+        if (STANDARD_MODELS.some(m => m.id === loadedModel)) {
+          setPreferredModel(loadedModel);
+          setCustomModel('');
+        } else {
+          setPreferredModel('custom');
+          setCustomModel(loadedModel);
+        }
+        setDefaultTone(dbSettings.default_tone || 'professional');
+        const keys = dbSettings.api_key_override || {};
+        setGeminiKey(keys.gemini || '');
+        setOpenaiKey(keys.openai || '');
+        setAnthropicKey(keys.anthropic || '');
+        setOpenrouterKey(keys.openrouter || '');
       }
 
-      // Fetch soft delete state from users profile
+      setDisplayName(user.name || '');
+      setAvatarUrl(user.avatar_url || '');
+
       const { data: profile, error: profileError } = await supabase
         .from('users')
         .select('deleted_at')
@@ -81,50 +160,190 @@ export default function SettingsScreen() {
     }
   };
 
-  const handleModelChange = async (modelId: string) => {
-    setPreferredModel(modelId);
+  const handleSelectAvatar = async () => {
     if (isLocalMode) {
-      await localStorageSet('pp_preferred_model', modelId);
+      Alert.alert('Sandbox Mode', 'Avatar upload is not supported in local sandbox mode.');
       return;
     }
-
+    
     try {
-      const { error } = await supabase
-        .from('settings')
-        .update({ preferred_model: modelId })
-        .eq('user_id', user!.id);
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Camera roll permissions are required to upload an avatar.');
+        return;
+      }
 
-      if (error) throw error;
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const selectedAsset = result.assets[0];
+        await handleUploadAvatar(selectedAsset.uri);
+      }
     } catch (e) {
-      Alert.alert('Error', 'Failed to update preferred model in the database.');
+      console.warn('Avatar picker error:', e);
+      Alert.alert('Error', 'Failed to pick an image.');
     }
   };
 
-  // Helper local storage wrappers
-  const localStorageGet = async (key: string) => {
+  const handleUploadAvatar = async (uri: string) => {
+    if (!user) return;
+
     try {
-      return await AsyncStorage.getItem(key);
-    } catch {
-      return null;
+      setUploadingAvatar(true);
+      
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      
+      const fileExt = uri.split('.').pop() || 'jpg';
+      const filePath = `${user.id}/avatar-${Math.floor(Math.random() * 1000000)}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, blob, { 
+          contentType: `image/${fileExt}`, 
+          upsert: true 
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      setAvatarUrl(publicUrl);
+      
+      const { error: profileError } = await supabase
+        .from('users')
+        .update({
+          avatar_url: publicUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (profileError) throw profileError;
+
+      await refreshUser();
+      Alert.alert('Success', 'Profile picture updated successfully!');
+    } catch (e: any) {
+      console.error('Avatar upload error:', e);
+      Alert.alert('Upload Failed', e.message || 'Failed to upload profile picture.');
+    } finally {
+      setUploadingAvatar(false);
     }
   };
 
-  const localStorageSet = async (key: string, val: string) => {
+  const handleSaveSettings = async () => {
+    setSaving(true);
     try {
-      await AsyncStorage.setItem(key, val);
-    } catch {}
+      const keys = {
+        gemini: geminiKey.trim() || undefined,
+        openai: openaiKey.trim() || undefined,
+        anthropic: anthropicKey.trim() || undefined,
+        openrouter: openrouterKey.trim() || undefined,
+      };
+
+      const finalModel = preferredModel === 'custom' ? customModel.trim() : preferredModel;
+
+      if (preferredModel === 'custom' && !customModel.trim()) {
+        throw new Error('Please specify a custom model ID.');
+      }
+
+      if (isLocalMode) {
+        const localSettings = {
+          preferred_model: finalModel,
+          default_tone: defaultTone,
+          api_key_override: keys,
+        };
+        await AsyncStorage.setItem('pp_settings', JSON.stringify(localSettings));
+        await AsyncStorage.setItem('pp_user_name', displayName.trim());
+      } else {
+        if (!user) return;
+        
+        const { error: settingsError } = await supabase
+          .from('settings')
+          .upsert({
+            user_id: user.id,
+            preferred_model: finalModel,
+            default_tone: defaultTone,
+            theme: 'dark',
+            api_key_override: keys,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id' });
+
+        if (settingsError) throw settingsError;
+
+        const { error: profileError } = await supabase
+          .from('users')
+          .update({
+            name: displayName.trim(),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
+
+        if (profileError) throw profileError;
+
+        await refreshUser();
+      }
+      Alert.alert('Success', 'Your settings and preferences have been saved!');
+    } catch (e: any) {
+      Alert.alert('Save Failed', e.message || 'An error occurred while saving settings.');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  // Soft delete procedures
+  const handleCopyUserId = () => {
+    if (isLocalMode || !user) return;
+    Clipboard.setString(user.id);
+    setCopiedId(true);
+    setTimeout(() => setCopiedId(false), 2000);
+  };
+
+  const handleExportData = async () => {
+    if (isLocalMode || !user) {
+      Alert.alert('Sandbox Info', 'Data export is not supported in local sandbox mode.');
+      return;
+    }
+    try {
+      const { data: prompts } = await supabase.from('prompts').select('*').eq('user_id', user.id);
+      const { data: history } = await supabase.from('history').select('*').eq('user_id', user.id);
+      const { data: settings } = await supabase.from('settings').select('*').eq('user_id', user.id).single();
+
+      const exportObj = {
+        user: {
+          id: user.id,
+          email: user.email,
+        },
+        settings,
+        prompts,
+        history,
+        exportedAt: new Date().toISOString(),
+      };
+
+      const content = JSON.stringify(exportObj, null, 2);
+      await Share.share({
+        message: content,
+        title: `PromptPilot Data Export`,
+      });
+    } catch (err: any) {
+      Alert.alert('Export Failed', err.message || 'Could not export your data.');
+    }
+  };
+
   const handleInitiateDelete = () => {
     if (isLocalMode || !user) {
-      Alert.alert('Sandbox Clean', 'You are in local sandbox mode. Sign out to clear cache data.');
+      Alert.alert('Sandbox Clean', 'You are running in offline sandbox mode.');
       return;
     }
 
     Alert.alert(
-      'Initiate Account Deletion',
-      'Are you sure? Your account will be marked for deletion. You will have a 30-day grace period to restore your profile before all data is permanently deleted.',
+      'Delete Account',
+      'Are you sure you want to deactivate your profile? Permanent purging will happen after 30 days. You can cancel deletion in settings anytime.',
       [
         { text: 'Cancel', style: 'cancel' },
         { 
@@ -134,7 +353,6 @@ export default function SettingsScreen() {
             try {
               setSyncingDeleteState(true);
               const nowIso = new Date().toISOString();
-              
               const { error } = await supabase
                 .from('users')
                 .update({ deleted_at: nowIso })
@@ -142,10 +360,10 @@ export default function SettingsScreen() {
 
               if (error) throw error;
               setDeletedAt(nowIso);
-              Alert.alert('Scheduled', 'Your account has been soft-deleted. You can restore it anytime in settings within 30 days.');
-              syncData(); // Reload RLS states
+              Alert.alert('Scheduled', 'Profile soft-deleted. Cloud sync paused.');
+              syncData();
             } catch (e) {
-              Alert.alert('Failed Deactivation', 'Could not soft delete profile at this time.');
+              Alert.alert('Failed', 'Could not deactivate profile at this time.');
             } finally {
               setSyncingDeleteState(false);
             }
@@ -165,10 +383,10 @@ export default function SettingsScreen() {
 
       if (error) throw error;
       setDeletedAt(null);
-      Alert.alert('Profile Restored', 'Your PromptPilot profile has been reactivated. Cloud syncing resumed.');
+      Alert.alert('Profile Restored', 'Account reactivated. Cloud sync resumed.');
       syncData();
     } catch (e) {
-      Alert.alert('Restoration Failed', 'Could not restore user account. Contact administration.');
+      Alert.alert('Restoration Failed', 'Could not restore user account.');
     } finally {
       setSyncingDeleteState(false);
     }
@@ -182,144 +400,470 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      {/* Sync State Banner */}
-      {deletedAt && (
-        <View style={styles.deleteWarningBanner}>
-          <Ionicons name="warning" size={20} color={THEME.colors.danger} />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.deleteWarningTitle}>Profile Scheduled for Deletion</Text>
-            <Text style={styles.deleteWarningDesc}>
-              Deactivation initiated. Permanent purging scheduled on {deletionDeadline()}.
-            </Text>
-          </View>
-          <TouchableOpacity 
-            onPress={handleRestoreAccount} 
-            disabled={syncingDeleteState}
-            style={styles.restoreBtn}
-          >
-            {syncingDeleteState ? (
-              <ActivityIndicator color="#fff" size="small" />
-            ) : (
-              <Text style={styles.restoreBtnText}>Restore</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      )}
+    <View style={styles.container}>
+      {/* Ambient background glows */}
+      <View style={styles.glowTop} />
+      <View style={styles.glowBottom} />
 
-      {/* Profile Card */}
-      <GlassCard style={styles.profileCard}>
-        <View style={styles.avatarRow}>
-          <View style={styles.avatarCircle}>
-            <Ionicons name="person" size={28} color={THEME.colors.textSecondary} />
-          </View>
-          <View>
-            <Text style={styles.profileName}>
-              {isLocalMode ? 'Sandbox User' : user?.name || 'Synced Profile'}
-            </Text>
-            <Text style={styles.profileEmail}>
-              {isLocalMode ? 'Running in offline local mode' : user?.email || 'Connected'}
-            </Text>
-          </View>
-          <View style={[
-            styles.syncBadge, 
-            { backgroundColor: isLocalMode ? 'rgba(107, 114, 128, 0.1)' : 'rgba(16, 185, 129, 0.1)' }
-          ]}>
-            <Text style={[
-              styles.syncBadgeText, 
-              { color: isLocalMode ? THEME.colors.textSecondary : THEME.colors.success }
-            ]}>
-              {isLocalMode ? 'Local' : 'Cloud'}
-            </Text>
-          </View>
-        </View>
-      </GlassCard>
-
-      {/* Model Selection */}
-      <Text style={styles.sectionTitle}>Prompting Configuration</Text>
-      <GlassCard style={styles.optionsCard}>
-        <Text style={styles.cardHeader}>Preferred AI Model</Text>
-        <Text style={styles.cardSubheader}>This model will be queried by default for prompt generation.</Text>
-        
-        {loadingSettings ? (
-          <ActivityIndicator color={THEME.colors.primaryLight} style={{ marginVertical: THEME.spacing.md }} />
-        ) : (
-          <View style={styles.modelList}>
-            {MODELS.map((m) => {
-              const isSelected = preferredModel === m.id;
-              return (
-                <TouchableOpacity
-                  key={m.id}
-                  onPress={() => handleModelChange(m.id)}
-                  style={[
-                    styles.modelItem,
-                    isSelected && styles.modelItemActive
-                  ]}
-                  activeOpacity={0.8}
-                >
-                  <View style={styles.modelCheck}>
-                    <Ionicons 
-                      name={isSelected ? 'radio-button-on' : 'radio-button-off'} 
-                      size={18} 
-                      color={isSelected ? THEME.colors.primaryLight : THEME.colors.textMuted} 
-                    />
-                  </View>
-                  <View>
-                    <Text style={[styles.modelName, isSelected && styles.modelNameActive]}>{m.name}</Text>
-                    <Text style={styles.modelProvider}>{m.provider} Integration</Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent}>
+        {/* Soft Delete Warning Banner */}
+        {deletedAt && (
+          <View style={styles.deleteWarningBanner}>
+            <Ionicons name="warning" size={20} color={THEME.colors.danger} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.deleteWarningTitle}>Profile Scheduled for Deletion</Text>
+              <Text style={styles.deleteWarningDesc}>
+                Deactivation initiated. Permanent purging scheduled on {deletionDeadline()}.
+              </Text>
+            </View>
+            <TouchableOpacity 
+              onPress={handleRestoreAccount} 
+              disabled={syncingDeleteState}
+              style={styles.restoreBtn}
+            >
+              {syncingDeleteState ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <Text style={styles.restoreBtnText}>Restore</Text>
+              )}
+            </TouchableOpacity>
           </View>
         )}
-      </GlassCard>
 
-      {/* System Settings Details */}
-      <Text style={styles.sectionTitle}>Connection Details</Text>
-      <GlassCard style={styles.connectionCard}>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Gateway URL</Text>
-          <Text style={styles.infoVal}>{apiUrl}</Text>
-        </View>
-        <View style={[styles.infoRow, { marginTop: THEME.spacing.sm }]}>
-          <Text style={styles.infoLabel}>Local Cache</Text>
-          <Text style={styles.infoVal}>Sync Database Configured</Text>
-        </View>
-      </GlassCard>
+        {/* Profile Card */}
+        <GlassCard style={styles.card}>
+          <View style={styles.cardHeaderRow}>
+            <Ionicons name="person-outline" size={18} color="#818cf8" style={styles.cardHeaderIcon} />
+            <Text style={styles.cardTitle}>Profile Details</Text>
+          </View>
 
-      {/* Deletion & Sign Out Actions */}
-      <View style={styles.actionContainer}>
+          <View style={styles.avatarSection}>
+            <TouchableOpacity 
+              onPress={handleSelectAvatar} 
+              disabled={uploadingAvatar}
+              style={styles.avatarBtn}
+              activeOpacity={0.8}
+            >
+              {uploadingAvatar ? (
+                <View style={styles.avatarLoadingOverlay}>
+                  <ActivityIndicator color={THEME.colors.primaryLight} size="small" />
+                </View>
+              ) : (
+                <View style={styles.avatarUploadHover}>
+                  <Ionicons name="camera-outline" size={16} color="#818cf8" />
+                </View>
+              )}
+
+              {avatarUrl ? (
+                <Image 
+                  source={{ uri: avatarUrl }} 
+                  style={styles.avatarImage} 
+                />
+              ) : (
+                <View style={styles.avatarFallback}>
+                  <Text style={styles.avatarFallbackText}>
+                    {displayName ? displayName.substring(0, 2).toUpperCase() : (user?.email?.substring(0, 2).toUpperCase() || 'SB')}
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+            
+            <View style={styles.avatarDescContainer}>
+              <Text style={styles.avatarDescTitle}>Profile Picture</Text>
+              <Text style={styles.avatarDescSub}>Tap to upload. PNG, JPG, or WebP under 2MB.</Text>
+            </View>
+          </View>
+
+          {/* Display Name Input */}
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Display Name</Text>
+            <TextInput
+              value={displayName}
+              onChangeText={setDisplayName}
+              placeholder="E.g. Murali"
+              placeholderTextColor="#475569"
+              autoCorrect={false}
+              style={styles.textInput}
+            />
+          </View>
+
+          {/* Email (Read-Only) */}
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Email Address (Read-only)</Text>
+            <View style={styles.readOnlyField}>
+              <Ionicons name="lock-closed-outline" size={14} color="#475569" style={styles.readOnlyIcon} />
+              <Text style={styles.readOnlyText} numberOfLines={1}>
+                {isLocalMode ? 'local@sandbox.demo' : user?.email}
+              </Text>
+            </View>
+          </View>
+
+          {/* User UID (Read-Only) */}
+          {!isLocalMode && user && (
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>User UID</Text>
+              <View style={styles.uidContainer}>
+                <Text style={styles.uidText} numberOfLines={1}>{user.id}</Text>
+                <TouchableOpacity onPress={handleCopyUserId} style={styles.copyBtn} activeOpacity={0.7}>
+                  <Ionicons 
+                    name={copiedId ? "checkmark" : "copy-outline"} 
+                    size={15} 
+                    color={copiedId ? THEME.colors.success : THEME.colors.textSecondary} 
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        </GlassCard>
+
+        {/* Workspace Preferences Card */}
+        <GlassCard style={styles.card}>
+          <View style={styles.cardHeaderRow}>
+            <Ionicons name="settings-outline" size={18} color="#818cf8" style={styles.cardHeaderIcon} />
+            <Text style={styles.cardTitle}>Workspace Preferences</Text>
+          </View>
+
+          {loadingSettings ? (
+            <ActivityIndicator color={THEME.colors.primaryLight} style={{ marginVertical: 20 }} />
+          ) : (
+            <View style={{ gap: 16 }}>
+              {/* Preferred Model Custom Selector */}
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Preferred AI Model</Text>
+                <TouchableOpacity
+                  onPress={() => setModelModalVisible(true)}
+                  style={styles.dropdownBtn}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.dropdownBtnText}>
+                    {STANDARD_MODELS.find(m => m.id === preferredModel)?.name || preferredModel}
+                  </Text>
+                  <Ionicons name="chevron-down" size={16} color={THEME.colors.textSecondary} />
+                </TouchableOpacity>
+              </View>
+
+              {preferredModel === 'custom' && (
+                <View style={[styles.formGroup, { marginTop: -4 }]}>
+                  <Text style={styles.label}>Custom Model ID</Text>
+                  <TextInput
+                    value={customModel}
+                    onChangeText={setCustomModel}
+                    placeholder="e.g. meta-llama/llama-3-8b-instruct"
+                    placeholderTextColor="#475569"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    style={styles.textInput}
+                  />
+                  <Text style={styles.fieldHint}>
+                    Type the exact model identifier required by your API provider.
+                  </Text>
+                </View>
+              )}
+
+              {/* Default Tone Selector */}
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Default Tone</Text>
+                <TouchableOpacity
+                  onPress={() => setToneModalVisible(true)}
+                  style={styles.dropdownBtn}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.dropdownBtnText}>
+                    {TONES.find(t => t.id === defaultTone)?.name || defaultTone}
+                  </Text>
+                  <Ionicons name="chevron-down" size={16} color={THEME.colors.textSecondary} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        </GlassCard>
+
+        {/* API Credentials Card */}
+        <GlassCard style={styles.card}>
+          <View style={styles.cardHeaderRow}>
+            <Ionicons name="key-outline" size={18} color="#818cf8" style={styles.cardHeaderIcon} />
+            <Text style={styles.cardTitle}>API Key Overrides (Optional)</Text>
+          </View>
+
+          <View style={{ gap: 16 }}>
+            {/* Gemini Key */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Google Gemini Key</Text>
+              <View style={styles.keyInputWrapper}>
+                <TextInput
+                  value={geminiKey}
+                  onChangeText={setGeminiKey}
+                  placeholder={geminiKey ? "••••••••••••••••" : "AIzaSy..."}
+                  placeholderTextColor="#475569"
+                  secureTextEntry={!showGemini}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  style={styles.keyInput}
+                />
+                <TouchableOpacity onPress={() => setShowGemini(!showGemini)} style={styles.keyEyeBtn}>
+                  <Ionicons name={showGemini ? "eye-off-outline" : "eye-outline"} size={16} color={THEME.colors.textMuted} />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* OpenAI Key */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>OpenAI API Key</Text>
+              <View style={styles.keyInputWrapper}>
+                <TextInput
+                  value={openaiKey}
+                  onChangeText={setOpenaiKey}
+                  placeholder={openaiKey ? "••••••••••••••••" : "sk-proj-..."}
+                  placeholderTextColor="#475569"
+                  secureTextEntry={!showOpenai}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  style={styles.keyInput}
+                />
+                <TouchableOpacity onPress={() => setShowOpenai(!showOpenai)} style={styles.keyEyeBtn}>
+                  <Ionicons name={showOpenai ? "eye-off-outline" : "eye-outline"} size={16} color={THEME.colors.textMuted} />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Anthropic Key */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>Anthropic Key</Text>
+              <View style={styles.keyInputWrapper}>
+                <TextInput
+                  value={anthropicKey}
+                  onChangeText={setAnthropicKey}
+                  placeholder={anthropicKey ? "••••••••••••••••" : "sk-ant-..."}
+                  placeholderTextColor="#475569"
+                  secureTextEntry={!showAnthropic}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  style={styles.keyInput}
+                />
+                <TouchableOpacity onPress={() => setShowAnthropic(!showAnthropic)} style={styles.keyEyeBtn}>
+                  <Ionicons name={showAnthropic ? "eye-off-outline" : "eye-outline"} size={16} color={THEME.colors.textMuted} />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* OpenRouter Key */}
+            <View style={styles.formGroup}>
+              <Text style={styles.label}>OpenRouter Key</Text>
+              <View style={styles.keyInputWrapper}>
+                <TextInput
+                  value={openrouterKey}
+                  onChangeText={setOpenrouterKey}
+                  placeholder={openrouterKey ? "••••••••••••••••" : "sk-or-v1-..."}
+                  placeholderTextColor="#475569"
+                  secureTextEntry={!showOpenrouter}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  style={styles.keyInput}
+                />
+                <TouchableOpacity onPress={() => setShowOpenrouter(!showOpenrouter)} style={styles.keyEyeBtn}>
+                  <Ionicons name={showOpenrouter ? "eye-off-outline" : "eye-outline"} size={16} color={THEME.colors.textMuted} />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Save Button */}
+            <CustomButton
+              title={saving ? "Saving Settings..." : "Save Settings"}
+              onPress={handleSaveSettings}
+              loading={saving}
+              variant="gradient"
+              icon="save-outline"
+              style={styles.saveBtn}
+            />
+          </View>
+        </GlassCard>
+
+        {/* Privacy & Danger Card */}
+        <GlassCard style={styles.card}>
+          <View style={styles.cardHeaderRow}>
+            <Ionicons name="shield-checkmark-outline" size={18} color="#818cf8" style={styles.cardHeaderIcon} />
+            <Text style={styles.cardTitle}>Account & Privacy</Text>
+          </View>
+
+          <View style={{ gap: 20 }}>
+            <View style={styles.privacyDescRow}>
+              <Ionicons name="shield-outline" size={18} color={THEME.colors.success} style={{ marginRight: 8, marginTop: 2 }} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.privacyDescTitle}>Privacy First Architecture</Text>
+                <Text style={styles.privacyDescText}>
+                  Your data is securely isolated using Row Level Security. You hold the authority to export or permanently purge all database logs.
+                </Text>
+              </View>
+            </View>
+
+            {/* Export data */}
+            <View style={styles.dividerSub} />
+            <View style={styles.privacyActionRow}>
+              <Text style={styles.privacyActionTitle}>Export Information</Text>
+              <TouchableOpacity onPress={handleExportData} style={styles.exportBtn} activeOpacity={0.7}>
+                <Ionicons name="download-outline" size={15} color="#fff" style={{ marginRight: 6 }} />
+                <Text style={styles.exportBtnText}>Export My Data</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Delete account */}
+            {!isLocalMode && (
+              <>
+                <View style={styles.dividerSub} />
+                <View style={styles.privacyActionRow}>
+                  <Text style={styles.privacyActionTitle}>Danger Zone</Text>
+                  <TouchableOpacity 
+                    onPress={handleInitiateDelete} 
+                    disabled={deletedAt !== null}
+                    style={[styles.deleteTriggerBtn, deletedAt !== null && { opacity: 0.4 }]} 
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="trash-outline" size={15} color={THEME.colors.danger} style={{ marginRight: 6 }} />
+                    <Text style={styles.deleteTriggerText}>Delete My Account</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+          </View>
+        </GlassCard>
+
+        {/* Sign Out Button */}
         <CustomButton
           title="Sign Out / Change Workspace"
           onPress={logout}
           icon="log-out-outline"
           variant="secondary"
-          style={styles.signOutBtn}
+          style={styles.signOutButton}
         />
+      </ScrollView>
 
-        {!isLocalMode && (
+      {/* Model Selection Modal */}
+      <Modal
+        visible={modelModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setModelModalVisible(false)}
+      >
+        <View style={styles.modalBackdrop}>
           <TouchableOpacity 
-            onPress={handleInitiateDelete} 
-            disabled={deletedAt !== null}
-            style={[
-              styles.deleteBtn,
-              deletedAt !== null && styles.deleteBtnDisabled
-            ]}
-          >
-            <Ionicons name="trash-outline" size={16} color={THEME.colors.danger} />
-            <Text style={styles.deleteText}>Initiate Profile Deactivation</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    </ScrollView>
+            style={styles.modalCloseOverlay} 
+            activeOpacity={1} 
+            onPress={() => setModelModalVisible(false)} 
+          />
+          <GlassCard style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Preferred Model</Text>
+              <TouchableOpacity onPress={() => setModelModalVisible(false)}>
+                <Ionicons name="close" size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.modalListScroll}>
+              {['Google Gemini', 'OpenAI', 'Anthropic Claude', 'OpenRouter', 'Other'].map(group => {
+                const groupModels = STANDARD_MODELS.filter(m => m.group === group);
+                if (groupModels.length === 0) return null;
+                return (
+                  <View key={group} style={styles.modalGroup}>
+                    <Text style={styles.modalGroupHeader}>{group}</Text>
+                    {groupModels.map(m => {
+                      const isSelected = preferredModel === m.id;
+                      return (
+                        <TouchableOpacity
+                          key={m.id}
+                          onPress={() => {
+                            setPreferredModel(m.id);
+                            setModelModalVisible(false);
+                          }}
+                          style={[styles.modalItem, isSelected && styles.modalItemActive]}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={[styles.modalItemText, isSelected && styles.modalItemTextActive]}>
+                            {m.name}
+                          </Text>
+                          {isSelected && <Ionicons name="checkmark" size={16} color={THEME.colors.primaryLight} />}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                );
+              })}
+            </ScrollView>
+          </GlassCard>
+        </View>
+      </Modal>
+
+      {/* Tone Selection Modal */}
+      <Modal
+        visible={toneModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setToneModalVisible(false)}
+      >
+        <View style={styles.modalBackdrop}>
+          <TouchableOpacity 
+            style={styles.modalCloseOverlay} 
+            activeOpacity={1} 
+            onPress={() => setToneModalVisible(false)} 
+          />
+          <GlassCard style={styles.modalContentSmall}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Default Tone</Text>
+              <TouchableOpacity onPress={() => setToneModalVisible(false)}>
+                <Ionicons name="close" size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.modalListScroll}>
+              {TONES.map(t => {
+                const isSelected = defaultTone === t.id;
+                return (
+                  <TouchableOpacity
+                    key={t.id}
+                    onPress={() => {
+                      setDefaultTone(t.id);
+                      setToneModalVisible(false);
+                    }}
+                    style={[styles.modalItem, isSelected && styles.modalItemActive]}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.modalItemText, isSelected && styles.modalItemTextActive]}>
+                      {t.name}
+                    </Text>
+                    {isSelected && <Ionicons name="checkmark" size={16} color={THEME.colors.primaryLight} />}
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </GlassCard>
+        </View>
+      </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: THEME.colors.background,
+    backgroundColor: '#020617', // slate-950
+    position: 'relative',
+  },
+  glowTop: {
+    position: 'absolute',
+    top: -120,
+    left: -120,
+    width: 320,
+    height: 320,
+    borderRadius: 160,
+    backgroundColor: 'rgba(99, 102, 241, 0.05)', // indigo-500/5
+    pointerEvents: 'none',
+  },
+  glowBottom: {
+    position: 'absolute',
+    bottom: -120,
+    right: -120,
+    width: 320,
+    height: 320,
+    borderRadius: 160,
+    backgroundColor: 'rgba(124, 58, 237, 0.05)', // violet-600/5
+    pointerEvents: 'none',
   },
   scrollContent: {
     padding: THEME.spacing.lg,
@@ -331,170 +875,373 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(239, 68, 68, 0.1)',
     borderColor: THEME.colors.danger,
     borderWidth: 1,
-    borderRadius: THEME.roundness.lg,
-    padding: THEME.spacing.md,
-    marginBottom: THEME.spacing.lg,
-    gap: THEME.spacing.md,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+    gap: 12,
   },
   deleteWarningTitle: {
-    fontSize: THEME.typography.sizes.sm,
-    fontWeight: THEME.typography.weights.bold,
+    fontSize: 13,
+    fontWeight: '700',
     color: '#fff',
   },
   deleteWarningDesc: {
-    fontSize: THEME.typography.sizes.xxs + 1,
-    color: THEME.colors.textSecondary,
+    fontSize: 11,
+    color: '#9ca3af',
     lineHeight: 14,
     marginTop: 2,
   },
   restoreBtn: {
     backgroundColor: THEME.colors.danger,
-    paddingHorizontal: THEME.spacing.md,
+    paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: THEME.roundness.md,
+    borderRadius: 8,
   },
   restoreBtnText: {
     color: '#fff',
-    fontSize: THEME.typography.sizes.xs,
-    fontWeight: THEME.typography.weights.bold,
+    fontSize: 12,
+    fontWeight: '700',
   },
-  profileCard: {
+  card: {
     padding: THEME.spacing.lg,
-    marginBottom: THEME.spacing.xl,
+    marginBottom: THEME.spacing.lg,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
-  avatarRow: {
+  cardHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: THEME.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+    paddingBottom: 12,
+    marginBottom: 20,
   },
-  avatarCircle: {
-    width: 46,
-    height: 46,
-    borderRadius: THEME.roundness.full,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    justifyContent: 'center',
-    alignItems: 'center',
+  cardHeaderIcon: {
+    marginRight: 8,
   },
-  profileName: {
-    fontSize: THEME.typography.sizes.lg,
-    fontWeight: THEME.typography.weights.bold,
-    color: THEME.colors.textPrimary,
-  },
-  profileEmail: {
-    fontSize: THEME.typography.sizes.xs,
-    color: THEME.colors.textMuted,
-    marginTop: 2,
-  },
-  syncBadge: {
-    marginLeft: 'auto',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: THEME.roundness.sm,
-  },
-  syncBadgeText: {
-    fontSize: THEME.typography.sizes.xxs,
-    fontWeight: THEME.typography.weights.bold,
-  },
-  sectionTitle: {
-    fontSize: THEME.typography.sizes.xs,
-    fontWeight: THEME.typography.weights.bold,
-    color: THEME.colors.textMuted,
+  cardTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#cbd5e1', // slate-300
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    marginBottom: THEME.spacing.md,
   },
-  optionsCard: {
-    padding: THEME.spacing.lg,
-    marginBottom: THEME.spacing.xl,
+  avatarSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    gap: 16,
   },
-  cardHeader: {
-    fontSize: THEME.typography.sizes.md,
-    fontWeight: THEME.typography.weights.bold,
-    color: THEME.colors.textPrimary,
+  avatarBtn: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    position: 'relative',
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  cardSubheader: {
-    fontSize: THEME.typography.sizes.xs,
-    color: THEME.colors.textMuted,
-    marginTop: 4,
-    marginBottom: THEME.spacing.md,
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+  },
+  avatarFallback: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#6366f1',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarFallbackText: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#fff',
+  },
+  avatarUploadHover: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 20,
+    backgroundColor: 'rgba(15, 23, 42, 0.8)',
+    zIndex: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarLoadingOverlay: {
+    position: 'absolute',
+    inset: 0,
+    backgroundColor: 'rgba(15, 23, 42, 0.8)',
+    zIndex: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarDescContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  avatarDescTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 2,
+  },
+  avatarDescSub: {
+    fontSize: 11,
+    color: '#64748b', // slate-500
+    lineHeight: 14,
+  },
+  formGroup: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#94a3b8',
+    textTransform: 'uppercase',
+    marginBottom: 8,
+    letterSpacing: 0.5,
+  },
+  textInput: {
+    backgroundColor: '#020617', // slate-950
+    borderColor: '#1e293b', // slate-800
+    borderWidth: 1,
+    borderRadius: 10,
+    height: 44,
+    paddingHorizontal: 14,
+    color: '#fff',
+    fontSize: 14,
+  },
+  fieldHint: {
+    fontSize: 10,
+    color: '#64748b',
+    marginTop: 6,
+    lineHeight: 14,
+  },
+  readOnlyField: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(2, 6, 23, 0.4)', // transparent slate-950
+    borderColor: '#0f172a', // slate-900
+    borderWidth: 1,
+    borderRadius: 10,
+    height: 44,
+    paddingHorizontal: 14,
+  },
+  readOnlyIcon: {
+    marginRight: 8,
+  },
+  readOnlyText: {
+    fontSize: 14,
+    color: '#475569', // slate-600
+  },
+  uidContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(2, 6, 23, 0.4)',
+    borderColor: '#0f172a',
+    borderWidth: 1,
+    borderRadius: 10,
+    height: 44,
+    paddingHorizontal: 14,
+  },
+  uidText: {
+    fontSize: 12,
+    color: '#475569',
+    fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace',
+    flex: 1,
+    marginRight: 12,
+  },
+  copyBtn: {
+    padding: 6,
+    borderRadius: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+  },
+  dropdownBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#020617', // slate-950
+    borderColor: '#1e293b', // slate-800
+    borderWidth: 1,
+    borderRadius: 10,
+    height: 44,
+    paddingHorizontal: 14,
+  },
+  dropdownBtnText: {
+    fontSize: 14,
+    color: '#e2e8f0', // slate-200
+  },
+  keyInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#020617', // slate-950
+    borderColor: '#1e293b', // slate-800
+    borderWidth: 1,
+    borderRadius: 10,
+    height: 44,
+    paddingHorizontal: 14,
+  },
+  keyInput: {
+    flex: 1,
+    color: '#e2e8f0',
+    fontSize: 13,
+    fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace',
+    height: '100%',
+  },
+  keyEyeBtn: {
+    padding: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  saveBtn: {
+    marginTop: 12,
+    height: 44,
+  },
+  privacyDescRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  privacyDescTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  privacyDescText: {
+    fontSize: 11,
+    color: '#64748b',
     lineHeight: 16,
   },
-  modelList: {
-    gap: THEME.spacing.sm,
+  dividerSub: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
-  modelItem: {
+  privacyActionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: THEME.spacing.md,
-    backgroundColor: 'rgba(0,0,0,0.1)',
-    borderWidth: 1,
-    borderColor: THEME.colors.border,
-    borderRadius: THEME.roundness.md,
-    gap: THEME.spacing.md,
-  },
-  modelItemActive: {
-    borderColor: THEME.colors.primaryLight,
-    backgroundColor: 'rgba(129, 140, 248, 0.03)',
-  },
-  modelCheck: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modelName: {
-    fontSize: THEME.typography.sizes.sm,
-    fontWeight: THEME.typography.weights.medium,
-    color: THEME.colors.textSecondary,
-  },
-  modelNameActive: {
-    color: THEME.colors.primaryLight,
-    fontWeight: THEME.typography.weights.bold,
-  },
-  modelProvider: {
-    fontSize: THEME.typography.sizes.xxs,
-    color: THEME.colors.textMuted,
-    marginTop: 2,
-  },
-  connectionCard: {
-    padding: THEME.spacing.lg,
-    marginBottom: THEME.spacing.xl,
-  },
-  infoRow: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
   },
-  infoLabel: {
-    fontSize: THEME.typography.sizes.sm,
-    color: THEME.colors.textSecondary,
+  privacyActionTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#cbd5e1',
   },
-  infoVal: {
-    fontSize: THEME.typography.sizes.xs,
-    color: THEME.colors.textMuted,
-    fontFamily: THEME.typography.fontFamily.mono,
-  },
-  actionContainer: {
-    gap: THEME.spacing.md,
-    alignItems: 'center',
-  },
-  signOutBtn: {
-    width: '100%',
-  },
-  deleteBtn: {
+  exportBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: THEME.spacing.sm,
-    marginTop: THEME.spacing.sm,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
   },
-  deleteBtnDisabled: {
-    opacity: 0.3,
+  exportBtnText: {
+    fontSize: 12,
+    color: '#cbd5e1',
+    fontWeight: '600',
   },
-  deleteText: {
-    fontSize: THEME.typography.sizes.xs + 1,
+  deleteTriggerBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(239, 68, 68, 0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.15)',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  deleteTriggerText: {
+    fontSize: 12,
     color: THEME.colors.danger,
-    fontWeight: THEME.typography.weights.semibold,
+    fontWeight: '600',
+  },
+  signOutButton: {
+    marginTop: 12,
+    height: 48,
+    marginBottom: 20,
+  },
+  // Modal layout
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(2, 6, 23, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalCloseOverlay: {
+    position: 'absolute',
+    inset: 0,
+  },
+  modalContent: {
+    width: '100%',
+    maxHeight: '80%',
+    padding: THEME.spacing.lg,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  modalContentSmall: {
+    width: '100%',
+    maxHeight: '50%',
+    padding: THEME.spacing.lg,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+    paddingBottom: 12,
+    marginBottom: 12,
+  },
+  modalTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  modalListScroll: {
+    flexGrow: 0,
+  },
+  modalGroup: {
+    marginBottom: 14,
+  },
+  modalGroupHeader: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#64748b',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 6,
+    marginTop: 6,
+  },
+  modalItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.02)',
+  },
+  modalItemActive: {
+    backgroundColor: 'rgba(99, 102, 241, 0.04)',
+  },
+  modalItemText: {
+    fontSize: 13,
+    color: '#94a3b8',
+  },
+  modalItemTextActive: {
+    color: THEME.colors.primaryLight,
+    fontWeight: '700',
   },
 });
