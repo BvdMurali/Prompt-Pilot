@@ -129,6 +129,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [supabaseUrl, supabaseAnonKey]);
 
+  // Listen to user profile changes in the users table in real-time
+  useEffect(() => {
+    if (isLocalMode || !user) return;
+
+    console.log('[AuthContext] Registering real-time listener for user profile changes:', user.id);
+
+    const client = updateSupabaseInstance(supabaseUrl, supabaseAnonKey);
+    const userChannel = client
+      .channel('user-profile-db-changes')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${user.id}` },
+        (payload) => {
+          console.log('[AuthContext] Real-time profile database update received:', payload.new);
+          setUser(prev => prev ? {
+            ...prev,
+            name: payload.new.name || prev.name,
+            avatar_url: payload.new.avatar_url || prev.avatar_url,
+          } : null);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('[AuthContext] Cleaning up user profile listener...');
+      client.removeChannel(userChannel);
+    };
+  }, [isLocalMode, user, supabaseUrl, supabaseAnonKey]);
+
   const loadSession = async () => {
     try {
       setLoading(true);
