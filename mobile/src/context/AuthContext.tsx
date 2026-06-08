@@ -8,9 +8,8 @@ import { updateSupabaseInstance, DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_ANON_KEY
 // Required for expo-web-browser OAuth redirect handling on Android
 WebBrowser.maybeCompleteAuthSession();
 
-// The web callback URL — always HTTPS, always works through any browser
-// It exchanges the Supabase code and then redirects to promptpilot://#tokens
-const WEB_CALLBACK_URL = 'https://prompt-pilot-ochre.vercel.app/api/auth/callback?mobile=1';
+// Base web callback URL — the device's own deep-link return URL is appended at call time
+const WEB_CALLBACK_BASE = 'https://prompt-pilot-ochre.vercel.app/api/auth/callback';
 
 interface UserProfile {
   id: string;
@@ -193,33 +192,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   /**
-   * Google Sign-In — Two-phase approach that works in BOTH Expo Go and standalone:
+   * Google Sign-In — Three-step approach that works in Expo Go AND standalone:
    *
-   * Phase 1: Open the OAuth flow using WebBrowser pointing to the Supabase OAuth URL.
-   *          redirectTo = our Vercel web callback (always HTTPS, always works).
+   * Step 1: Get the device's own deep-link URL:
+   *         - Expo Go:    exp://192.168.x.x:8081
+   *         - Standalone: promptpilot://
    *
-   * Phase 2: The web callback (route.ts) exchanges the Supabase code, then redirects to:
-   *          promptpilot://#access_token=xxx&refresh_token=yyy
+   * Step 2: Pass it as `return=<encoded>` in the Vercel web callback URL.
+   *         The redirectTo sent to Supabase is:
+   *         https://prompt-pilot-ochre.vercel.app/api/auth/callback?return=exp%3A%2F%2F...
    *
-   *          The deep link listener above catches this URL and calls loginWithOAuth().
-   *
-   * Why this is better than using exp:// directly:
-   * - The web callback is HTTPS and always reachable from any browser
-   * - promptpilot:// is registered by app.json scheme and handled by the OS
-   * - Works in Expo Go (via Linking.addEventListener) AND standalone builds
+   * Step 3: After Google login, the Vercel page:
+   *         - Exchanges the Supabase code for tokens
+   *         - Shows a page with window.location = "<return>#access_token=..."
+   *         - The OS routes this back to the correct app (Expo Go or standalone)
+   *         - Linking.addEventListener in this AuthProvider catches it
    */
   const signInWithGoogle = async (): Promise<void> => {
     try {
       setLoading(true);
       const client = updateSupabaseInstance(supabaseUrl, supabaseAnonKey);
 
-      console.log('[AuthContext] Starting Google OAuth...');
-      console.log('[AuthContext] Web callback URL:', WEB_CALLBACK_URL);
+      // Get THIS device's deep-link URL — changes per device/environment
+      // Expo Go:    exp://192.168.x.x:8081
+      // Standalone: promptpilot://
+      const deviceReturnUrl = Linking.createURL('');
+      const callbackUrl = `${WEB_CALLBACK_BASE}?return=${encodeURIComponent(deviceReturnUrl)}`;
+
+      console.log('[AuthContext] Device deep-link URL:', deviceReturnUrl);
+      console.log('[AuthContext] Callback URL:', callbackUrl);
 
       const { data, error } = await client.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: WEB_CALLBACK_URL,
+          redirectTo: callbackUrl,
           skipBrowserRedirect: true,
         },
       });
@@ -228,15 +234,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(error?.message || 'Failed to get Google OAuth URL from Supabase');
       }
 
-      console.log('[AuthContext] Opening OAuth URL...');
+      console.log('[AuthContext] Opening browser for OAuth...');
 
-      // Open browser — on Android this uses the polyfill (Chrome Custom Tabs).
-      // The browser will:
-      //   Google login → Supabase callback → Our Vercel /api/auth/callback?mobile=1
-      //   → promptpilot://#access_token=xxx
-      // That final redirect fires the deep link listener above.
-      // We use openBrowserAsync (not openAuthSessionAsync) because we don't need
-      // the browser to intercept the redirect — the OS/Linking handles it.
+      // Open Chrome Custom Tab / Safari — the web callback will show a page
+      // that uses window.location to redirect to deviceReturnUrl#tokens
+      // The Linking listener below catches that deep link and logs the user in.
       await WebBrowser.openBrowserAsync(data.url);
 
       console.log('[AuthContext] Browser closed/dismissed.');

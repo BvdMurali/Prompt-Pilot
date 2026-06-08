@@ -7,16 +7,12 @@ export async function GET(request: NextRequest) {
   const code = requestUrl.searchParams.get('code');
   const next = requestUrl.searchParams.get('next') ?? '/dashboard/editor';
 
-  // ── Mobile app deep-link redirect ───────────────────────────────────────────
-  // When the mobile app initiates Google OAuth, it sets redirectTo to this
-  // callback URL with a `mobile=1` query param. After Supabase exchanges the
-  // code, we redirect back to the mobile app scheme instead of the web dashboard.
-  //
-  // Flow:
-  //   Mobile app → Supabase OAuth → Google → Supabase callback →
-  //   THIS route (with ?code=xxx&mobile=1) → exchanges code → redirects to
-  //   promptpilot://#access_token=yyy&refresh_token=zzz  (app opens directly)
-  const isMobile = requestUrl.searchParams.get('mobile') === '1';
+  // The mobile app encodes its own deep-link URL in the `return` param so
+  // this server knows exactly where to redirect after auth completes.
+  // e.g. in Expo Go:   exp://192.168.x.x:8081
+  //      in standalone: promptpilot://
+  const returnUrl = requestUrl.searchParams.get('return');
+  const isMobile = !!returnUrl;
 
   if (code) {
     const cookieStore = await cookies();
@@ -24,22 +20,111 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && data.session && isMobile) {
-      // Build the mobile deep-link URL with tokens in the hash fragment
       const { access_token, refresh_token, expires_in, token_type } = data.session;
-      const mobileRedirect = new URL('promptpilot://');
+
       const fragment = new URLSearchParams({
         access_token,
         refresh_token: refresh_token ?? '',
         token_type: token_type ?? 'bearer',
         expires_in: String(expires_in ?? 3600),
         type: 'oauth',
+      }).toString();
+
+      // Build the deep link back to the mobile app
+      const deepLink = `${returnUrl}#${fragment}`;
+
+      // Return an HTML page that:
+      // 1. Auto-redirects via JS (works in most cases)
+      // 2. Shows a manual "Open App" button as fallback
+      // Using HTML instead of NextResponse.redirect because:
+      // - Custom scheme redirects (exp://, promptpilot://) can be blocked by browsers
+      // - window.location assignment works more reliably for custom schemes on Android
+      const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login Successful — PromptPilot</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 40px 32px;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+    }
+    .icon { font-size: 48px; margin-bottom: 20px; }
+    h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    p { font-size: 14px; color: #94a3b8; margin-bottom: 28px; line-height: 1.6; }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: #6366f1;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #4f46e5; }
+    .status { font-size: 12px; color: #64748b; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">✅</div>
+    <h1>Login Successful!</h1>
+    <p>You have signed in with Google. Tap the button below to return to PromptPilot.</p>
+    <a class="btn" id="openBtn" href="${deepLink}">Open PromptPilot App</a>
+    <p class="status" id="status">Attempting to open app automatically...</p>
+  </div>
+  <script>
+    // Try auto-redirect immediately
+    window.location.href = ${JSON.stringify(deepLink)};
+    
+    // Update status after a moment
+    setTimeout(function() {
+      document.getElementById('status').textContent = 
+        'If the app did not open, tap the button above.';
+    }, 2500);
+  </script>
+</body>
+</html>`;
+
+      return new Response(html, {
+        status: 200,
+        headers: { 'Content-Type': 'text/html' },
       });
-      // Redirect to the mobile app with tokens — the Expo deep link handler
-      // will catch this and establish the session
-      return NextResponse.redirect(`promptpilot://#${fragment.toString()}`);
+    }
+
+    // Failed to exchange code — show error
+    if (error && isMobile) {
+      return new Response(`<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Auth Error</title>
+<style>body{font-family:sans-serif;background:#0f172a;color:#f1f5f9;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;text-align:center;}</style>
+</head><body><div><h1>⚠️ Authentication Error</h1><p style="color:#94a3b8;margin-top:12px">${error.message}</p><p style="margin-top:20px;font-size:13px;color:#64748b">Please close this and try again.</p></div></body></html>`,
+        { status: 200, headers: { 'Content-Type': 'text/html' } }
+      );
     }
   }
 
-  // ── Web dashboard redirect (default) ────────────────────────────────────────
+  // ── Web dashboard redirect (default, non-mobile) ────────────────────────────
   return NextResponse.redirect(`${requestUrl.origin}${next}`);
 }
