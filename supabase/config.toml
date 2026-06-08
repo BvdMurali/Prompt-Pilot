@@ -17,7 +17,10 @@ site_url = "http://localhost:3000"
 additional_redirect_urls = [
   "http://localhost:3000/api/auth/callback",
   "chrome-extension://*",
-  "http://localhost:19006"
+  "http://localhost:19006",
+  "promptpilot://",
+  "promptpilot://**",
+  "exp://**"
 ]
 
 [auth.external.google]

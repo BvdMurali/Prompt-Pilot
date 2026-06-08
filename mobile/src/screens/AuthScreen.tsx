@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   StyleSheet, 
   Text, 
@@ -11,7 +11,6 @@ import {
   Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as Linking from 'expo-linking';
 import { useAuth } from '../context/AuthContext';
 import { THEME } from '../constants/theme';
 import GlassCard from '../components/GlassCard';
@@ -23,7 +22,6 @@ export default function AuthScreen() {
     loginWithEmail, 
     signUpWithEmail, 
     signInWithGoogle, 
-    loginWithOAuth, 
     loginSandbox, 
     loading, 
     updateConfig, 
@@ -41,60 +39,9 @@ export default function AuthScreen() {
   const [sbUrlInput, setSbUrlInput] = useState(supabaseUrl);
   const [sbKeyInput, setSbKeyInput] = useState(supabaseAnonKey);
 
-  // Setup deep linking listener to capture Google OAuth redirect
-  useEffect(() => {
-    const handleDeepLink = async (event: { url: string }) => {
-      const url = event.url;
-      if (!url) return;
-
-      console.log('Incoming OAuth Redirect URL:', url);
-
-      // Parse tokens from hash query params
-      const parts = url.split(/[#?]/);
-      if (parts.length > 1) {
-        const queryString = parts[1];
-        const pairs = queryString.split('&');
-        const params: Record<string, string> = {};
-
-        pairs.forEach((pair) => {
-          const [key, value] = pair.split('=');
-          if (key && value) {
-            params[key] = decodeURIComponent(value);
-          }
-        });
-
-        const accessToken = params.access_token;
-        const refreshToken = params.refresh_token;
-
-        if (accessToken && refreshToken) {
-          try {
-            // Reinitialize config to match developer overrides prior to starting login
-            if (showAdvanced) {
-              await updateConfig(apiUrlInput.trim(), sbUrlInput.trim(), sbKeyInput.trim());
-            } else {
-              await updateConfig(apiUrlInput.trim());
-            }
-            await loginWithOAuth(accessToken, refreshToken);
-            Alert.alert('Google Sign-In Successful', 'Successfully synced your workspace.');
-          } catch (err: any) {
-            Alert.alert('Authentication Error', err.message || 'OAuth session initialization failed');
-          }
-        }
-      }
-    };
-
-    // Listen for deep link events while the app is active
-    const subscription = Linking.addEventListener('url', handleDeepLink);
-
-    // Capture initial link if the app was opened from a cold start
-    Linking.getInitialURL().then((url) => {
-      if (url) handleDeepLink({ url });
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [apiUrlInput, sbUrlInput, sbKeyInput, showAdvanced]);
+  // No manual deep link listener needed here.
+  // expo-web-browser (WebBrowser.openAuthSessionAsync) handles the OAuth
+  // redirect interception internally inside signInWithGoogle() in AuthContext.
 
   const handleGoogleLogin = async () => {
     try {

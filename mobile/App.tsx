@@ -10,9 +10,14 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as WebBrowser from 'expo-web-browser';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { DatabaseProvider } from './src/context/DatabaseContext';
 import { THEME } from './src/constants/theme';
+
+// Required so Android closes the OAuth browser tab when it redirects back
+WebBrowser.maybeCompleteAuthSession();
+
 import Logo from './src/components/Logo';
 
 // Screens

@@ -9,8 +9,8 @@ export const initSupabase = (url?: string, anonKey?: string) => {
   
   return createClient(finalUrl, finalKey, {
     auth: {
-      persistSession: false,
-      autoRefreshToken: false,
+      persistSession: true,
+      autoRefreshToken: true,
       detectSessionInUrl: false,
     },
   });
