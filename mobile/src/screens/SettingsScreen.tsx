@@ -240,6 +240,11 @@ export default function SettingsScreen() {
   const handleSaveSettings = async () => {
     setSaving(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('[SettingsScreen] Supabase session user:', session?.user?.id);
+      console.log('[SettingsScreen] Context user ID:', user?.id);
+      console.log('[SettingsScreen] Supabase URL:', supabase.supabaseUrl);
+      console.log('[SettingsScreen] isLocalMode:', isLocalMode);
       const keys = {
         gemini: geminiKey.trim() || undefined,
         openai: openaiKey.trim() || undefined,
