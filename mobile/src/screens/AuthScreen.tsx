@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   StyleSheet, 
   Text, 
@@ -11,6 +11,7 @@ import {
   Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Linking from 'expo-linking';
 import { useAuth } from '../context/AuthContext';
 import { THEME } from '../constants/theme';
 import GlassCard from '../components/GlassCard';
@@ -18,17 +19,95 @@ import CustomButton from '../components/CustomButton';
 import Logo from '../components/Logo';
 
 export default function AuthScreen() {
-  const { loginWithEmail, signUpWithEmail, loginSandbox, loading, updateConfig, supabaseUrl, supabaseAnonKey } = useAuth();
+  const { 
+    loginWithEmail, 
+    signUpWithEmail, 
+    signInWithGoogle, 
+    loginWithOAuth, 
+    loginSandbox, 
+    loading, 
+    updateConfig, 
+    supabaseUrl, 
+    supabaseAnonKey 
+  } = useAuth();
   
-  const [apiUrlInput, setApiUrlInput] = useState('http://localhost:3000');
+  const [apiUrlInput, setApiUrlInput] = useState('https://prompt-pilot-ochre.vercel.app');
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   
-  // Advanced Supabase overrides
+  // Advanced overrides hidden under Developer Settings
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [sbUrlInput, setSbUrlInput] = useState(supabaseUrl);
   const [sbKeyInput, setSbKeyInput] = useState(supabaseAnonKey);
+
+  // Setup deep linking listener to capture Google OAuth redirect
+  useEffect(() => {
+    const handleDeepLink = async (event: { url: string }) => {
+      const url = event.url;
+      if (!url) return;
+
+      console.log('Incoming OAuth Redirect URL:', url);
+
+      // Parse tokens from hash query params
+      const parts = url.split(/[#?]/);
+      if (parts.length > 1) {
+        const queryString = parts[1];
+        const pairs = queryString.split('&');
+        const params: Record<string, string> = {};
+
+        pairs.forEach((pair) => {
+          const [key, value] = pair.split('=');
+          if (key && value) {
+            params[key] = decodeURIComponent(value);
+          }
+        });
+
+        const accessToken = params.access_token;
+        const refreshToken = params.refresh_token;
+
+        if (accessToken && refreshToken) {
+          try {
+            // Reinitialize config to match developer overrides prior to starting login
+            if (showAdvanced) {
+              await updateConfig(apiUrlInput.trim(), sbUrlInput.trim(), sbKeyInput.trim());
+            } else {
+              await updateConfig(apiUrlInput.trim());
+            }
+            await loginWithOAuth(accessToken, refreshToken);
+            Alert.alert('Google Sign-In Successful', 'Successfully synced your workspace.');
+          } catch (err: any) {
+            Alert.alert('Authentication Error', err.message || 'OAuth session initialization failed');
+          }
+        }
+      }
+    };
+
+    // Listen for deep link events while the app is active
+    const subscription = Linking.addEventListener('url', handleDeepLink);
+
+    // Capture initial link if the app was opened from a cold start
+    Linking.getInitialURL().then((url) => {
+      if (url) handleDeepLink({ url });
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [apiUrlInput, sbUrlInput, sbKeyInput, showAdvanced]);
+
+  const handleGoogleLogin = async () => {
+    try {
+      if (showAdvanced) {
+        await updateConfig(apiUrlInput.trim(), sbUrlInput.trim(), sbKeyInput.trim());
+      } else {
+        await updateConfig(apiUrlInput.trim());
+      }
+      await signInWithGoogle();
+    } catch (e: any) {
+      Alert.alert('OAuth Failure', e.message || 'Failed to start Google authentication.');
+    }
+  };
 
   const handleAuthenticate = async () => {
     try {
@@ -97,6 +176,24 @@ export default function AuthScreen() {
         </View>
 
         <GlassCard style={styles.card}>
+          {/* Continue with Google (OAuth Primary CTA) */}
+          <CustomButton
+            title="Continue with Google"
+            onPress={handleGoogleLogin}
+            loading={loading}
+            icon="logo-google"
+            variant="secondary"
+            style={styles.googleButton}
+            textStyle={styles.googleButtonText}
+          />
+
+          {/* Styled Separator Divider */}
+          <View style={styles.dividerRow}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>or use email</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
           {/* Tab Switcher between Sign In and Sign Up */}
           <View style={styles.tabHeader}>
             <TouchableOpacity 
@@ -121,23 +218,6 @@ export default function AuthScreen() {
             >
               <Text style={[styles.tabText, isSignUp && styles.tabTextActive]}>Sign Up</Text>
             </TouchableOpacity>
-          </View>
-          
-          {/* Dashboard API Endpoint Input */}
-          <View style={styles.formGroup}>
-            <Text style={styles.label}>Dashboard API Endpoint</Text>
-            <View style={styles.inputContainer}>
-              <Ionicons name="link-outline" size={18} color={THEME.colors.textMuted} style={styles.inputIcon} />
-              <TextInput
-                value={apiUrlInput}
-                onChangeText={setApiUrlInput}
-                placeholder="http://192.168.137.1:3000"
-                placeholderTextColor={THEME.colors.textMuted}
-                autoCapitalize="none"
-                autoCorrect={false}
-                style={styles.input}
-              />
-            </View>
           </View>
 
           {/* Email Input */}
@@ -176,14 +256,14 @@ export default function AuthScreen() {
             </View>
           </View>
 
-          {/* Advanced Supabase Database configurations (collapsible) */}
+          {/* Advanced Configurations Collapsible Toggle */}
           <TouchableOpacity 
             onPress={() => setShowAdvanced(!showAdvanced)} 
             style={styles.advancedToggle}
             activeOpacity={0.7}
           >
             <Text style={styles.advancedToggleText}>
-              {showAdvanced ? 'Hide Database Overrides' : 'Advanced Database Configuration'}
+              {showAdvanced ? 'Hide Developer Settings' : 'Developer / Local Settings'}
             </Text>
             <Ionicons 
               name={showAdvanced ? 'chevron-up' : 'chevron-down'} 
@@ -194,6 +274,21 @@ export default function AuthScreen() {
 
           {showAdvanced && (
             <View style={styles.advancedBox}>
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Dashboard API Endpoint</Text>
+                <View style={styles.inputContainer}>
+                  <Ionicons name="link-outline" size={18} color={THEME.colors.textMuted} style={styles.inputIcon} />
+                  <TextInput
+                    value={apiUrlInput}
+                    onChangeText={setApiUrlInput}
+                    placeholder="https://prompt-pilot-ochre.vercel.app"
+                    placeholderTextColor={THEME.colors.textMuted}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    style={styles.input}
+                  />
+                </View>
+              </View>
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Supabase Project URL</Text>
                 <TextInput
@@ -222,9 +317,9 @@ export default function AuthScreen() {
             </View>
           )}
 
-          {/* Primary Authentication Button */}
+          {/* Primary Email Auth Button */}
           <CustomButton
-            title={isSignUp ? "Create Workspace Account" : "Authenticate & Sync"}
+            title={isSignUp ? "Create Workspace Account" : "Sign In & Sync"}
             onPress={handleAuthenticate}
             loading={loading}
             variant="gradient"
@@ -257,7 +352,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: THEME.spacing.xl,
+    marginBottom: THEME.spacing.lg,
   },
   iconCircle: {
     width: 70,
@@ -282,6 +377,33 @@ const styles = StyleSheet.create({
   },
   card: {
     padding: THEME.spacing.xl,
+  },
+  googleButton: {
+    backgroundColor: '#1e293b',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1,
+    marginBottom: THEME.spacing.xs,
+  },
+  googleButtonText: {
+    color: '#fff',
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: THEME.spacing.md,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  dividerText: {
+    fontSize: THEME.typography.sizes.xxs,
+    fontWeight: THEME.typography.weights.bold,
+    color: THEME.colors.textMuted,
+    textTransform: 'uppercase',
+    paddingHorizontal: THEME.spacing.md,
+    letterSpacing: 0.5,
   },
   tabHeader: {
     flexDirection: 'row',

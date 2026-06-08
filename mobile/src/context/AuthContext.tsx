@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Linking from 'expo-linking';
+import { Linking as RNLinking } from 'react-native';
 import { supabase, updateSupabaseInstance, DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_ANON_KEY } from '../services/supabase';
 
 interface UserProfile {
@@ -21,6 +23,8 @@ interface AuthContextType {
   supabaseAnonKey: string;
   loginWithEmail: (url: string, email: string, password: string) => Promise<boolean>;
   signUpWithEmail: (url: string, email: string, password: string) => Promise<boolean>;
+  signInWithGoogle: () => Promise<void>;
+  loginWithOAuth: (accessToken: string, refreshToken: string) => Promise<void>;
   loginSandbox: (url: string) => Promise<void>;
   logout: () => Promise<void>;
   updateConfig: (apiUrl: string, supabaseUrl?: string, supabaseKey?: string) => Promise<void>;
@@ -37,7 +41,7 @@ const SB_KEY_KEY = 'pp_supabase_key';
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState<string | null>(null);
-  const [apiUrl, setApiUrl] = useState('http://localhost:3000');
+  const [apiUrl, setApiUrl] = useState('https://prompt-pilot-ochre.vercel.app');
   const [supabaseUrl, setSupabaseUrl] = useState(DEFAULT_SUPABASE_URL);
   const [supabaseAnonKey, setSupabaseAnonKey] = useState(DEFAULT_SUPABASE_ANON_KEY);
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -206,6 +210,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signInWithGoogle = async (): Promise<void> => {
+    try {
+      setLoading(true);
+      const client = updateSupabaseInstance(supabaseUrl, supabaseAnonKey);
+      
+      // Generate redirect link dynamically via expo-linking
+      const redirectUrl = Linking.createURL('/');
+      console.log('OAuth redirect URL:', redirectUrl);
+
+      const { data, error } = await client.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          skipBrowserRedirect: true,
+        },
+      });
+
+      if (error || !data?.url) {
+        throw new Error(error?.message || 'Failed to initialize Google authentication');
+      }
+
+      // Open Google login page in browser
+      await RNLinking.openURL(data.url);
+    } catch (error) {
+      console.error('Google Sign-In error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loginWithOAuth = async (accessToken: string, refreshToken: string): Promise<void> => {
+    try {
+      setLoading(true);
+      const client = updateSupabaseInstance(supabaseUrl, supabaseAnonKey);
+      
+      const { data: sessionData, error: sessionError } = await client.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+
+      if (sessionError || !sessionData.user) {
+        throw new Error(sessionError?.message || 'OAuth session initialization failed');
+      }
+
+      // Fetch user profile from public.users
+      const { data: profile } = await client
+        .from('users')
+        .select('*')
+        .eq('id', sessionData.user.id)
+        .single();
+
+      setUser({
+        id: sessionData.user.id,
+        email: sessionData.user.email || '',
+        name: profile?.name || '',
+        avatar_url: profile?.avatar_url || '',
+      });
+
+      await SecureStore.setItemAsync(TOKEN_KEY, accessToken);
+      await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, refreshToken);
+      
+      setToken(accessToken);
+      setIsLocalMode(false);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('OAuth login failed:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const loginSandbox = async (url: string): Promise<void> => {
     try {
       setLoading(true);
@@ -277,6 +354,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       supabaseAnonKey,
       loginWithEmail,
       signUpWithEmail,
+      signInWithGoogle,
+      loginWithOAuth,
       loginSandbox,
       logout,
       updateConfig,
