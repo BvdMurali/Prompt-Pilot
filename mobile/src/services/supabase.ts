@@ -18,9 +18,21 @@ const initSupabase = (url?: string, anonKey?: string) => {
 
 // Store active client internally
 let activeClient = initSupabase();
+let currentUrl = DEFAULT_SUPABASE_URL;
+let currentKey = DEFAULT_SUPABASE_ANON_KEY;
 
 export const updateSupabaseInstance = (url?: string, anonKey?: string) => {
-  activeClient = initSupabase(url, anonKey);
+  const targetUrl = url || DEFAULT_SUPABASE_URL;
+  const targetKey = anonKey || DEFAULT_SUPABASE_ANON_KEY;
+  
+  if (activeClient && currentUrl === targetUrl && currentKey === targetKey) {
+    return activeClient;
+  }
+  
+  console.log(`[supabase.ts] Creating a new Supabase client instance for URL: ${targetUrl}`);
+  currentUrl = targetUrl;
+  currentKey = targetKey;
+  activeClient = initSupabase(targetUrl, targetKey);
   return activeClient;
 };
 

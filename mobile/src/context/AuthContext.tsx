@@ -183,6 +183,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           refresh_token: refreshToken || '',
         });
 
+        console.log('[AuthContext] loadSession setSession result error:', sessionError?.message || 'none');
+        console.log('[AuthContext] loadSession sessionData user:', sessionData.user?.id);
+        
+        const { data: { session: globalSession } } = await supabase.auth.getSession();
+        console.log('[AuthContext] loadSession global proxy session user:', globalSession?.user?.id);
+
         if (!sessionError && sessionData.user && sessionData.session) {
           const newAccess = sessionData.session.access_token;
           const newRefresh = sessionData.session.refresh_token;

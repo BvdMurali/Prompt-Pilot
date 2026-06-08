@@ -108,7 +108,7 @@ function AppContent() {
         {(['editor', 'library', 'templates', 'history', 'settings'] as TabType[]).map((tab) => {
           let iconName: any = 'sparkles';
           if (tab === 'library') iconName = 'library-outline';
-          else if (tab === 'templates') iconName = 'layout-outline';
+          else if (tab === 'templates') iconName = 'layers-outline';
           else if (tab === 'history') iconName = 'time-outline';
           else if (tab === 'settings') iconName = 'settings-outline';
 
