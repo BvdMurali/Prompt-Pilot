@@ -79,21 +79,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ── Deep link listener ───────────────────────────────────────────────────────
-  // After the web callback exchanges the Supabase code, it redirects to:
-  //   promptpilot://#access_token=xxx&refresh_token=yyy
-  // This listener catches that URL and establishes the session.
+  // After the web callback exchanges the Supabase code, it shows a page with:
+  //   window.location.href = "<deviceReturnUrl>#access_token=xxx&refresh_token=yyy"
+  // Where deviceReturnUrl is:
+  //   - exp://192.168.x.x:8081  in Expo Go
+  //   - promptpilot://           in standalone build
+  // This listener catches both and establishes the session.
   useEffect(() => {
     const handleDeepLink = (event: { url: string }) => {
       const { url } = event;
-      if (!url || !url.startsWith('promptpilot://')) return;
+      if (!url) return;
 
-      console.log('[AuthContext] Deep link received:', url.substring(0, 80) + '...');
+      // Only handle URLs that contain OAuth tokens (have access_token param)
+      if (!url.includes('access_token=')) return;
+
+      console.log('[AuthContext] Deep link with tokens received:', url.substring(0, 100) + '...');
       const params = parseUrlParams(url);
       const accessToken = params['access_token'];
       const refreshToken = params['refresh_token'];
 
       if (accessToken && refreshToken) {
-        console.log('[AuthContext] Tokens found in deep link, logging in...');
+        console.log('[AuthContext] Logging in via deep link tokens...');
         loginWithOAuth(accessToken, refreshToken).catch((e) =>
           console.error('[AuthContext] Deep link login failed:', e)
         );
