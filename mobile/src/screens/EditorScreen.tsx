@@ -10,7 +10,9 @@ import {
   Alert,
   Keyboard,
   Modal,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
@@ -64,6 +66,8 @@ export default function EditorScreen({ preloadText, onClearPreloadText }: Editor
   // Modal visibility states
   const [showToneModal, setShowToneModal] = useState(false);
   const [showPlatformModal, setShowPlatformModal] = useState(false);
+  const [saveModalVisible, setSaveModalVisible] = useState(false);
+  const [promptTitle, setPromptTitle] = useState('');
 
   React.useEffect(() => {
     if (preloadText) {
@@ -119,37 +123,28 @@ export default function EditorScreen({ preloadText, onClearPreloadText }: Editor
   };
 
   const handleSavePrompt = () => {
+    const defaultTitle = action === 'optimize' ? 'My Optimized Prompt' : 'My Improved Text';
+    setPromptTitle(defaultTitle);
+    setSaveModalVisible(true);
+  };
+
+  const confirmSavePrompt = async () => {
+    if (!promptTitle.trim()) {
+      Alert.alert('Error', 'Please enter a valid title.');
+      return;
+    }
+
     const textToSave = selectedVariation === null 
       ? result.improved_text 
       : result.variations[selectedVariation];
 
-    Alert.prompt(
-      'Save to Library',
-      'Enter a name for this prompt:',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Save',
-          onPress: async (title?: string) => {
-            if (!title || !title.trim()) {
-              Alert.alert('Error', 'Please enter a valid title.');
-              return;
-            }
-            try {
-              await savePrompt(title.trim(), textToSave, action === 'optimize' ? 'Optimization' : 'Rewriting');
-              Alert.alert('Saved', 'Prompt saved to your synced library.');
-            } catch (e) {
-              Alert.alert('Failed to Save', 'Could not save prompt to library.');
-            }
-          },
-        },
-      ],
-      'plain-text',
-      'My Optimized Prompt'
-    );
+    try {
+      await savePrompt(promptTitle.trim(), textToSave, action === 'optimize' ? 'Optimization' : 'Rewriting');
+      setSaveModalVisible(false);
+      Alert.alert('Saved', 'Prompt saved to your synced library.');
+    } catch (e) {
+      Alert.alert('Failed to Save', 'Could not save prompt to library.');
+    }
   };
 
   const getActiveText = () => {
@@ -438,6 +433,61 @@ export default function EditorScreen({ preloadText, onClearPreloadText }: Editor
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+
+      {/* Save to Library Modal */}
+      <Modal
+        visible={saveModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSaveModalVisible(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setSaveModalVisible(false)}>
+          <View style={styles.modalCenteredOverlay}>
+            <TouchableWithoutFeedback>
+              <KeyboardAvoidingView 
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={{ width: '100%', alignItems: 'center' }}
+              >
+                <GlassCard style={styles.saveModalBox}>
+                  <View style={styles.modalHeader}>
+                    <Text style={styles.modalTitle}>Save to Library</Text>
+                    <TouchableOpacity onPress={() => setSaveModalVisible(false)}>
+                      <Ionicons name="close" size={20} color={THEME.colors.textSecondary} />
+                    </TouchableOpacity>
+                  </View>
+                  
+                  <View style={styles.saveModalBody}>
+                    <Text style={styles.saveModalLabel}>Prompt Title</Text>
+                    <TextInput
+                      value={promptTitle}
+                      onChangeText={setPromptTitle}
+                      placeholder="Enter a title..."
+                      placeholderTextColor={THEME.colors.textMuted}
+                      autoFocus
+                      style={styles.saveModalInput}
+                    />
+                  </View>
+
+                  <View style={styles.saveModalActions}>
+                    <CustomButton
+                      title="Cancel"
+                      onPress={() => setSaveModalVisible(false)}
+                      variant="secondary"
+                      style={styles.saveModalBtn}
+                    />
+                    <CustomButton
+                      title="Save"
+                      onPress={confirmSavePrompt}
+                      variant="gradient"
+                      style={styles.saveModalBtn}
+                    />
+                  </View>
+                </GlassCard>
+              </KeyboardAvoidingView>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </ScrollView>
   );
 }
@@ -693,5 +743,46 @@ const styles = StyleSheet.create({
   boldLabel: {
     fontWeight: THEME.typography.weights.bold,
     color: THEME.colors.textPrimary,
+  },
+  modalCenteredOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(2, 6, 23, 0.75)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: THEME.spacing.lg,
+  },
+  saveModalBox: {
+    width: '90%',
+    maxWidth: 360,
+    padding: THEME.spacing.lg,
+    borderWidth: 1,
+    borderColor: THEME.colors.border,
+  },
+  saveModalBody: {
+    marginVertical: THEME.spacing.lg,
+    gap: 8,
+  },
+  saveModalLabel: {
+    fontSize: THEME.typography.sizes.xs,
+    color: THEME.colors.textMuted,
+    fontWeight: THEME.typography.weights.bold,
+    textTransform: 'uppercase',
+  },
+  saveModalInput: {
+    backgroundColor: THEME.colors.surface,
+    borderColor: THEME.colors.border,
+    borderWidth: 1,
+    borderRadius: THEME.roundness.md,
+    height: 44,
+    paddingHorizontal: THEME.spacing.md,
+    color: THEME.colors.textPrimary,
+    fontSize: THEME.typography.sizes.sm,
+  },
+  saveModalActions: {
+    flexDirection: 'row',
+    gap: THEME.spacing.md,
+  },
+  saveModalBtn: {
+    flex: 1,
   },
 });
