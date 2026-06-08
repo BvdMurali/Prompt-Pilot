@@ -220,7 +220,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     userId: string,
     email: string
   ) => {
-    const client = updateSupabaseInstance(supabaseUrl, supabaseAnonKey);
+    const client = supabase;
+    await client.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
     await SecureStore.setItemAsync(TOKEN_KEY, accessToken);
     await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, refreshToken);
 
