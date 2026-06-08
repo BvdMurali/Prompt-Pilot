@@ -62,7 +62,6 @@ export default function SettingsPage() {
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [copiedId, setCopiedId] = useState(false);
-  const [copiedToken, setCopiedToken] = useState(false);
 
   useEffect(() => {
     async function loadSettings() {
@@ -321,13 +320,6 @@ export default function SettingsPage() {
     navigator.clipboard.writeText(session.user.id);
     setCopiedId(true);
     setTimeout(() => setCopiedId(false), 2000);
-  };
-
-  const handleCopySyncToken = () => {
-    if (!session?.access_token) return;
-    navigator.clipboard.writeText(session.access_token);
-    setCopiedToken(true);
-    setTimeout(() => setCopiedToken(false), 2000);
   };
 
   if (loading) {
@@ -646,31 +638,6 @@ export default function SettingsPage() {
                 <p className="text-xs xl:text-sm leading-relaxed text-slate-400">
                   Your data is isolated securely using PostgreSQL Row Level Security (RLS). You hold the authority to export or permanently purge all record data.
                 </p>
-              </div>
-
-              {/* Mobile App Sync */}
-              <div className="flex flex-col gap-3 border-t border-slate-800/80 pt-6">
-                <span className="font-semibold text-slate-300 text-xs xl:text-sm">Mobile App Sync</span>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Connect your mobile client to sync optimized prompts, templates, and history logs in real-time.
-                </p>
-                <div className="flex flex-col gap-2.5">
-                  <div className="flex items-center justify-between bg-slate-950/40 border border-slate-900 rounded-xl px-4 py-2.5 text-xs text-slate-500">
-                    <span className="font-mono truncate max-w-[170px] xl:max-w-[200px]">
-                      {session?.access_token ? `${session.access_token.substring(0, 24)}...` : 'No active session'}
-                    </span>
-                    <button
-                      onClick={handleCopySyncToken}
-                      className="p-1 rounded hover:bg-slate-900 text-slate-400 hover:text-white transition-colors"
-                      title="Copy Mobile Sync Token"
-                    >
-                      {copiedToken ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                    </button>
-                  </div>
-                  <span className="text-[10px] text-slate-500 italic leading-relaxed">
-                    Paste this into the "Access Sync Token" field on your mobile login screen.
-                  </span>
-                </div>
               </div>
 
               {/* Export block */}
