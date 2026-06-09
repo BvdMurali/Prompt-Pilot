@@ -6,62 +6,67 @@ export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
   const next = requestUrl.searchParams.get('next') ?? '/dashboard/editor';
-
-  // The mobile app encodes its own deep-link URL in the `return` param so
-  // this server knows exactly where to redirect after auth completes.
-  // e.g. in Expo Go:   exp://192.168.x.x:8081
-  //      in standalone: promptpilot://
   const returnUrl = requestUrl.searchParams.get('return');
   const isMobile = !!returnUrl;
 
   console.log('[api/auth/callback] GET requestUrl:', request.url);
   console.log('[api/auth/callback] code present:', !!code, 'isMobile:', isMobile, 'returnUrl:', returnUrl);
 
-  if (code) {
-    const cookieStore = await cookies();
-    const supabase = createClient(cookieStore);
-    console.log('[api/auth/callback] Exchanging OAuth code for session...');
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+  let sessionData: any = null;
 
-    if (error) {
-      console.error('[api/auth/callback] Code exchange error:', error.message);
-    } else {
-      console.log('[api/auth/callback] Code exchange success. Session user:', data.session?.user?.id);
+  if (code) {
+    try {
+      const cookieStore = await cookies();
+      const supabase = createClient(cookieStore);
+      console.log('[api/auth/callback] Exchanging OAuth code for session...');
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+      if (error) {
+        console.error('[api/auth/callback] Code exchange error:', error.message);
+      } else {
+        console.log('[api/auth/callback] Code exchange success. Session user:', data.session?.user?.id);
+        sessionData = data.session;
+      }
+    } catch (err) {
+      console.error('[api/auth/callback] Server side session exchange failed:', err);
+    }
+  }
+
+  if (isMobile) {
+    // Return the HTML page for mobile deep-linking.
+    // If we have sessionData (PKCE Flow), we append it to the deep link.
+    // If not (Implicit Flow), the client-side JavaScript will read the hash fragment (window.location.hash)
+    // from the URL and append it automatically to the deep link.
+    const access_token = sessionData?.access_token || '';
+    const refresh_token = sessionData?.refresh_token || '';
+    const expires_in = sessionData?.expires_in || 3600;
+    const token_type = sessionData?.token_type || 'bearer';
+
+    const fragmentParams = new URLSearchParams();
+    if (access_token) {
+      fragmentParams.set('access_token', access_token);
+      fragmentParams.set('refresh_token', refresh_token);
+      fragmentParams.set('token_type', token_type);
+      fragmentParams.set('expires_in', String(expires_in));
+      fragmentParams.set('type', 'oauth');
     }
 
-    if (!error && data.session && isMobile) {
-      // Store the mobile return URL in a cookie so the dashboard can offer an "Open in App" button
-      try {
-        cookieStore.set('mobile_return_url', returnUrl, {
-          path: '/',
-          maxAge: 3600,
-          sameSite: 'lax',
-          httpOnly: false,
-        });
-      } catch (cookieErr) {
-        console.error('[api/auth/callback] Failed to set mobile_return_url cookie:', cookieErr);
-      }
+    const fragmentStr = fragmentParams.toString();
+    const deepLink = fragmentStr ? `${returnUrl}#${fragmentStr}` : returnUrl;
 
-      const { access_token, refresh_token, expires_in, token_type } = data.session;
+    // Set cookie if we have a returnUrl
+    try {
+      const cookieStore = await cookies();
+      cookieStore.set('mobile_return_url', returnUrl, {
+        path: '/',
+        maxAge: 3600,
+        sameSite: 'lax',
+        httpOnly: false,
+      });
+    } catch (cookieErr) {
+      console.error('[api/auth/callback] Failed to set mobile_return_url cookie:', cookieErr);
+    }
 
-      const fragment = new URLSearchParams({
-        access_token,
-        refresh_token: refresh_token ?? '',
-        token_type: token_type ?? 'bearer',
-        expires_in: String(expires_in ?? 3600),
-        type: 'oauth',
-      }).toString();
-
-      // Build the deep link back to the mobile app
-      const deepLink = `${returnUrl}#${fragment}`;
-
-      // Return an HTML page that:
-      // 1. Auto-redirects via JS (works in most cases)
-      // 2. Shows a manual "Open App" button as fallback
-      // Using HTML instead of NextResponse.redirect because:
-      // - Custom scheme redirects (exp://, promptpilot://) can be blocked by browsers
-      // - window.location assignment works more reliably for custom schemes on Android
-      const html = `<!DOCTYPE html>
+    const html = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -121,56 +126,55 @@ export async function GET(request: NextRequest) {
   </div>
   <script>
     (function() {
-      var deepLink = ${JSON.stringify(deepLink)};
+      var baseDeepLink = ${JSON.stringify(returnUrl)};
+      var serverDeepLink = ${JSON.stringify(deepLink)};
+      
+      // If the server didn't have sessionData (e.g. Implicit Flow),
+      // we read the tokens from the browser hash fragment
+      var hash = window.location.hash || '';
+      var finalDeepLink = serverDeepLink;
+      
+      if (hash && hash.indexOf('access_token') > -1) {
+        finalDeepLink = baseDeepLink + hash;
+      }
+
       var isAndroid = /Android/i.test(navigator.userAgent);
-      var finalUrl = deepLink;
+      var finalUrl = finalDeepLink;
 
       if (isAndroid) {
-        // Parse the deep link to construct an Android Intent URL
-        // e.g. exp://10.66.53.216:8081#access_token=...
-        // or promptpilot://#access_token=...
-        var match = deepLink.match(/^([^:]+):\\/\\/([^#?]*)(.*)$/);
+        var match = finalDeepLink.match(/^([^:]+):\\/\\/([^#?]*)(.*)$/);
         if (match) {
           var scheme = match[1];
           var hostAndPath = match[2];
           var queryAndFragment = match[3];
           
           var params = queryAndFragment;
-          // Change fragment hash (#) to query (?) for intent data URL parameter passing
           if (params.indexOf('#') === 0) {
             params = '?' + params.substring(1);
           }
           
-          // We omit the package name (package=...) to prevent Android Chrome from
-          // redirecting to the Google Play Store if it fails to resolve the app.
-          // This allows implicit intent matching, which is safer for local development.
           finalUrl = 'intent://' + hostAndPath + params + '#Intent;scheme=' + scheme + ';end;';
         }
       }
 
-      // Update button href: KEEP it as the raw deepLink (e.g. exp:// or promptpilot://)
-      // because when a user clicks the button, it is a user gesture and custom schemes
-      // are always allowed to open the app directly without intent:// wrapping.
       var openBtn = document.getElementById('openBtn');
       if (openBtn) {
-        openBtn.href = deepLink;
+        openBtn.href = finalDeepLink;
       }
 
-      // Show debug URL
       var debugEl = document.getElementById('debug');
       if (debugEl) {
-        debugEl.textContent = 'Platform: ' + (isAndroid ? 'Android' : 'Other') + ' | Intent: ' + finalUrl + ' | Raw: ' + deepLink;
+        debugEl.textContent = 'Platform: ' + (isAndroid ? 'Android' : 'Other') + ' | Intent: ' + finalUrl + ' | Raw: ' + finalDeepLink;
       }
 
-      // Try automatic redirect using the raw custom scheme link first
+      // Try automatic redirect
       try {
-        window.location.href = deepLink;
+        window.location.href = finalDeepLink;
       } catch (e) {
         console.error('Raw redirect failed:', e);
       }
       
-      // Fallback: Try automatic redirect using the intent link after a short delay
-      if (isAndroid && finalUrl !== deepLink) {
+      if (isAndroid && finalUrl !== finalDeepLink) {
         setTimeout(function() {
           try {
             window.location.href = finalUrl;
@@ -180,7 +184,6 @@ export async function GET(request: NextRequest) {
         }, 800);
       }
       
-      // Update status text if redirect doesn't trigger immediately
       setTimeout(function() {
         var statusEl = document.getElementById('status');
         if (statusEl) {
@@ -192,21 +195,10 @@ export async function GET(request: NextRequest) {
 </body>
 </html>`;
 
-      return new Response(html, {
-        status: 200,
-        headers: { 'Content-Type': 'text/html' },
-      });
-    }
-
-    // Failed to exchange code — show error
-    if (error && isMobile) {
-      return new Response(`<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Auth Error</title>
-<style>body{font-family:sans-serif;background:#0f172a;color:#f1f5f9;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;text-align:center;}</style>
-</head><body><div><h1>⚠️ Authentication Error</h1><p style="color:#94a3b8;margin-top:12px">${error.message}</p><p style="margin-top:20px;font-size:13px;color:#64748b">Please close this and try again.</p></div></body></html>`,
-        { status: 200, headers: { 'Content-Type': 'text/html' } }
-      );
-    }
+    return new Response(html, {
+      status: 200,
+      headers: { 'Content-Type': 'text/html' },
+    });
   }
 
   // ── Web dashboard redirect (default, non-mobile) ────────────────────────────
