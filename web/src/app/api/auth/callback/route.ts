@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
           path: '/',
           maxAge: 3600,
           sameSite: 'lax',
+          httpOnly: false,
         });
       } catch (cookieErr) {
         console.error('[api/auth/callback] Failed to set mobile_return_url cookie:', cookieErr);
