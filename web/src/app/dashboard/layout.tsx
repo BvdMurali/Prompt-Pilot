@@ -16,6 +16,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [checkingSoftDelete, setCheckingSoftDelete] = useState(true);
   const [restoring, setRestoring] = useState(false);
   const [profile, setProfile] = useState<{ name: string | null; avatarUrl: string | null } | null>(null);
+  const [mobileReturnUrl, setMobileReturnUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const match = document.cookie.match(/(?:^|; )mobile_return_url=([^;]*)/);
+    if (match) {
+      setMobileReturnUrl(decodeURIComponent(match[1]));
+    }
+  }, []);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -303,9 +311,40 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {navItems.find(n => n.href === pathname)?.name || 'Dashboard'}
             </h1>
           </div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Session active</span>
+          <div className="flex items-center gap-3">
+            {mobileReturnUrl && (
+              <button
+                onClick={async () => {
+                  try {
+                    const session = (await supabase.auth.getSession()).data.session;
+                    if (session) {
+                      const { access_token, refresh_token, expires_in, token_type } = session;
+                      const fragment = new URLSearchParams({
+                        access_token,
+                        refresh_token: refresh_token ?? '',
+                        token_type: token_type ?? 'bearer',
+                        expires_in: String(expires_in ?? 3600),
+                        type: 'oauth',
+                      }).toString();
+                      
+                      window.location.href = `${mobileReturnUrl}#${fragment}`;
+                    } else {
+                      window.location.href = mobileReturnUrl;
+                    }
+                  } catch (err) {
+                    console.error('Failed to resolve session for mobile redirect:', err);
+                    window.location.href = mobileReturnUrl;
+                  }
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-600/10 transition-all cursor-pointer"
+              >
+                <span>📱 Open in Mobile App</span>
+              </button>
+            )}
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Session active</span>
+            </div>
           </div>
         </header>
 

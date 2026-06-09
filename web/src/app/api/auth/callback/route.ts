@@ -30,6 +30,17 @@ export async function GET(request: NextRequest) {
     }
 
     if (!error && data.session && isMobile) {
+      // Store the mobile return URL in a cookie so the dashboard can offer an "Open in App" button
+      try {
+        cookieStore.set('mobile_return_url', returnUrl, {
+          path: '/',
+          maxAge: 3600,
+          sameSite: 'lax',
+        });
+      } catch (cookieErr) {
+        console.error('[api/auth/callback] Failed to set mobile_return_url cookie:', cookieErr);
+      }
+
       const { access_token, refresh_token, expires_in, token_type } = data.session;
 
       const fragment = new URLSearchParams({
