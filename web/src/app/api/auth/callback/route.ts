@@ -14,10 +14,20 @@ export async function GET(request: NextRequest) {
   const returnUrl = requestUrl.searchParams.get('return');
   const isMobile = !!returnUrl;
 
+  console.log('[api/auth/callback] GET requestUrl:', request.url);
+  console.log('[api/auth/callback] code present:', !!code, 'isMobile:', isMobile, 'returnUrl:', returnUrl);
+
   if (code) {
     const cookieStore = await cookies();
     const supabase = createClient(cookieStore);
+    console.log('[api/auth/callback] Exchanging OAuth code for session...');
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) {
+      console.error('[api/auth/callback] Code exchange error:', error.message);
+    } else {
+      console.log('[api/auth/callback] Code exchange success. Session user:', data.session?.user?.id);
+    }
 
     if (!error && data.session && isMobile) {
       const { access_token, refresh_token, expires_in, token_type } = data.session;
@@ -113,38 +123,49 @@ export async function GET(request: NextRequest) {
           var hostAndPath = match[2];
           var queryAndFragment = match[3];
           
-          var packageName = 'host.exp.exponent'; // default for Expo Go
-          if (scheme === 'promptpilot') {
-            packageName = 'com.promptpilot.app';
-          }
-          
           var params = queryAndFragment;
           // Change fragment hash (#) to query (?) for intent data URL parameter passing
           if (params.indexOf('#') === 0) {
             params = '?' + params.substring(1);
           }
           
-          finalUrl = 'intent://' + hostAndPath + params + '#Intent;scheme=' + scheme + ';package=' + packageName + ';end;';
+          // We omit the package name (package=...) to prevent Android Chrome from
+          // redirecting to the Google Play Store if it fails to resolve the app.
+          // This allows implicit intent matching, which is safer for local development.
+          finalUrl = 'intent://' + hostAndPath + params + '#Intent;scheme=' + scheme + ';end;';
         }
       }
 
-      // Update button href
+      // Update button href: KEEP it as the raw deepLink (e.g. exp:// or promptpilot://)
+      // because when a user clicks the button, it is a user gesture and custom schemes
+      // are always allowed to open the app directly without intent:// wrapping.
       var openBtn = document.getElementById('openBtn');
       if (openBtn) {
-        openBtn.href = finalUrl;
+        openBtn.href = deepLink;
       }
 
       // Show debug URL
       var debugEl = document.getElementById('debug');
       if (debugEl) {
-        debugEl.textContent = 'Platform: ' + (isAndroid ? 'Android' : 'Other') + ' | Target: ' + finalUrl;
+        debugEl.textContent = 'Platform: ' + (isAndroid ? 'Android' : 'Other') + ' | Intent: ' + finalUrl + ' | Raw: ' + deepLink;
       }
 
-      // Try automatic redirect
+      // Try automatic redirect using the raw custom scheme link first
       try {
-        window.location.href = finalUrl;
+        window.location.href = deepLink;
       } catch (e) {
-        console.error('Auto redirect failed:', e);
+        console.error('Raw redirect failed:', e);
+      }
+      
+      // Fallback: Try automatic redirect using the intent link after a short delay
+      if (isAndroid && finalUrl !== deepLink) {
+        setTimeout(function() {
+          try {
+            window.location.href = finalUrl;
+          } catch (e) {
+            console.error('Intent redirect failed:', e);
+          }
+        }, 800);
       }
       
       // Update status text if redirect doesn't trigger immediately
