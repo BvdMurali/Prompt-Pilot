@@ -69,7 +69,7 @@ async function main() {
   const toAdd = [
     'promptpilot://',
     'exp://**',
-    'https://prompt-pilot-ochre.vercel.app/api/auth/callback',
+    'https://prompt-pilot-ochre.vercel.app/api/auth/callback*',
   ];
 
   const updated = [...new Set([...existing, ...toAdd])].join(',');
