@@ -16,6 +16,7 @@ export default function LandingPage() {
 
   // Auth Modal state
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [footerModal, setFooterModal] = useState<'privacy' | 'terms' | 'security' | null>(null);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -373,12 +374,144 @@ export default function LandingPage() {
         <div className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 flex flex-col md:flex-row items-center justify-between gap-6 xl:gap-8">
           <p className="text-sm 2xl:text-base text-slate-500">&copy; 2026 PromptPilot. Built for elite productivity. Privacy First.</p>
           <div className="flex gap-6 2xl:gap-8 text-sm 2xl:text-base text-slate-500">
-            <a href="#" className="hover:text-slate-900 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-slate-900 transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-slate-900 transition-colors">Security</a>
+            <button onClick={() => setFooterModal('privacy')} className="hover:text-slate-900 transition-colors cursor-pointer bg-transparent border-0 text-sm 2xl:text-base text-slate-500 font-medium">Privacy Policy</button>
+            <button onClick={() => setFooterModal('terms')} className="hover:text-slate-900 transition-colors cursor-pointer bg-transparent border-0 text-sm 2xl:text-base text-slate-500 font-medium">Terms of Service</button>
+            <button onClick={() => setFooterModal('security')} className="hover:text-slate-900 transition-colors cursor-pointer bg-transparent border-0 text-sm 2xl:text-base text-slate-500 font-medium">Security</button>
           </div>
         </div>
       </footer>
+
+      {/* Footer Modals */}
+      {footerModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300 animate-fade-in"
+            onClick={() => setFooterModal(null)}
+          />
+          
+          {/* Modal Content */}
+          <div className="relative w-full max-w-2xl bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] flex flex-col">
+            {/* Decorative Glow */}
+            <div className="absolute -top-12 -left-12 w-40 h-40 rounded-full bg-indigo-600/5 blur-3xl pointer-events-none" />
+            
+            {/* Close button */}
+            <button 
+              onClick={() => setFooterModal(null)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Header */}
+            <div className="mb-4">
+              <h3 className="text-xl font-bold text-slate-900">
+                {footerModal === 'privacy' && 'Privacy Policy'}
+                {footerModal === 'terms' && 'Terms of Service'}
+                {footerModal === 'security' && 'Security Architecture'}
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">Last Updated: June 11, 2026</p>
+            </div>
+
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto pr-1 text-sm text-slate-650 space-y-4 leading-relaxed font-sans scrollbar-thin">
+              {footerModal === 'privacy' && (
+                <>
+                  <p>
+                    At PromptPilot, we prioritize your data privacy. This Privacy Policy details how we handle the text and prompts you process with our extension and dashboard.
+                  </p>
+                  
+                  <h4 className="font-bold text-slate-900 text-sm mt-4">1. Zero Retention Principle</h4>
+                  <p>
+                    We do not store your raw or optimized prompts on our servers permanently unless you explicitly click <strong>Save to Library</strong>. Prompt processing is ephemeral, executing in memory and passing directly to target LLM endpoints.
+                  </p>
+
+                  <h4 className="font-bold text-slate-900 text-sm mt-4">2. Local Processing & Injection</h4>
+                  <p>
+                    All text edits on the web browser extension run locally within your browser context. Injection occurs on your device without transmitting page content to our databases.
+                  </p>
+
+                  <h4 className="font-bold text-slate-900 text-sm mt-4">3. Third-Party API Intermediaries</h4>
+                  <p>
+                    When processing prompts, we query secure API endpoints of foundational model providers (OpenAI, Anthropic, Google). These calls adhere to developer agreements that prohibit model training on customer inputs.
+                  </p>
+
+                  <h4 className="font-bold text-slate-900 text-sm mt-4">4. Account and Data Control</h4>
+                  <p>
+                    You maintain complete control. You can delete your saved prompts or terminate your account at any time. Accounts scheduled for deletion are completely wiped from our PostgreSQL databases after 30 days.
+                  </p>
+                </>
+              )}
+
+              {footerModal === 'terms' && (
+                <>
+                  <p>
+                    By using PromptPilot, you agree to these Terms of Service. Please read them carefully to understand your rights and obligations.
+                  </p>
+
+                  <h4 className="font-bold text-slate-900 text-sm mt-4">1. Service Provision</h4>
+                  <p>
+                    PromptPilot provides text rewrite, tone modification, and prompt structure optimization utilities via web, browser extensions, and mobile clients. We strive for high service uptime and premium model performance.
+                  </p>
+
+                  <h4 className="font-bold text-slate-900 text-sm mt-4">2. User Accounts & Keys</h4>
+                  <p>
+                    You are responsible for keeping your account credentials secure. If you configure custom API credentials (such as OpenAI/Anthropic/Gemini keys) in the Settings panel, you remain responsible for the usage charges incurred on those endpoints.
+                  </p>
+
+                  <h4 className="font-bold text-slate-900 text-sm mt-4">3. Content Ownership</h4>
+                  <p>
+                    PromptPilot claims no ownership over the text inputs or optimized prompt outputs you generate. You retain all intellectual property rights and are solely responsible for ensuring your prompts comply with third-party platform rules.
+                  </p>
+
+                  <h4 className="font-bold text-slate-900 text-sm mt-4">4. Restrictions on Use</h4>
+                  <p>
+                    You agree not to exploit our platform to distribute malware, generate spam, bypass system safety alignments, or perform scraping operations that degrade service quality for others.
+                  </p>
+                </>
+              )}
+
+              {footerModal === 'security' && (
+                <>
+                  <p>
+                    PromptPilot is engineered with robust security protocols to protect your API keys, credentials, and text streams.
+                  </p>
+
+                  <h4 className="font-bold text-slate-900 text-sm mt-4">1. Key Encryption</h4>
+                  <p>
+                    All API keys entered into the Settings panel are encrypted in transit using SSL/TLS protocols and stored at rest. We leverage Supabase's secure vault framework to prevent unauthorized key exposure.
+                  </p>
+
+                  <h4 className="font-bold text-slate-900 text-sm mt-4">2. Secure Sessions</h4>
+                  <p>
+                    User authentication and session tokens are managed via secure JWT policies. Session states are regularly refreshed, and database interactions utilize strict Row-Level Security (RLS) policies.
+                  </p>
+
+                  <h4 className="font-bold text-slate-900 text-sm mt-4">3. Transit Security</h4>
+                  <p>
+                    Every communication between the browser extension, the mobile app, and our API servers is protected using HTTPS with TLS 1.3 encryption, ensuring defense against man-in-the-middle vector attacks.
+                  </p>
+
+                  <h4 className="font-bold text-slate-900 text-sm mt-4">4. Audits & Compliance</h4>
+                  <p>
+                    Our architecture is monitored for vulnerabilities, and model provider integrations use enterprise-grade endpoints with strict data handling covenants.
+                  </p>
+                </>
+              )}
+            </div>
+
+            {/* Footer button */}
+            <div className="mt-6 border-t border-slate-100 pt-4 flex justify-end">
+              <button 
+                onClick={() => setFooterModal(null)}
+                className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow-md transition-all cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Auth Modal */}
       {isAuthModalOpen && (
