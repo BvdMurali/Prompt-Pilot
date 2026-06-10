@@ -119,9 +119,9 @@ export default function LandingPage() {
           ? 'border-slate-200 bg-white/80 backdrop-blur-md shadow-sm' 
           : 'border-slate-200 bg-white'
       }`}>
-        <div className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 h-14 xl:h-16 2xl:h-18 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight text-slate-900">
-            <svg className="w-8 h-8" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 h-14 xl:h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 font-extrabold text-lg xl:text-xl tracking-tight text-slate-900">
+            <svg className="w-7 h-7 xl:w-8 xl:h-8" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="pGradNav" x1="50" y1="165" x2="160" y2="40" gradientUnits="userSpaceOnUse">
                   <stop offset="0%" stopColor="#7c3aed"/>

@@ -203,8 +203,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
       }`}>
         <div className="h-14 xl:h-16 px-6 border-b border-slate-200 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-lg text-slate-900">
-            <svg className="w-7 h-7" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <div className="flex items-center gap-2 font-extrabold text-lg xl:text-xl tracking-tight text-slate-900">
+            <svg className="w-7 h-7 xl:w-8 xl:h-8" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="pGradDash" x1="50" y1="165" x2="160" y2="40" gradientUnits="userSpaceOnUse">
                   <stop offset="0%" stopColor="#7c3aed"/>
@@ -227,7 +227,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <circle cx="119" cy="100" r="5" fill="#0ea5e9"/>
               <path d="M 70 42 H 125 C 158 42, 172 65, 172 90 C 172 115, 158 138, 125 138 H 80 C 70 138, 62 148, 58 165 C 61 146, 70 128, 76 114 H 125 C 140 114, 146 102, 146 90 C 146 78, 140 66, 125 66 H 70 C 63 66, 63 42, 70 42 Z" fill="url(#pGradDash)"/>
             </svg>
-            <span>Prompt<span className="text-indigo-600">Pilot</span></span>
+            <span>Prompt<span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">Pilot</span></span>
           </div>
           <button 
             onClick={() => setIsSidebarOpen(false)}
