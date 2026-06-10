@@ -217,20 +217,20 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 pt-16 xl:pt-24 2xl:pt-28 pb-12 2xl:pb-16 flex flex-col items-center text-center relative z-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 2xl:px-4 2xl:py-2.5 rounded-full bg-violet-100 border border-violet-200 text-xs xl:text-sm 2xl:text-base font-semibold text-violet-750 mb-8 2xl:mb-12 animate-fade-in">
+      <section className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 pt-8 xl:pt-12 2xl:pt-14 pb-6 2xl:pb-8 flex flex-col items-center text-center relative z-10">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 2xl:px-4 2xl:py-2.5 rounded-full bg-violet-100 border border-violet-200 text-xs xl:text-sm 2xl:text-base font-semibold text-violet-750 mb-4 2xl:mb-6 animate-fade-in">
           <Globe className="w-3.5 h-3.5 xl:w-4 xl:h-4 2xl:w-5 2xl:h-5 text-violet-600" />
           <span>Universal Browser Extension Available Now</span>
         </div>
 
-        <h1 className="text-5xl md:text-7xl xl:text-8xl 2xl:text-[7rem] font-extrabold tracking-tight max-w-4xl xl:max-w-6xl 2xl:max-w-7xl leading-tight md:leading-none 2xl:leading-[1.1] text-slate-900 mb-6 2xl:mb-8">
+        <h1 className="text-5xl md:text-7xl xl:text-8xl 2xl:text-[7rem] font-extrabold tracking-tight max-w-4xl xl:max-w-6xl 2xl:max-w-7xl leading-tight md:leading-none 2xl:leading-[1.1] text-slate-900 mb-4 2xl:mb-5">
           The Intelligent AI Layer for <br />
           <span className="bg-gradient-to-r from-violet-650 via-indigo-650 to-cyan-550 bg-clip-text text-transparent">
             Every Text Box on the Web
           </span>
         </h1>
 
-        <p className="text-lg md:text-xl xl:text-2xl 2xl:text-3xl text-slate-650 max-w-2xl xl:max-w-4xl 2xl:max-w-5xl mb-10 xl:mb-14 2xl:mb-20 leading-relaxed">
+        <p className="text-lg md:text-xl xl:text-2xl 2xl:text-3xl text-slate-650 max-w-2xl xl:max-w-4xl 2xl:max-w-5xl mb-6 xl:mb-8 2xl:mb-10 leading-relaxed">
           PromptPilot sits invisibly between you and any input field. Instantly rewrite messages, transform tones, and optimize complex prompts without leaving the page.
         </p>
 
@@ -260,40 +260,40 @@ export default function LandingPage() {
       </section>
 
       {/* Feature Grid */}
-      <section id="features" className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 py-16 xl:py-24 2xl:py-28 relative z-10 w-full scroll-mt-16">
-        <h2 className="text-3xl xl:text-5xl 2xl:text-6xl font-bold text-center text-slate-900 mb-16 xl:mb-24 2xl:mb-28">
+      <section id="features" className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 py-8 xl:py-12 2xl:py-14 relative z-10 w-full scroll-mt-16">
+        <h2 className="text-3xl xl:text-5xl 2xl:text-6xl font-bold text-center text-slate-900 mb-8 xl:mb-12 2xl:mb-14">
           Powerful Utilities Built for Modern AI Productivity
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 xl:gap-12 2xl:gap-16">
           {/* Card 1 */}
-          <div className="p-8 xl:p-12 2xl:p-16 rounded-2xl xl:rounded-3xl 2xl:rounded-[2rem] bg-white border border-slate-200/80 shadow-sm hover:border-slate-300/80 hover:shadow-md transition-all group">
-            <div className="w-12 h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-violet-100 flex items-center justify-center mb-6 xl:mb-8 2xl:mb-10 group-hover:scale-110 transition-transform">
+          <div className="p-6 xl:p-8 2xl:p-10 rounded-2xl xl:rounded-3xl 2xl:rounded-[2rem] bg-white border border-slate-200/80 shadow-sm hover:border-slate-300/80 hover:shadow-md transition-all group">
+            <div className="w-12 h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-violet-100 flex items-center justify-center mb-4 xl:mb-6 2xl:mb-8 group-hover:scale-110 transition-transform">
               <Sparkles className="w-6 h-6 xl:w-8 xl:h-8 2xl:w-10 2xl:h-10 text-violet-600" />
             </div>
-            <h3 className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-slate-900 mb-3 xl:mb-4 2xl:mb-5">Prompt Optimization</h3>
+            <h3 className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-slate-900 mb-2 xl:mb-3 2xl:mb-4">Prompt Optimization</h3>
             <p className="text-slate-650 xl:text-lg 2xl:text-xl leading-relaxed">
               Injects context, specificity, and constraints to turn a single-line request into a structured prompt that gets premium results.
             </p>
           </div>
 
           {/* Card 2 */}
-          <div className="p-8 xl:p-12 2xl:p-16 rounded-2xl xl:rounded-3xl 2xl:rounded-[2rem] bg-white border border-slate-200/80 shadow-sm hover:border-slate-300/80 hover:shadow-md transition-all group">
-            <div className="w-12 h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-indigo-100 flex items-center justify-center mb-6 xl:mb-8 2xl:mb-10 group-hover:scale-110 transition-transform">
+          <div className="p-6 xl:p-8 2xl:p-10 rounded-2xl xl:rounded-3xl 2xl:rounded-[2rem] bg-white border border-slate-200/80 shadow-sm hover:border-slate-300/80 hover:shadow-md transition-all group">
+            <div className="w-12 h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-indigo-100 flex items-center justify-center mb-4 xl:mb-6 2xl:mb-8 group-hover:scale-110 transition-transform">
               <Zap className="w-6 h-6 xl:w-8 xl:h-8 2xl:w-10 2xl:h-10 text-indigo-600" />
             </div>
-            <h3 className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-slate-900 mb-3 xl:mb-4 2xl:mb-5">Tone & Length Control</h3>
+            <h3 className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-slate-900 mb-2 xl:mb-3 2xl:mb-4">Tone & Length Control</h3>
             <p className="text-slate-650 xl:text-lg 2xl:text-xl leading-relaxed">
               Instantly rewrite text into professional, persuasive, friendly, or executive tones. Shorten, expand, or simplify on the fly.
             </p>
           </div>
 
           {/* Card 3 */}
-          <div className="p-8 xl:p-12 2xl:p-16 rounded-2xl xl:rounded-3xl 2xl:rounded-[2rem] bg-white border border-slate-200/80 shadow-sm hover:border-slate-300/80 hover:shadow-md transition-all group">
-            <div className="w-12 h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-emerald-100 flex items-center justify-center mb-6 xl:mb-8 2xl:mb-10 group-hover:scale-110 transition-transform">
+          <div className="p-6 xl:p-8 2xl:p-10 rounded-2xl xl:rounded-3xl 2xl:rounded-[2rem] bg-white border border-slate-200/80 shadow-sm hover:border-slate-300/80 hover:shadow-md transition-all group">
+            <div className="w-12 h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-emerald-100 flex items-center justify-center mb-4 xl:mb-6 2xl:mb-8 group-hover:scale-110 transition-transform">
               <Layout className="w-6 h-6 xl:w-8 xl:h-8 2xl:w-10 2xl:h-10 text-emerald-600" />
             </div>
-            <h3 className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-slate-900 mb-3 xl:mb-4 2xl:mb-5">Universal Browser Injection</h3>
+            <h3 className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-slate-900 mb-2 xl:mb-3 2xl:mb-4">Universal Browser Injection</h3>
             <p className="text-slate-650 xl:text-lg 2xl:text-xl leading-relaxed">
               Integrates directly with Chrome, Brave, Edge, and Firefox to capture inputs on any page and apply replacements instantly.
             </p>
@@ -302,17 +302,17 @@ export default function LandingPage() {
       </section>
 
       {/* Interactive Demo Section */}
-      <section id="demo" className="w-full bg-slate-100/50 border-t border-slate-200 py-16 xl:py-24 2xl:py-28 relative z-10 scroll-mt-16">
+      <section id="demo" className="w-full bg-slate-100/50 border-t border-slate-200 py-8 xl:py-12 2xl:py-14 relative z-10 scroll-mt-16">
         <div className="max-w-5xl xl:max-w-7xl 2xl:max-w-[90rem] mx-auto px-6 xl:px-12 2xl:px-16">
-          <div className="text-center mb-12 xl:mb-16 2xl:mb-20">
-            <h2 className="text-3xl xl:text-5xl 2xl:text-6xl font-bold text-slate-900 mb-4 xl:mb-6">See PromptPilot in Action</h2>
+          <div className="text-center mb-6 xl:mb-8 2xl:mb-10">
+            <h2 className="text-3xl xl:text-5xl 2xl:text-6xl font-bold text-slate-900 mb-2 xl:mb-3">See PromptPilot in Action</h2>
             <p className="text-slate-600 xl:text-xl 2xl:text-2xl max-w-xl xl:max-w-2xl 2xl:max-w-4xl mx-auto">
               Compare original text with PromptPilot enhanced outputs. Select a mode below to test.
             </p>
           </div>
 
           {/* Demo Controller Tabs */}
-          <div className="flex justify-center gap-4 xl:gap-6 2xl:gap-8 mb-8 xl:mb-12 2xl:mb-16">
+          <div className="flex justify-center gap-4 xl:gap-6 2xl:gap-8 mb-4 xl:mb-6 2xl:mb-8">
             {examples.map((ex, index) => (
               <button
                 key={index}
@@ -329,7 +329,7 @@ export default function LandingPage() {
           </div>
 
           {/* Interactive Comparison Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 xl:gap-12 2xl:gap-16 bg-white border border-slate-200 rounded-3xl xl:rounded-[2rem] 2xl:rounded-[2.5rem] p-8 xl:p-12 2xl:p-16 relative w-full shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 xl:gap-12 2xl:gap-16 bg-white border border-slate-200 rounded-3xl xl:rounded-[2rem] 2xl:rounded-[2.5rem] p-6 xl:p-8 2xl:p-10 relative w-full shadow-sm">
             <div className="absolute top-3 right-6 2xl:top-4 2xl:right-8 text-xs 2xl:text-sm text-indigo-600 font-bold flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 2xl:w-4 2xl:h-4 text-indigo-500" />
               <span>{examples[selectedExample].action}</span>
@@ -337,7 +337,7 @@ export default function LandingPage() {
 
             {/* Before Column */}
             <div className="flex flex-col w-full">
-              <div className="flex items-center justify-between mb-4 xl:mb-6 2xl:mb-8">
+              <div className="flex items-center justify-between mb-3 xl:mb-4 2xl:mb-6">
                 <span className="text-sm xl:text-base 2xl:text-lg font-semibold text-slate-500 uppercase tracking-wider">Before</span>
                 <span className="text-xs xl:text-sm 2xl:text-base px-2.5 py-1 xl:px-4 xl:py-1.5 2xl:px-5 2xl:py-2 rounded bg-red-50 border border-red-100 text-red-650 font-bold">
                   Score: {examples[selectedExample].scoreBefore}/100
@@ -350,7 +350,7 @@ export default function LandingPage() {
 
             {/* After Column */}
             <div className="flex flex-col w-full">
-              <div className="flex items-center justify-between mb-4 xl:mb-6 2xl:mb-8">
+              <div className="flex items-center justify-between mb-3 xl:mb-4 2xl:mb-6">
                 <span className="text-sm xl:text-base 2xl:text-lg font-semibold text-slate-900 flex items-center gap-1.5 2xl:gap-2">
                   <CheckCircle className="w-4 h-4 xl:w-5 xl:h-5 2xl:w-6 2xl:h-6 text-emerald-600" />
                   <span>After (PromptPilot)</span>
@@ -369,7 +369,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 py-12 mt-auto relative z-10 bg-white w-full">
+      <footer className="border-t border-slate-200 py-8 mt-auto relative z-10 bg-white w-full">
         <div className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 flex flex-col md:flex-row items-center justify-between gap-6 xl:gap-8">
           <p className="text-sm 2xl:text-base text-slate-500">&copy; 2026 PromptPilot. Built for elite productivity. Privacy First.</p>
           <div className="flex gap-6 2xl:gap-8 text-sm 2xl:text-base text-slate-500">

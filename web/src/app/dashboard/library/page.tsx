@@ -177,13 +177,13 @@ export default function LibraryPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search saved prompts or categories..."
-            className="w-full bg-white border border-slate-200 rounded-xl pl-10 xl:pl-12 pr-4 py-2.5 xl:py-3.5 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500 transition-all shadow-sm"
+            className="w-full bg-white border border-slate-200 rounded-xl pl-10 xl:pl-12 pr-4 py-2 xl:py-2 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500 transition-all shadow-sm"
           />
         </div>
 
         <button
           onClick={handleOpenCreate}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2.5 xl:px-8 xl:py-3.5 rounded-xl xl:rounded-2xl bg-indigo-650 hover:bg-indigo-750 text-sm xl:text-base font-bold text-white transition-all shadow-sm"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2 xl:px-8 xl:py-2 rounded-xl xl:rounded-2xl bg-indigo-650 hover:bg-indigo-750 text-sm xl:text-base font-bold text-white transition-all shadow-sm"
         >
           <Plus className="w-4 h-4" />
           <span>Save New Prompt</span>
@@ -268,11 +268,11 @@ export default function LibraryPage() {
 
       {/* Prompts Display */}
       {loading ? (
-        <div className="flex justify-center items-center py-20">
+        <div className="flex justify-center items-center py-8">
           <span className="text-sm text-slate-500">Retrieving saved library items...</span>
         </div>
       ) : filteredPrompts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 border border-dashed border-slate-200 rounded-2xl bg-white shadow-sm">
+        <div className="flex flex-col items-center justify-center py-8 border border-dashed border-slate-200 rounded-2xl bg-white shadow-sm">
           <Library className="w-10 h-10 text-slate-400 mb-3" />
           <p className="text-sm font-semibold text-slate-900">Your prompt library is empty</p>
           <p className="text-xs text-slate-500 max-w-xs text-center mt-1">

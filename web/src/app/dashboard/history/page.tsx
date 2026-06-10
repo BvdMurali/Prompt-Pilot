@@ -101,11 +101,11 @@ export default function HistoryPage() {
       )}
 
       {loading ? (
-        <div className="flex justify-center items-center py-20">
+        <div className="flex justify-center items-center py-8">
           <span className="text-sm text-slate-500">Retrieving audit history logs...</span>
         </div>
       ) : historyList.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 border border-dashed border-slate-200 rounded-2xl bg-white shadow-sm">
+        <div className="flex flex-col items-center justify-center py-8 border border-dashed border-slate-200 rounded-2xl bg-white shadow-sm">
           <History className="w-10 h-10 text-slate-400 mb-3" />
           <p className="text-sm font-semibold text-slate-900">No optimization history found</p>
           <p className="text-xs text-slate-500 max-w-xs text-center mt-1">

@@ -398,7 +398,7 @@ export default function SettingsPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="E.g. Murali"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2.5 xl:px-6 xl:py-4 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500/50 transition-colors"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2 xl:px-4.5 xl:py-2 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500/50 transition-colors"
                 />
               </div>
             </div>
@@ -406,7 +406,7 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 xl:gap-6 pt-2">
               <div className="flex flex-col gap-1.5 xl:gap-2.5">
                 <label className="text-xs xl:text-sm font-semibold text-slate-500">Email Address (Read-only)</label>
-                <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2.5 xl:px-6 xl:py-4 text-sm xl:text-base text-slate-400 cursor-not-allowed">
+                <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2 xl:px-4.5 xl:py-2 text-sm xl:text-base text-slate-400 cursor-not-allowed">
                   <Lock className="w-4 h-4 text-slate-400" />
                   <span className="truncate">{session?.user?.email}</span>
                 </div>
@@ -414,7 +414,7 @@ export default function SettingsPage() {
 
               <div className="flex flex-col gap-1.5 xl:gap-2.5">
                 <label className="text-xs xl:text-sm font-semibold text-slate-500">User UID</label>
-                <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2 xl:px-6 xl:py-3.5 text-sm text-slate-400">
+                <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2 xl:px-4.5 xl:py-2 text-sm text-slate-400">
                   <span className="font-mono text-xs truncate max-w-[200px] xl:max-w-xs">{session?.user?.id}</span>
                   <button
                     onClick={handleCopyUserId}
@@ -442,7 +442,7 @@ export default function SettingsPage() {
                   <select
                     value={model}
                     onChange={(e) => setModel(e.target.value)}
-                    className="bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2.5 xl:px-6 xl:py-4 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500/50 transition-colors"
+                    className="bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2 xl:px-4.5 xl:py-2 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500/50 transition-colors"
                   >
                     <optgroup label="Google Gemini (Direct)">
                       <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite (Default)</option>
@@ -480,7 +480,7 @@ export default function SettingsPage() {
                   <select
                     value={tone}
                     onChange={(e) => setTone(e.target.value)}
-                    className="bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2.5 xl:px-6 xl:py-4 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500/50 transition-colors"
+                    className="bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2 xl:px-4.5 xl:py-2 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500/50 transition-colors"
                   >
                     <option value="professional">Professional</option>
                     <option value="friendly">Friendly</option>
@@ -498,7 +498,7 @@ export default function SettingsPage() {
                     value={customModel}
                     onChange={(e) => setCustomModel(e.target.value)}
                     placeholder="E.g. meta-llama/llama-3-8b-instruct or custom-fine-tuned-model"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2.5 xl:px-6 xl:py-4 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500/50 transition-colors font-mono"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2 xl:px-4.5 xl:py-2 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500/50 transition-colors font-mono"
                   />
                   <span className="text-[10px] xl:text-[11px] text-slate-500">
                     Type the exact model identifier required by your API provider (e.g. OpenAI model ID, OpenRouter route path, etc.).
@@ -525,7 +525,7 @@ export default function SettingsPage() {
                       value={geminiKey}
                       onChange={(e) => setGeminiKey(e.target.value)}
                       placeholder={geminiKey ? "••••••••••••••••" : "AIzaSy..."}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2 xl:pl-5 xl:pr-12 xl:py-2 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
                     />
                     <button
                       type="button"
@@ -545,7 +545,7 @@ export default function SettingsPage() {
                       value={openaiKey}
                       onChange={(e) => setOpenaiKey(e.target.value)}
                       placeholder={openaiKey ? "••••••••••••••••" : "sk-proj-..."}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2 xl:pl-5 xl:pr-12 xl:py-2 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
                     />
                     <button
                       type="button"
@@ -567,7 +567,7 @@ export default function SettingsPage() {
                       value={anthropicKey}
                       onChange={(e) => setAnthropicKey(e.target.value)}
                       placeholder={anthropicKey ? "••••••••••••••••" : "sk-ant-..."}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2 xl:pl-5 xl:pr-12 xl:py-2 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
                     />
                     <button
                       type="button"
@@ -587,7 +587,7 @@ export default function SettingsPage() {
                       value={openrouterKey}
                       onChange={(e) => setOpenrouterKey(e.target.value)}
                       placeholder={openrouterKey ? "••••••••••••••••" : "sk-or-v1-..."}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2 xl:pl-5 xl:pr-12 xl:py-2 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
                     />
                     <button
                       type="button"
@@ -609,7 +609,7 @@ export default function SettingsPage() {
               <button
                 onClick={handleSaveSettings}
                 disabled={saving}
-                className="inline-flex items-center gap-2 xl:gap-3 px-6 py-2.5 xl:px-8 xl:py-4 rounded-xl xl:rounded-2xl bg-indigo-650 hover:bg-indigo-750 text-sm xl:text-base font-bold text-white transition-all shadow-md shadow-indigo-650/10 hover:shadow-indigo-650/20 disabled:opacity-50"
+                className="inline-flex items-center gap-2 xl:gap-3 px-6 py-2 xl:px-6 xl:py-2 rounded-xl xl:rounded-2xl bg-indigo-650 hover:bg-indigo-750 text-sm xl:text-base font-bold text-white transition-all shadow-md shadow-indigo-650/10 hover:shadow-indigo-650/20 disabled:opacity-50"
               >
                 <Save className="w-4 h-4 xl:w-5 xl:h-5" />
                 <span>{saving ? 'Saving...' : 'Save Settings'}</span>
@@ -645,7 +645,7 @@ export default function SettingsPage() {
                 <span className="font-semibold text-slate-755 text-xs xl:text-sm">Export Information</span>
                 <button
                   onClick={handleExportData}
-                  className="w-full inline-flex items-center justify-center gap-2 xl:gap-3 px-4 py-2.5 xl:py-4 rounded-xl xl:rounded-2xl border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 text-xs xl:text-sm font-semibold text-slate-700 transition-all cursor-pointer shadow-sm"
+                  className="w-full inline-flex items-center justify-center gap-2 xl:gap-3 px-4 py-2 xl:py-2 rounded-xl xl:rounded-2xl border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 text-xs xl:text-sm font-semibold text-slate-700 transition-all cursor-pointer shadow-sm"
                 >
                   <Download className="w-3.5 h-3.5 xl:w-4.5 xl:h-4.5" />
                   <span>Export My Data</span>
@@ -658,7 +658,7 @@ export default function SettingsPage() {
                 {!confirmDelete ? (
                   <button
                     onClick={() => setConfirmDelete(true)}
-                    className="w-full inline-flex items-center justify-center gap-2 xl:gap-3 px-4 py-2.5 xl:py-4 rounded-xl xl:rounded-2xl border border-red-200 hover:border-red-300 hover:bg-red-50 text-xs xl:text-sm font-semibold text-red-650 transition-all cursor-pointer shadow-sm"
+                    className="w-full inline-flex items-center justify-center gap-2 xl:gap-3 px-4 py-2 xl:py-2 rounded-xl xl:rounded-2xl border border-red-200 hover:border-red-300 hover:bg-red-50 text-xs xl:text-sm font-semibold text-red-650 transition-all cursor-pointer shadow-sm"
                   >
                     <Trash2 className="w-3.5 h-3.5 xl:w-4.5 xl:h-4.5" />
                     <span>Delete My Account</span>

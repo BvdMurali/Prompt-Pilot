@@ -224,7 +224,7 @@ export default function TemplatesPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search default templates or tags..."
-          className="w-full bg-white border border-slate-200 rounded-xl pl-10 xl:pl-12 pr-4 py-2.5 xl:py-3.5 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500 transition-all shadow-sm"
+          className="w-full bg-white border border-slate-200 rounded-xl pl-10 xl:pl-12 pr-4 py-2 xl:py-2 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500 transition-all shadow-sm"
         />
       </div>
 
