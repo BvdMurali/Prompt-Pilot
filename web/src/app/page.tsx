@@ -338,7 +338,7 @@ export default function LandingPage() {
             {/* Before Column */}
             <div className="flex flex-col w-full">
               <div className="flex items-center justify-between mb-4 xl:mb-6 2xl:mb-8">
-                <span className="text-sm xl:text-base 2xl:text-lg font-semibold text-slate-400 uppercase tracking-wider">Before</span>
+                <span className="text-sm xl:text-base 2xl:text-lg font-semibold text-slate-500 uppercase tracking-wider">Before</span>
                 <span className="text-xs xl:text-sm 2xl:text-base px-2.5 py-1 xl:px-4 xl:py-1.5 2xl:px-5 2xl:py-2 rounded bg-red-50 border border-red-100 text-red-650 font-bold">
                   Score: {examples[selectedExample].scoreBefore}/100
                 </span>
@@ -372,7 +372,7 @@ export default function LandingPage() {
       <footer className="border-t border-slate-200 py-12 mt-auto relative z-10 bg-white w-full">
         <div className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 flex flex-col md:flex-row items-center justify-between gap-6 xl:gap-8">
           <p className="text-sm 2xl:text-base text-slate-500">&copy; 2026 PromptPilot. Built for elite productivity. Privacy First.</p>
-          <div className="flex gap-6 2xl:gap-8 text-sm 2xl:text-base text-slate-550">
+          <div className="flex gap-6 2xl:gap-8 text-sm 2xl:text-base text-slate-500">
             <a href="#" className="hover:text-slate-900 transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-slate-900 transition-colors">Terms of Service</a>
             <a href="#" className="hover:text-slate-900 transition-colors">Security</a>
@@ -425,7 +425,7 @@ export default function LandingPage() {
             )}
 
             {message && (
-              <div className="mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-250 text-emerald-700 text-xs text-center font-medium">
+              <div className="mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs text-center font-medium">
                 {message}
               </div>
             )}
@@ -494,7 +494,7 @@ export default function LandingPage() {
                 <div className="w-full border-t border-slate-200" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-3 text-slate-405">Or continue with</span>
+                <span className="bg-white px-3 text-slate-400">Or continue with</span>
               </div>
             </div>
 

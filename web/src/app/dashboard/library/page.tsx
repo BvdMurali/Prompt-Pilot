@@ -183,7 +183,7 @@ export default function LibraryPage() {
 
         <button
           onClick={handleOpenCreate}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2.5 xl:px-8 xl:py-3.5 rounded-xl xl:rounded-2xl bg-indigo-650 hover:bg-indigo-550 text-sm xl:text-base font-bold text-white transition-all shadow-sm"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2.5 xl:px-8 xl:py-3.5 rounded-xl xl:rounded-2xl bg-indigo-650 hover:bg-indigo-750 text-sm xl:text-base font-bold text-white transition-all shadow-sm"
         >
           <Plus className="w-4 h-4" />
           <span>Save New Prompt</span>
@@ -256,7 +256,7 @@ export default function LibraryPage() {
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 rounded-lg bg-indigo-650 hover:bg-indigo-550 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm"
+                className="px-4 py-2 rounded-lg bg-indigo-650 hover:bg-indigo-750 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm"
               >
                 <Save className="w-3.5 h-3.5" />
                 <span>Save Prompt</span>

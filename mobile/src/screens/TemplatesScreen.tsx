@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     paddingTop: THEME.spacing.md,
     paddingBottom: THEME.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    borderBottomColor: THEME.colors.borderLight,
     marginBottom: THEME.spacing.md,
   },
   backBtn: {
@@ -189,9 +189,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: THEME.spacing.sm + 2,
     marginLeft: -8,
     borderRadius: THEME.roundness.md,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    backgroundColor: THEME.colors.surface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderColor: THEME.colors.border,
     gap: THEME.spacing.xs + 2,
   },
   backBtnText: {
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     marginBottom: THEME.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: THEME.colors.borderLight,
     paddingBottom: 6,
   },
   noVariablesText: {
@@ -265,11 +265,11 @@ const styles = StyleSheet.create({
   },
   previewScroll: {
     height: 140,
-    backgroundColor: 'rgba(2, 6, 23, 0.5)',
+    backgroundColor: THEME.colors.borderLight,
     borderRadius: THEME.roundness.md,
     padding: THEME.spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.04)',
+    borderColor: THEME.colors.border,
     marginBottom: THEME.spacing.lg,
   },
   previewText: {

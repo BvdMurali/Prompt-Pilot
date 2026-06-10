@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   detailContainer: {
     marginTop: THEME.spacing.md,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.05)',
+    borderTopColor: THEME.colors.borderLight,
     paddingTop: THEME.spacing.md,
   },
   detailLabel: {
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   textContainer: {
-    backgroundColor: 'rgba(0,0,0,0.15)',
+    backgroundColor: THEME.colors.borderLight,
     padding: THEME.spacing.md,
     borderRadius: THEME.roundness.md,
     marginBottom: THEME.spacing.sm,

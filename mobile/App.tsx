@@ -77,7 +77,7 @@ function AppContent() {
 
   return (
     <SafeAreaView style={styles.safeContainer}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       
       {/* Title Header */}
       <View style={styles.header}>
@@ -124,7 +124,7 @@ function AppContent() {
               <Ionicons 
                 name={isActive ? iconName.replace('-outline', '') : iconName} 
                 size={20} 
-                color={isActive ? THEME.colors.primaryLight : THEME.colors.textMuted} 
+                color={isActive ? THEME.colors.primary : THEME.colors.textMuted} 
               />
               <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -182,14 +182,14 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: THEME.typography.sizes.lg,
     fontWeight: THEME.typography.weights.bold,
-    color: '#fff',
+    color: THEME.colors.textPrimary,
   },
   headerBadge: {
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: THEME.roundness.sm,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.03)',
+    borderColor: THEME.colors.border,
   },
   headerBadgeText: {
     fontSize: THEME.typography.sizes.xxs,
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     fontWeight: THEME.typography.weights.medium,
   },
   tabLabelActive: {
-    color: THEME.colors.primaryLight,
+    color: THEME.colors.primary,
     fontWeight: THEME.typography.weights.bold,
   },
 });

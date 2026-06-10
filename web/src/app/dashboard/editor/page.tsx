@@ -235,7 +235,7 @@ export default function EditorPage() {
                 <select
                   value={tone}
                   onChange={(e) => setTone(e.target.value)}
-                  className="bg-slate-50 border border-slate-200 rounded-lg xl:rounded-xl px-3 py-1.5 xl:px-4 xl:py-2.5 text-xs xl:text-sm text-slate-700 outline-none focus:border-indigo-555"
+                  className="bg-slate-50 border border-slate-200 rounded-lg xl:rounded-xl px-3 py-1.5 xl:px-4 xl:py-2.5 text-xs xl:text-sm text-slate-700 outline-none focus:border-indigo-500"
                 >
                   {tones.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
@@ -247,7 +247,7 @@ export default function EditorPage() {
                 <select
                   value={length}
                   onChange={(e) => setLength(e.target.value)}
-                  className="bg-slate-50 border border-slate-200 rounded-lg xl:rounded-xl px-3 py-1.5 xl:px-4 xl:py-2.5 text-xs xl:text-sm text-slate-700 outline-none focus:border-indigo-555"
+                  className="bg-slate-50 border border-slate-200 rounded-lg xl:rounded-xl px-3 py-1.5 xl:px-4 xl:py-2.5 text-xs xl:text-sm text-slate-700 outline-none focus:border-indigo-500"
                 >
                   {lengths.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
                 </select>
@@ -259,7 +259,7 @@ export default function EditorPage() {
                 <select
                   value={platform}
                   onChange={(e) => setPlatform(e.target.value)}
-                  className="bg-slate-50 border border-slate-200 rounded-lg xl:rounded-xl px-3 py-1.5 xl:px-4 xl:py-2.5 text-xs xl:text-sm text-slate-700 outline-none focus:border-indigo-555"
+                  className="bg-slate-50 border border-slate-200 rounded-lg xl:rounded-xl px-3 py-1.5 xl:px-4 xl:py-2.5 text-xs xl:text-sm text-slate-700 outline-none focus:border-indigo-500"
                 >
                   {platforms.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
                 </select>
@@ -269,7 +269,7 @@ export default function EditorPage() {
             <button
               onClick={handleProcess}
               disabled={loading}
-              className="inline-flex items-center gap-2 px-6 xl:px-8 h-10 xl:h-12 rounded-xl bg-gradient-to-r from-violet-650 to-indigo-650 hover:from-violet-550 hover:to-indigo-550 text-sm xl:text-base font-bold text-white transition-all shadow-md shadow-indigo-600/10 disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-6 xl:px-8 h-10 xl:h-12 rounded-xl bg-gradient-to-r from-violet-650 to-indigo-650 hover:from-violet-500 hover:to-indigo-500 text-sm xl:text-base font-bold text-white transition-all shadow-md shadow-indigo-600/10 disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -293,7 +293,7 @@ export default function EditorPage() {
             <span>Optimization Info</span>
           </h2>
 
-          <div className="flex flex-col gap-4 text-sm text-slate-605 leading-relaxed">
+          <div className="flex flex-col gap-4 text-sm text-slate-600 leading-relaxed">
             <p>
               Select <strong>Optimize Prompt</strong> if you are preparing instructions for LLMs. This will add rich structures, constraints, and outputs tailored to the target platform.
             </p>
@@ -416,7 +416,7 @@ export default function EditorPage() {
                   <div key={s.label} className="flex flex-col gap-1">
                     <div className="flex justify-between text-xs font-semibold">
                       <span className="text-slate-500">{s.label}</span>
-                      <span className="text-slate-850">{s.val}%</span>
+                      <span className="text-slate-900">{s.val}%</span>
                     </div>
                     <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200">
                       <div 

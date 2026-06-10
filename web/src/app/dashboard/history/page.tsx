@@ -88,7 +88,7 @@ export default function HistoryPage() {
   const getScoreColor = (val: number) => {
     if (val >= 85) return 'text-emerald-700 border-emerald-200 bg-emerald-50';
     if (val >= 60) return 'text-amber-700 border-amber-200 bg-amber-50';
-    return 'text-red-750 border-red-200 bg-red-50';
+    return 'text-red-650 border-red-200 bg-red-50';
   };
 
   return (
@@ -169,7 +169,7 @@ export default function HistoryPage() {
 
                   <button
                     onClick={() => handleCopy(selectedItem.optimized_output)}
-                    className="px-3.5 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-605 hover:text-slate-900 transition-all flex items-center gap-1.5 text-xs font-semibold shadow-sm"
+                    className="px-3.5 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5 text-xs font-semibold shadow-sm"
                   >
                     <Copy className="w-3.5 h-3.5" />
                     <span>{copied ? 'Copied' : 'Copy Output'}</span>

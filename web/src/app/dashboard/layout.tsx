@@ -152,7 +152,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <button
               onClick={handleRestore}
               disabled={restoring}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-650 to-violet-650 hover:from-indigo-550 hover:to-violet-550 disabled:opacity-50 disabled:scale-100 text-white rounded-xl text-sm font-extrabold shadow-lg shadow-indigo-600/10 active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-650 to-violet-650 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 disabled:scale-100 text-white rounded-xl text-sm font-extrabold shadow-lg shadow-indigo-600/10 active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
             >
               {restoring ? (
                 <>
@@ -166,7 +166,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             <button
               onClick={() => signOut()}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 hover:border-slate-350 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-sm font-semibold transition-all cursor-pointer shadow-sm"
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-sm font-semibold transition-all cursor-pointer shadow-sm"
             >
               <span>Sign Out</span>
             </button>
@@ -290,7 +290,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           <button
             onClick={() => signOut()}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 hover:border-slate-350 hover:bg-slate-50 text-sm font-semibold text-slate-650 hover:text-slate-900 transition-all shadow-sm bg-white"
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-sm font-semibold text-slate-650 hover:text-slate-900 transition-all shadow-sm bg-white"
           >
             <LogOut className="w-4 h-4 text-slate-400" />
             <span>Sign Out</span>

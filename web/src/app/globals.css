@@ -5,9 +5,17 @@
   --foreground: #0f172a; /* slate-900 */
 }
 
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-slate-450: #64748b;
+  --color-slate-650: #334155;
+  --color-indigo-650: #4f46e5;
+  --color-indigo-750: #3730a3;
+  --color-indigo-755: #312e81;
+  --color-violet-650: #7c3aed;
+  --color-red-650: #dc2626;
+  --color-cyan-550: #0ea5e9;
 }
 
 body {
@@ -40,6 +48,16 @@ body {
 * {
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+/* Ensure all input, textarea, and select text colors are highly visible */
+input, textarea, select {
+  color: #0f172a !important;
+}
+
+/* Ensure placeholder text is visible but styled as muted */
+input::placeholder, textarea::placeholder {
+  color: #94a3b8 !important;
 }
 
 

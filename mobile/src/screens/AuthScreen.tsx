@@ -82,7 +82,7 @@ export default function AuthScreen() {
             {/* Header Section */}
             <View style={styles.header}>
               <LinearGradient
-                colors={THEME.colors.primaryGradient}
+                colors={THEME.colors.primaryGradient as any}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.sparklesIconContainer}

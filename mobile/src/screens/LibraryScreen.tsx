@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   categoriesWrapper: {
     paddingVertical: THEME.spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.03)',
+    borderBottomColor: THEME.colors.borderLight,
   },
   categoriesScroll: {
     paddingHorizontal: THEME.spacing.lg,
@@ -326,13 +326,13 @@ const styles = StyleSheet.create({
     fontFamily: THEME.typography.fontFamily.mono,
     fontSize: THEME.typography.sizes.xs,
     color: THEME.colors.textSecondary,
-    backgroundColor: 'rgba(0,0,0,0.15)',
+    backgroundColor: THEME.colors.borderLight,
     padding: THEME.spacing.sm,
     borderRadius: THEME.roundness.md,
     lineHeight: 18,
   },
   cardSnippetExpanded: {
-    backgroundColor: 'rgba(0,0,0,0.25)',
+    backgroundColor: 'rgba(15, 23, 42, 0.08)',
   },
   cardActions: {
     flexDirection: 'row',
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     gap: THEME.spacing.lg,
     marginTop: THEME.spacing.md,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.05)',
+    borderTopColor: THEME.colors.borderLight,
     paddingTop: THEME.spacing.sm,
   },
   actionBtn: {

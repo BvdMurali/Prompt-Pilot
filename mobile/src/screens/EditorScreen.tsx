@@ -624,12 +624,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: THEME.spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    borderBottomColor: THEME.colors.border,
   },
   modalTitle: {
     fontSize: THEME.typography.sizes.md,
     fontWeight: THEME.typography.weights.bold,
-    color: '#fff',
+    color: THEME.colors.textPrimary,
   },
   modalScroll: {
     paddingHorizontal: THEME.spacing.lg,
@@ -640,7 +640,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.02)',
+    borderBottomColor: THEME.colors.borderLight,
   },
   modalItemText: {
     color: THEME.colors.textSecondary,
@@ -700,7 +700,7 @@ const styles = StyleSheet.create({
     color: THEME.colors.textPrimary,
     marginBottom: THEME.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    borderBottomColor: THEME.colors.border,
     paddingBottom: 8,
   },
   explanationItem: {

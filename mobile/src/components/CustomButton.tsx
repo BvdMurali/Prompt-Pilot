@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   secondaryBtn: {
     backgroundColor: THEME.colors.surfaceCard,
     borderWidth: 1,
-    borderColor: THEME.colors.borderLight,
+    borderColor: THEME.colors.border,
   },
   dangerBtn: {
     backgroundColor: 'transparent',

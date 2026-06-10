@@ -17,3 +17,16 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #94A3B8;
 }
+
+/* Ensure all input, textarea, and select text colors are highly visible inside extension Shadow DOM */
+.promptpilot-shadow-dom input,
+.promptpilot-shadow-dom textarea,
+.promptpilot-shadow-dom select {
+  color: #0f172a !important;
+}
+
+/* Ensure placeholder text is visible but styled as muted */
+.promptpilot-shadow-dom input::placeholder,
+.promptpilot-shadow-dom textarea::placeholder {
+  color: #94a3b8 !important;
+}

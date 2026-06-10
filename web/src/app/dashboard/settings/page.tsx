@@ -413,7 +413,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex flex-col gap-1.5 xl:gap-2.5">
-                <label className="text-xs xl:text-sm font-semibold text-slate-550">User UID</label>
+                <label className="text-xs xl:text-sm font-semibold text-slate-500">User UID</label>
                 <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2 xl:px-6 xl:py-3.5 text-sm text-slate-400">
                   <span className="font-mono text-xs truncate max-w-[200px] xl:max-w-xs">{session?.user?.id}</span>
                   <button
@@ -430,7 +430,7 @@ export default function SettingsPage() {
 
           {/* Core Preferences Card */}
           <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-10 rounded-2xl xl:rounded-[2rem] shadow-sm">
-            <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-505 flex items-center gap-2 xl:gap-3 border-b border-slate-100 pb-4 xl:pb-6">
+            <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2 xl:gap-3 border-b border-slate-100 pb-4 xl:pb-6">
               <Settings className="w-4 h-4 xl:w-5 xl:h-5 text-violet-600" />
               <span>Workspace Preferences</span>
             </h2>
@@ -510,7 +510,7 @@ export default function SettingsPage() {
 
           {/* API Credentials Card */}
           <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-10 rounded-2xl xl:rounded-[2rem] shadow-sm">
-            <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-505 flex items-center gap-2 xl:gap-3 border-b border-slate-100 pb-4 xl:pb-6">
+            <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2 xl:gap-3 border-b border-slate-100 pb-4 xl:pb-6">
               <Key className="w-4 h-4 xl:w-5 xl:h-5 text-violet-600" />
               <span>API Key Overrides (Optional)</span>
             </h2>
@@ -525,7 +525,7 @@ export default function SettingsPage() {
                       value={geminiKey}
                       onChange={(e) => setGeminiKey(e.target.value)}
                       placeholder={geminiKey ? "••••••••••••••••" : "AIzaSy..."}
-                      className="w-full bg-slate-55 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
                     />
                     <button
                       type="button"
@@ -545,7 +545,7 @@ export default function SettingsPage() {
                       value={openaiKey}
                       onChange={(e) => setOpenaiKey(e.target.value)}
                       placeholder={openaiKey ? "••••••••••••••••" : "sk-proj-..."}
-                      className="w-full bg-slate-55 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
                     />
                     <button
                       type="button"
@@ -567,7 +567,7 @@ export default function SettingsPage() {
                       value={anthropicKey}
                       onChange={(e) => setAnthropicKey(e.target.value)}
                       placeholder={anthropicKey ? "••••••••••••••••" : "sk-ant-..."}
-                      className="w-full bg-slate-55 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
                     />
                     <button
                       type="button"
@@ -587,7 +587,7 @@ export default function SettingsPage() {
                       value={openrouterKey}
                       onChange={(e) => setOpenrouterKey(e.target.value)}
                       placeholder={openrouterKey ? "••••••••••••••••" : "sk-or-v1-..."}
-                      className="w-full bg-slate-55 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
                     />
                     <button
                       type="button"
@@ -609,7 +609,7 @@ export default function SettingsPage() {
               <button
                 onClick={handleSaveSettings}
                 disabled={saving}
-                className="inline-flex items-center gap-2 xl:gap-3 px-6 py-2.5 xl:px-8 xl:py-4 rounded-xl xl:rounded-2xl bg-indigo-650 hover:bg-indigo-550 text-sm xl:text-base font-bold text-white transition-all shadow-md shadow-indigo-650/10 hover:shadow-indigo-650/20 disabled:opacity-50"
+                className="inline-flex items-center gap-2 xl:gap-3 px-6 py-2.5 xl:px-8 xl:py-4 rounded-xl xl:rounded-2xl bg-indigo-650 hover:bg-indigo-750 text-sm xl:text-base font-bold text-white transition-all shadow-md shadow-indigo-650/10 hover:shadow-indigo-650/20 disabled:opacity-50"
               >
                 <Save className="w-4 h-4 xl:w-5 xl:h-5" />
                 <span>{saving ? 'Saving...' : 'Save Settings'}</span>
@@ -624,12 +624,12 @@ export default function SettingsPage() {
           
           {/* Privacy info card */}
           <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-10 rounded-2xl xl:rounded-[2rem] shadow-sm h-fit">
-            <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-505 flex items-center gap-2 xl:gap-3 border-b border-slate-105 pb-4 xl:pb-6">
+            <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2 xl:gap-3 border-b border-slate-200 pb-4 xl:pb-6">
               <Database className="w-4 h-4 xl:w-5 xl:h-5 text-violet-600" />
               <span>Account & Privacy</span>
             </h2>
 
-            <div className="flex flex-col gap-6 xl:gap-8 text-sm xl:text-base text-slate-655">
+            <div className="flex flex-col gap-6 xl:gap-8 text-sm xl:text-base text-slate-650">
               <div className="flex flex-col gap-2.5 xl:gap-4">
                 <span className="font-bold text-slate-900 flex items-center gap-1.5 xl:gap-2.5">
                   <ShieldCheck className="w-4 h-4 xl:w-5 xl:h-5 text-emerald-600" />
@@ -645,7 +645,7 @@ export default function SettingsPage() {
                 <span className="font-semibold text-slate-755 text-xs xl:text-sm">Export Information</span>
                 <button
                   onClick={handleExportData}
-                  className="w-full inline-flex items-center justify-center gap-2 xl:gap-3 px-4 py-2.5 xl:py-4 rounded-xl xl:rounded-2xl border border-slate-200 hover:border-slate-350 bg-slate-50 hover:bg-slate-100 text-xs xl:text-sm font-semibold text-slate-700 transition-all cursor-pointer shadow-sm"
+                  className="w-full inline-flex items-center justify-center gap-2 xl:gap-3 px-4 py-2.5 xl:py-4 rounded-xl xl:rounded-2xl border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 text-xs xl:text-sm font-semibold text-slate-700 transition-all cursor-pointer shadow-sm"
                 >
                   <Download className="w-3.5 h-3.5 xl:w-4.5 xl:h-4.5" />
                   <span>Export My Data</span>
@@ -701,7 +701,7 @@ export default function SettingsPage() {
                       <button
                         onClick={handleDeleteAccount}
                         disabled={deleteConfirmText !== session?.user?.email || deleting}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-red-650 hover:bg-red-550 disabled:bg-red-50 disabled:text-red-300 disabled:border-red-100 text-white border border-red-650 rounded-xl text-xs xl:text-sm font-extrabold shadow-md active:scale-[0.97] transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-red-650 hover:bg-red-700 disabled:bg-red-50 disabled:text-red-300 disabled:border-red-100 text-white border border-red-650 rounded-xl text-xs xl:text-sm font-extrabold shadow-md active:scale-[0.97] transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
                       >
                         {deleting ? (
                           <>
