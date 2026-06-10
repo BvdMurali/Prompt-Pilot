@@ -215,7 +215,7 @@ export default function TemplatesPage() {
   );
 
   return (
-    <div className="flex-1 flex flex-col gap-8 xl:gap-12 max-w-7xl mx-auto w-full">
+    <div className="flex-1 flex flex-col gap-6 xl:gap-8 max-w-7xl mx-auto w-full">
       {/* Header filter */}
       <div className="relative w-full lg:max-w-[320px] xl:max-w-[360px] 2xl:max-w-[400px]">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 xl:w-5 xl:h-5 text-slate-400" />
@@ -228,7 +228,7 @@ export default function TemplatesPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-8 xl:gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
         
         {/* TEMPLATE LIST PANEL */}
         <div className="lg:col-span-1 flex flex-col gap-4 max-h-[250px] lg:max-h-[600px] xl:max-h-[750px] 2xl:max-h-[850px] overflow-y-auto pr-1">
@@ -272,7 +272,7 @@ export default function TemplatesPage() {
         </div>
 
         {/* TEMPLATE WORKSPACE PANEL */}
-        <div className="lg:col-span-2 xl:col-span-3 flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl min-h-[450px] shadow-sm">
+        <div className="lg:col-span-2 xl:col-span-3 flex flex-col gap-5 xl:gap-6 bg-white border border-slate-200 p-5 xl:p-6 rounded-2xl xl:rounded-3xl min-h-[450px] shadow-sm">
           {selectedTemplate ? (
             <div className="flex flex-col gap-6 h-full">
               
@@ -315,7 +315,7 @@ export default function TemplatesPage() {
                   Clear All
                 </button>
               </div>              {/* Workspace contents */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 xl:gap-10 2xl:gap-16 flex-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 xl:gap-6 2xl:gap-8 flex-1">
                 {/* Variables Inputs Column */}
                 <div className="flex flex-col gap-4 overflow-y-auto max-h-[350px] xl:max-h-[500px] 2xl:max-h-[650px] pr-2">
                   <h4 className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Template Variables</h4>

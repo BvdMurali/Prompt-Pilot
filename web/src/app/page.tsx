@@ -118,7 +118,7 @@ export default function LandingPage() {
           ? 'border-slate-200 bg-white/80 backdrop-blur-md shadow-sm' 
           : 'border-slate-200 bg-white'
       }`}>
-        <div className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 h-16 xl:h-20 2xl:h-24 flex items-center justify-between">
+        <div className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 h-14 xl:h-16 2xl:h-18 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight text-slate-900">
             <svg className="w-8 h-8" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
@@ -217,7 +217,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 pt-20 xl:pt-32 2xl:pt-40 pb-16 2xl:pb-24 flex flex-col items-center text-center relative z-10">
+      <section className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 pt-16 xl:pt-24 2xl:pt-28 pb-12 2xl:pb-16 flex flex-col items-center text-center relative z-10">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 2xl:px-4 2xl:py-2.5 rounded-full bg-violet-100 border border-violet-200 text-xs xl:text-sm 2xl:text-base font-semibold text-violet-750 mb-8 2xl:mb-12 animate-fade-in">
           <Globe className="w-3.5 h-3.5 xl:w-4 xl:h-4 2xl:w-5 2xl:h-5 text-violet-600" />
           <span>Universal Browser Extension Available Now</span>
@@ -260,7 +260,7 @@ export default function LandingPage() {
       </section>
 
       {/* Feature Grid */}
-      <section id="features" className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 py-20 xl:py-32 2xl:py-40 relative z-10 w-full scroll-mt-16">
+      <section id="features" className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 py-16 xl:py-24 2xl:py-28 relative z-10 w-full scroll-mt-16">
         <h2 className="text-3xl xl:text-5xl 2xl:text-6xl font-bold text-center text-slate-900 mb-16 xl:mb-24 2xl:mb-28">
           Powerful Utilities Built for Modern AI Productivity
         </h2>
@@ -302,7 +302,7 @@ export default function LandingPage() {
       </section>
 
       {/* Interactive Demo Section */}
-      <section id="demo" className="w-full bg-slate-100/50 border-t border-slate-200 py-20 xl:py-32 2xl:py-40 relative z-10 scroll-mt-16">
+      <section id="demo" className="w-full bg-slate-100/50 border-t border-slate-200 py-16 xl:py-24 2xl:py-28 relative z-10 scroll-mt-16">
         <div className="max-w-5xl xl:max-w-7xl 2xl:max-w-[90rem] mx-auto px-6 xl:px-12 2xl:px-16">
           <div className="text-center mb-12 xl:mb-16 2xl:mb-20">
             <h2 className="text-3xl xl:text-5xl 2xl:text-6xl font-bold text-slate-900 mb-4 xl:mb-6">See PromptPilot in Action</h2>

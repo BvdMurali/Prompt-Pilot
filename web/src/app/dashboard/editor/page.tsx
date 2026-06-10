@@ -184,12 +184,12 @@ export default function EditorPage() {
     : '';
 
   return (
-    <div className="flex-1 flex flex-col gap-8 xl:gap-12 max-w-7xl mx-auto w-full">
+    <div className="flex-1 flex flex-col gap-6 xl:gap-8 max-w-7xl mx-auto w-full">
       {/* Selection Control Panel */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:gap-8">
         
         {/* INPUT FORM BLOCK */}
-        <div className="lg:col-span-2 flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl shadow-sm">
+        <div className="lg:col-span-2 flex flex-col gap-5 xl:gap-6 bg-white border border-slate-200 p-5 xl:p-6 rounded-2xl xl:rounded-3xl shadow-sm">
           <div className="flex justify-between items-center border-b border-slate-100 pb-4">
             <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
               <Zap className="w-4 h-4 text-violet-600" />
@@ -287,7 +287,7 @@ export default function EditorPage() {
         </div>
 
         {/* CONTROLS INFO BLOCK */}
-        <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl shadow-sm">
+        <div className="flex flex-col gap-5 xl:gap-6 bg-white border border-slate-200 p-5 xl:p-6 rounded-2xl xl:rounded-3xl shadow-sm">
           <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2 border-b border-slate-100 pb-4">
             <BarChart2 className="w-4 h-4 text-violet-600" />
             <span>Optimization Info</span>
@@ -321,10 +321,10 @@ export default function EditorPage() {
 
       {/* Result Section */}
       {result && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12 animate-fade-in">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:gap-8 animate-fade-in">
           
           {/* OUTPUT COMPONENT */}
-          <div className="lg:col-span-2 flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl shadow-sm">
+          <div className="lg:col-span-2 flex flex-col gap-5 xl:gap-6 bg-white border border-slate-200 p-5 xl:p-6 rounded-2xl xl:rounded-3xl shadow-sm">
             <div className="flex justify-between items-center border-b border-slate-100 pb-4">
               <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-600" />
@@ -393,7 +393,7 @@ export default function EditorPage() {
           <div className="flex flex-col gap-6">
             
             {/* SCORE SYSTEM */}
-            <div className="bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl flex flex-col gap-4 shadow-sm">
+            <div className="bg-white border border-slate-200 p-5 xl:p-6 rounded-2xl xl:rounded-3xl flex flex-col gap-4 shadow-sm">
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                 <h3 className="text-sm xl:text-base font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
                   <BarChart2 className="w-4 h-4 text-indigo-600" />
@@ -430,7 +430,7 @@ export default function EditorPage() {
             </div>
 
             {/* EXPLANATIONS LIST */}
-            <div className="bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl flex flex-col gap-4 flex-1 shadow-sm">
+            <div className="bg-white border border-slate-200 p-5 xl:p-6 rounded-2xl xl:rounded-3xl flex flex-col gap-4 flex-1 shadow-sm">
               <h3 className="text-sm xl:text-base font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2 border-b border-slate-100 pb-3">
                 <HelpCircle className="w-4 h-4 text-indigo-600" />
                 <span>Explain Improvements</span>

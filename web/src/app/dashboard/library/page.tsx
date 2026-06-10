@@ -166,7 +166,7 @@ export default function LibraryPage() {
   );
 
   return (
-    <div className="flex-1 flex flex-col gap-8 xl:gap-12 max-w-7xl mx-auto w-full">
+    <div className="flex-1 flex flex-col gap-6 xl:gap-8 max-w-7xl mx-auto w-full">
       
       {/* Search and Header panel */}
       <div className="flex flex-col sm:flex-row gap-4 xl:gap-6 items-center justify-between">
@@ -280,11 +280,11 @@ export default function LibraryPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 xl:gap-6">
           {filteredPrompts.map((item) => (
             <div 
               key={item.id}
-              className="p-5 xl:p-8 rounded-2xl xl:rounded-3xl bg-white border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all flex flex-col gap-4 xl:gap-6 relative overflow-hidden group"
+              className="p-4 xl:p-5.5 rounded-2xl xl:rounded-3xl bg-white border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md transition-all flex flex-col gap-3.5 xl:gap-5 relative overflow-hidden group"
             >
               <div className="flex justify-between items-start gap-3">
                 <div className="min-w-0">

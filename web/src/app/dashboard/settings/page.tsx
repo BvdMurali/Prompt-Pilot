@@ -331,12 +331,12 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col gap-8 xl:gap-12 max-w-7xl mx-auto w-full">
+    <div className="flex-1 flex flex-col gap-6 xl:gap-8 max-w-7xl mx-auto w-full">
       {/* Settings Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:gap-8">
         
         {/* Main Settings Area */}
-        <div className="lg:col-span-2 flex flex-col gap-8">
+        <div className="lg:col-span-2 flex flex-col gap-6">
           
           {/* Profile Details Card */}
           <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl shadow-sm">
@@ -620,7 +620,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Security & Data exports panel */}
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6">
           
           {/* Privacy info card */}
           <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl shadow-sm h-fit">

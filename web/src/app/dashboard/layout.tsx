@@ -202,7 +202,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <aside className={`w-64 xl:w-72 2xl:w-80 border-r border-slate-200 bg-white flex flex-col z-40 md:z-20 fixed md:sticky top-0 h-full transition-transform duration-300 ease-in-out ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
       }`}>
-        <div className="h-16 xl:h-20 px-6 border-b border-slate-200 flex items-center justify-between">
+        <div className="h-14 xl:h-16 px-6 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-lg text-slate-900">
             <svg className="w-7 h-7" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
@@ -245,7 +245,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 xl:px-5 xl:py-3.5 rounded-xl text-sm xl:text-base font-semibold transition-all ${
+                className={`flex items-center gap-3 px-4 py-2.5 xl:px-4.5 xl:py-2.5 rounded-xl text-sm font-semibold transition-all ${
                   isActive
                     ? 'bg-indigo-50 border border-indigo-100 text-indigo-700'
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
@@ -299,7 +299,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       <main className="flex-1 flex flex-col h-full relative z-10 overflow-y-auto">
-        <header className="h-16 xl:h-20 border-b border-slate-200 flex items-center justify-between px-4 sm:px-8 xl:px-12 bg-white/80 backdrop-blur-md sticky top-0 z-30 shadow-sm">
+        <header className="h-14 xl:h-16 border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 xl:px-8 bg-white/80 backdrop-blur-md sticky top-0 z-30 shadow-sm">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsSidebarOpen(true)}
@@ -348,7 +348,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        <div className="p-4 sm:p-8 xl:p-12 flex-1 flex flex-col w-full">
+        <div className="p-4 sm:p-6 xl:p-8 flex-1 flex flex-col w-full">
           {children}
         </div>
       </main>

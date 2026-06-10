@@ -92,7 +92,7 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col gap-8 xl:gap-12 max-w-7xl mx-auto w-full">
+    <div className="flex-1 flex flex-col gap-6 xl:gap-8 max-w-7xl mx-auto w-full">
       {error && (
         <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 flex items-center gap-2">
           <AlertCircle className="w-4 h-4" />
@@ -113,7 +113,7 @@ export default function HistoryPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:gap-8">
           
           {/* HISTORY LOGS LIST PANEL */}
           <div className="lg:col-span-1 flex flex-col gap-3 max-h-[250px] lg:max-h-[600px] xl:max-h-[750px] 2xl:max-h-[850px] overflow-y-auto pr-1">
@@ -152,7 +152,7 @@ export default function HistoryPage() {
           </div>
 
           {/* HISTORY LOG DETAILS WORKSPACE */}
-          <div className="lg:col-span-2 flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl min-h-[450px] shadow-sm">
+          <div className="lg:col-span-2 flex flex-col gap-5 xl:gap-6 bg-white border border-slate-200 p-5 xl:p-6 rounded-2xl xl:rounded-3xl min-h-[450px] shadow-sm">
             {selectedItem ? (
               <div className="flex flex-col gap-6">
                 
