@@ -341,10 +341,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <span>📱 Open in Mobile App</span>
               </button>
             )}
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Session active</span>
-            </div>
           </div>
         </header>
 
