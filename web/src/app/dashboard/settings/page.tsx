@@ -339,7 +339,7 @@ export default function SettingsPage() {
         <div className="lg:col-span-2 flex flex-col gap-8">
           
           {/* Profile Details Card */}
-          <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-10 rounded-2xl xl:rounded-[2rem] shadow-sm">
+          <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl shadow-sm">
             <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2 xl:gap-3 border-b border-slate-100 pb-4 xl:pb-6">
               <User className="w-4 h-4 xl:w-5 xl:h-5 text-violet-600" />
               <span>Profile Details</span>
@@ -429,7 +429,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Core Preferences Card */}
-          <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-10 rounded-2xl xl:rounded-[2rem] shadow-sm">
+          <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl shadow-sm">
             <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2 xl:gap-3 border-b border-slate-100 pb-4 xl:pb-6">
               <Settings className="w-4 h-4 xl:w-5 xl:h-5 text-violet-600" />
               <span>Workspace Preferences</span>
@@ -509,7 +509,7 @@ export default function SettingsPage() {
           </div>
 
           {/* API Credentials Card */}
-          <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-10 rounded-2xl xl:rounded-[2rem] shadow-sm">
+          <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl shadow-sm">
             <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2 xl:gap-3 border-b border-slate-100 pb-4 xl:pb-6">
               <Key className="w-4 h-4 xl:w-5 xl:h-5 text-violet-600" />
               <span>API Key Overrides (Optional)</span>
@@ -623,7 +623,7 @@ export default function SettingsPage() {
         <div className="flex flex-col gap-8">
           
           {/* Privacy info card */}
-          <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-10 rounded-2xl xl:rounded-[2rem] shadow-sm h-fit">
+          <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl shadow-sm h-fit">
             <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2 xl:gap-3 border-b border-slate-200 pb-4 xl:pb-6">
               <Database className="w-4 h-4 xl:w-5 xl:h-5 text-violet-600" />
               <span>Account & Privacy</span>

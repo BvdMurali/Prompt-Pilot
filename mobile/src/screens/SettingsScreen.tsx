@@ -709,7 +709,7 @@ export default function SettingsScreen() {
             <View style={styles.privacyActionRow}>
               <Text style={styles.privacyActionTitle}>Export Information</Text>
               <TouchableOpacity onPress={handleExportData} style={styles.exportBtn} activeOpacity={0.7}>
-                <Ionicons name="download-outline" size={15} color="#fff" style={{ marginRight: 6 }} />
+                <Ionicons name="download-outline" size={15} color={THEME.colors.textSecondary} style={{ marginRight: 6 }} />
                 <Text style={styles.exportBtnText}>Export My Data</Text>
               </TouchableOpacity>
             </View>
@@ -883,10 +883,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(239, 68, 68, 0.06)',
     borderColor: THEME.colors.danger,
     borderWidth: 1,
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 16,
-    gap: 12,
+    borderRadius: THEME.roundness.lg,
+    padding: THEME.spacing.md,
+    marginBottom: THEME.spacing.lg,
+    gap: THEME.spacing.md,
   },
   deleteWarningTitle: {
     fontSize: 13,
@@ -901,9 +901,9 @@ const styles = StyleSheet.create({
   },
   restoreBtn: {
     backgroundColor: THEME.colors.danger,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+    paddingHorizontal: THEME.spacing.md,
+    paddingVertical: THEME.spacing.sm - 2,
+    borderRadius: THEME.roundness.md,
   },
   restoreBtnText: {
     color: '#fff',
@@ -913,7 +913,7 @@ const styles = StyleSheet.create({
   card: {
     padding: THEME.spacing.lg,
     marginBottom: THEME.spacing.lg,
-    borderRadius: 16,
+    borderRadius: THEME.roundness.xl,
     borderWidth: 1,
     borderColor: THEME.colors.border,
   },
@@ -922,11 +922,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: THEME.colors.borderLight,
-    paddingBottom: 12,
-    marginBottom: 20,
+    paddingBottom: THEME.spacing.md,
+    marginBottom: THEME.spacing.xl,
   },
   cardHeaderIcon: {
-    marginRight: 8,
+    marginRight: THEME.spacing.sm,
   },
   cardTitle: {
     fontSize: 15,
@@ -938,13 +938,13 @@ const styles = StyleSheet.create({
   avatarSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
-    gap: 16,
+    marginBottom: THEME.spacing.xl,
+    gap: THEME.spacing.lg,
   },
   avatarBtn: {
     width: 64,
     height: 64,
-    borderRadius: 32,
+    borderRadius: THEME.roundness.full,
     position: 'relative',
     overflow: 'hidden',
     backgroundColor: THEME.colors.borderLight,
@@ -974,7 +974,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 20,
+    height: THEME.spacing.xl,
     backgroundColor: 'rgba(15, 23, 42, 0.6)',
     zIndex: 10,
     justifyContent: 'center',
@@ -996,7 +996,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: THEME.colors.textPrimary,
-    marginBottom: 2,
+    marginBottom: THEME.spacing.xs,
   },
   avatarDescSub: {
     fontSize: 11,
@@ -1004,30 +1004,30 @@ const styles = StyleSheet.create({
     lineHeight: 14,
   },
   formGroup: {
-    marginBottom: 16,
+    marginBottom: THEME.spacing.lg,
   },
   label: {
     fontSize: 11,
     fontWeight: '600',
     color: THEME.colors.textMuted,
     textTransform: 'uppercase',
-    marginBottom: 8,
+    marginBottom: THEME.spacing.sm,
     letterSpacing: 0.5,
   },
   textInput: {
     backgroundColor: THEME.colors.surface,
     borderColor: THEME.colors.border,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: THEME.roundness.lg,
     height: 44,
-    paddingHorizontal: 14,
+    paddingHorizontal: THEME.spacing.lg,
     color: THEME.colors.textPrimary,
     fontSize: 14,
   },
   fieldHint: {
     fontSize: 10,
     color: THEME.colors.textMuted,
-    marginTop: 6,
+    marginTop: THEME.spacing.xs + 2,
     lineHeight: 14,
   },
   readOnlyField: {
@@ -1036,12 +1036,12 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.colors.borderLight,
     borderColor: THEME.colors.border,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: THEME.roundness.lg,
     height: 44,
-    paddingHorizontal: 14,
+    paddingHorizontal: THEME.spacing.lg,
   },
   readOnlyIcon: {
-    marginRight: 8,
+    marginRight: THEME.spacing.sm,
   },
   readOnlyText: {
     fontSize: 14,
@@ -1054,20 +1054,20 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.colors.borderLight,
     borderColor: THEME.colors.border,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: THEME.roundness.lg,
     height: 44,
-    paddingHorizontal: 14,
+    paddingHorizontal: THEME.spacing.lg,
   },
   uidText: {
     fontSize: 12,
     color: THEME.colors.textSecondary,
     fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace',
     flex: 1,
-    marginRight: 12,
+    marginRight: THEME.spacing.md,
   },
   copyBtn: {
-    padding: 6,
-    borderRadius: 6,
+    padding: THEME.spacing.sm,
+    borderRadius: THEME.roundness.sm,
     backgroundColor: 'rgba(0, 0, 0, 0.03)',
   },
   dropdownBtn: {
@@ -1077,9 +1077,9 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.colors.surface,
     borderColor: THEME.colors.border,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: THEME.roundness.lg,
     height: 44,
-    paddingHorizontal: 14,
+    paddingHorizontal: THEME.spacing.lg,
   },
   dropdownBtnText: {
     fontSize: 14,
@@ -1091,9 +1091,9 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.colors.surface,
     borderColor: THEME.colors.border,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: THEME.roundness.lg,
     height: 44,
-    paddingHorizontal: 14,
+    paddingHorizontal: THEME.spacing.lg,
   },
   keyInput: {
     flex: 1,
@@ -1103,12 +1103,12 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   keyEyeBtn: {
-    padding: 6,
+    padding: THEME.spacing.sm,
     justifyContent: 'center',
     alignItems: 'center',
   },
   saveBtn: {
-    marginTop: 12,
+    marginTop: THEME.spacing.md,
     height: 44,
   },
   privacyDescRow: {
@@ -1119,7 +1119,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: THEME.colors.textPrimary,
-    marginBottom: 4,
+    marginBottom: THEME.spacing.xs,
   },
   privacyDescText: {
     fontSize: 11,
@@ -1146,9 +1146,9 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.colors.surface,
     borderWidth: 1,
     borderColor: THEME.colors.border,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    borderRadius: THEME.roundness.lg,
+    paddingHorizontal: THEME.spacing.md,
+    paddingVertical: THEME.spacing.sm,
   },
   exportBtnText: {
     fontSize: 12,
@@ -1161,9 +1161,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(239, 68, 68, 0.05)',
     borderWidth: 1,
     borderColor: 'rgba(239, 68, 68, 0.2)',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    borderRadius: THEME.roundness.lg,
+    paddingHorizontal: THEME.spacing.md,
+    paddingVertical: THEME.spacing.sm,
   },
   deleteTriggerText: {
     fontSize: 12,
@@ -1171,9 +1171,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   signOutButton: {
-    marginTop: 12,
+    marginTop: THEME.spacing.md,
     height: 48,
-    marginBottom: 20,
+    marginBottom: THEME.spacing.xl,
   },
   // Modal layout
   modalBackdrop: {
@@ -1181,7 +1181,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: THEME.spacing.xxl,
   },
   modalCloseOverlay: {
     position: 'absolute',
@@ -1191,7 +1191,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxHeight: '80%',
     padding: THEME.spacing.lg,
-    borderRadius: 16,
+    borderRadius: THEME.roundness.xl,
     borderWidth: 1,
     borderColor: THEME.colors.border,
     backgroundColor: THEME.colors.surface,
@@ -1200,7 +1200,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxHeight: '50%',
     padding: THEME.spacing.lg,
-    borderRadius: 16,
+    borderRadius: THEME.roundness.xl,
     borderWidth: 1,
     borderColor: THEME.colors.border,
     backgroundColor: THEME.colors.surface,
@@ -1211,8 +1211,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderBottomColor: THEME.colors.border,
-    paddingBottom: 12,
-    marginBottom: 12,
+    paddingBottom: THEME.spacing.md,
+    marginBottom: THEME.spacing.md,
   },
   modalTitle: {
     fontSize: 15,
@@ -1223,7 +1223,7 @@ const styles = StyleSheet.create({
     flexGrow: 0,
   },
   modalGroup: {
-    marginBottom: 14,
+    marginBottom: THEME.spacing.md + 2,
   },
   modalGroupHeader: {
     fontSize: 10,
@@ -1231,15 +1231,15 @@ const styles = StyleSheet.create({
     color: THEME.colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    marginBottom: 6,
-    marginTop: 6,
+    marginBottom: THEME.spacing.sm,
+    marginTop: THEME.spacing.sm,
   },
   modalItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 10,
-    paddingHorizontal: 4,
+    paddingVertical: THEME.spacing.sm + 2,
+    paddingHorizontal: THEME.spacing.xs,
     borderBottomWidth: 1,
     borderBottomColor: THEME.colors.borderLight,
   },

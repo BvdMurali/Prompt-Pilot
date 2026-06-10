@@ -92,7 +92,7 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col gap-6">
+    <div className="flex-1 flex flex-col gap-8 xl:gap-12 max-w-7xl mx-auto w-full">
       {error && (
         <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 flex items-center gap-2">
           <AlertCircle className="w-4 h-4" />

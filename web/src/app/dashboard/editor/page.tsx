@@ -184,7 +184,7 @@ export default function EditorPage() {
     : '';
 
   return (
-    <div className="flex-1 flex flex-col gap-8 xl:gap-12">
+    <div className="flex-1 flex flex-col gap-8 xl:gap-12 max-w-7xl mx-auto w-full">
       {/* Selection Control Panel */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12">
         

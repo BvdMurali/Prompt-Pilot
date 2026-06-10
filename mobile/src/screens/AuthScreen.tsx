@@ -230,21 +230,21 @@ const styles = StyleSheet.create({
   },
   card: {
     padding: THEME.spacing.xl,
-    borderRadius: 16,
+    borderRadius: THEME.roundness.xl,
     borderWidth: 1,
     borderColor: THEME.colors.border,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 28,
+    marginBottom: THEME.spacing.xxl + 4,
   },
   sparklesIconContainer: {
     width: 42,
     height: 42,
-    borderRadius: 12,
+    borderRadius: THEME.roundness.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
+    marginBottom: THEME.spacing.lg,
     shadowColor: THEME.colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     color: THEME.colors.textPrimary,
-    marginBottom: 6,
+    marginBottom: THEME.spacing.xs + 2,
   },
   cardSubtitle: {
     fontSize: 13,
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: THEME.colors.textMuted,
     textTransform: 'uppercase',
-    marginBottom: 8,
+    marginBottom: THEME.spacing.sm,
     letterSpacing: 0.5,
   },
   inputContainer: {
@@ -279,12 +279,12 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.colors.background,
     borderColor: THEME.colors.border,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: THEME.roundness.md,
     height: 48,
-    paddingHorizontal: 14,
+    paddingHorizontal: THEME.spacing.md + 2,
   },
   inputIcon: {
-    marginRight: 10,
+    marginRight: THEME.spacing.sm + 2,
   },
   input: {
     flex: 1,
@@ -293,18 +293,18 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   eyeIconContainer: {
-    padding: 4,
+    padding: THEME.spacing.xs,
     justifyContent: 'center',
     alignItems: 'center',
   },
   submitButton: {
-    marginTop: 8,
+    marginTop: THEME.spacing.sm,
     height: 48,
   },
   dividerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 24,
+    marginVertical: THEME.spacing.xxl,
   },
   dividerLine: {
     flex: 1,
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: THEME.colors.textMuted,
     textTransform: 'uppercase',
-    paddingHorizontal: 12,
+    paddingHorizontal: THEME.spacing.md,
     letterSpacing: 0.5,
   },
   googleButton: {
@@ -330,8 +330,8 @@ const styles = StyleSheet.create({
   },
   switchModeContainer: {
     alignItems: 'center',
-    marginTop: 24,
-    paddingVertical: 6,
+    marginTop: THEME.spacing.xxl,
+    paddingVertical: THEME.spacing.sm - 2,
   },
   switchModeText: {
     fontSize: 12,

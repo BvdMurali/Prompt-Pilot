@@ -215,7 +215,7 @@ export default function TemplatesPage() {
   );
 
   return (
-    <div className="flex-1 flex flex-col gap-8 w-full">
+    <div className="flex-1 flex flex-col gap-8 xl:gap-12 max-w-7xl mx-auto w-full">
       {/* Header filter */}
       <div className="relative w-full lg:max-w-[320px] xl:max-w-[360px] 2xl:max-w-[400px]">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 xl:w-5 xl:h-5 text-slate-400" />

@@ -166,7 +166,7 @@ export default function LibraryPage() {
   );
 
   return (
-    <div className="flex-1 flex flex-col gap-6">
+    <div className="flex-1 flex flex-col gap-8 xl:gap-12 max-w-7xl mx-auto w-full">
       
       {/* Search and Header panel */}
       <div className="flex flex-col sm:flex-row gap-4 xl:gap-6 items-center justify-between">
