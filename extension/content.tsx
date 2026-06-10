@@ -382,7 +382,7 @@ export default function ContentScriptUI() {
   };
 
   return (
-    <div ref={containerRef} className="promptpilot-shadow-dom text-slate-100 font-sans">
+    <div ref={containerRef} className="promptpilot-shadow-dom text-slate-900 font-sans">
       
       {/* FLOATING ACTION TRIGGER BUBBLE */}
       {!showModal && (
@@ -393,7 +393,7 @@ export default function ContentScriptUI() {
             setInputTextVal(getInputText());
             setShowModal(true);
           }}
-          className="fixed z-[99999] flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-500 hover:from-violet-500 hover:to-indigo-400 text-white border border-indigo-400/20 shadow-xl transition-all scale-100 cursor-move active:scale-95 select-none"
+          className="fixed z-[99999] flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-[#7C3AED] via-[#8B5CF6] to-[#06B6D4] hover:opacity-90 text-white border border-white/20 shadow-xl transition-all scale-100 cursor-move active:scale-95 select-none"
           style={{
             left: `${position.x}px`,
             top: `${position.y}px`
@@ -407,28 +407,28 @@ export default function ContentScriptUI() {
       {showModal && isMinimized && (
         <div
           onMouseDown={handleModalMouseDown}
-          className="fixed z-[999999] bg-slate-950 border border-slate-900/80 rounded-xl shadow-2xl p-3 flex items-center gap-4 cursor-move select-none animate-in fade-in zoom-in-95 duration-150"
+          className="fixed z-[999999] bg-white border border-slate-200 rounded-xl shadow-2xl p-3 flex items-center gap-4 cursor-move select-none animate-in fade-in zoom-in-95 duration-150"
           style={{
             left: `${modalPosition.x}px`,
             top: `${modalPosition.y}px`
           }}
         >
           <div className="flex items-center gap-2 pointer-events-none">
-            <div className="w-5 h-5 rounded bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center shadow">
+            <div className="w-5 h-5 rounded bg-gradient-to-r from-[#7C3AED] via-[#8B5CF6] to-[#06B6D4] flex items-center justify-center shadow">
               <Sparkles className="w-3 h-3 text-white animate-pulse" />
             </div>
-            <span className="text-xs font-bold text-white">PromptPilot (Minimized)</span>
+            <span className="text-xs font-bold text-slate-900">PromptPilot (Minimized)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <button
               onClick={() => setIsMinimized(false)}
-              className="px-2.5 py-1.5 rounded-lg bg-indigo-650 hover:bg-indigo-550 text-white text-[10px] font-bold transition-all active:scale-95"
+              className="px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-brand-start to-brand-mid hover:opacity-90 text-white text-[10px] font-bold transition-all active:scale-95"
             >
               Restore
             </button>
             <button
               onClick={handleClose}
-              className="p-1 rounded-lg hover:bg-slate-900 text-slate-455 hover:text-white transition-all"
+              className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-all"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -439,7 +439,7 @@ export default function ContentScriptUI() {
       {/* OVERLAY PANEL MODAL - ACTIVE STATE */}
       {showModal && !isMinimized && (
         <div 
-          className="fixed z-[999999] w-full max-w-2xl bg-slate-950/95 border border-slate-900 rounded-2xl p-6 flex flex-col gap-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+          className="fixed z-[999999] w-full max-w-2xl bg-white border border-slate-200 rounded-2xl p-6 flex flex-col gap-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200 text-slate-900"
           style={{
             left: `${modalPosition.x}px`,
             top: `${modalPosition.y}px`
@@ -449,10 +449,10 @@ export default function ContentScriptUI() {
           {/* Modal Header */}
           <div 
             onMouseDown={handleModalMouseDown}
-            className="flex justify-between items-center border-b border-slate-900 pb-3 cursor-move select-none"
+            className="flex justify-between items-center border-b border-slate-100 pb-3 cursor-move select-none"
           >
-            <div className="flex items-center gap-2 font-bold text-white text-sm pointer-events-none">
-              <div className="w-6 h-6 rounded bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center shadow">
+            <div className="flex items-center gap-2 font-bold text-slate-900 text-sm pointer-events-none">
+              <div className="w-6 h-6 rounded bg-gradient-to-r from-[#7C3AED] via-[#8B5CF6] to-[#06B6D4] flex items-center justify-center shadow">
                 <Sparkles className="w-3.5 h-3.5 text-white" />
               </div>
               <span>PromptPilot universal rewrite panel</span>
@@ -460,14 +460,14 @@ export default function ContentScriptUI() {
             <div className="flex items-center gap-2">
               <button 
                 onClick={() => setIsMinimized(true)}
-                className="text-slate-450 hover:text-white p-1 rounded hover:bg-slate-900 transition-all"
+                className="text-slate-400 hover:text-slate-700 p-1 rounded hover:bg-slate-100 transition-all"
                 title="Minimize"
               >
                 <Minus className="w-4 h-4" />
               </button>
               <button 
                 onClick={handleClose}
-                className="text-slate-450 hover:text-white p-1 rounded hover:bg-slate-900 transition-all"
+                className="text-slate-400 hover:text-slate-700 p-1 rounded hover:bg-slate-100 transition-all"
                 title="Close"
               >
                 <X className="w-4 h-4" />
@@ -477,7 +477,7 @@ export default function ContentScriptUI() {
 
             {/* Error notifications */}
             {error && (
-              <div className="p-3 bg-red-950/30 border border-red-900/40 text-xs text-red-400 rounded-lg flex items-center gap-2">
+              <div className="p-3 bg-red-50 border border-red-100 text-xs text-red-700 rounded-lg flex items-center gap-2">
                 <span>{error}</span>
               </div>
             )}
@@ -489,7 +489,7 @@ export default function ContentScriptUI() {
                   {/* Before Draft */}
                   <div className="flex flex-col gap-1.5">
                     <span className="text-[10px] uppercase font-bold text-slate-500">Original Text</span>
-                    <div className="p-3 rounded-xl bg-slate-900/50 border border-slate-900 font-mono text-[11px] text-slate-400 leading-relaxed max-h-36 overflow-y-auto whitespace-pre-wrap">
+                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 font-mono text-[11px] text-slate-600 leading-relaxed max-h-36 overflow-y-auto whitespace-pre-wrap">
                       {inputText}
                     </div>
                   </div>
@@ -498,24 +498,24 @@ export default function ContentScriptUI() {
                   <div className="flex flex-col gap-1.5">
                     <span className="text-[10px] uppercase font-bold text-slate-500 flex items-center justify-between">
                       <span>Improved version</span>
-                      {result.score?.overall && <span className="text-indigo-400 font-bold">Score: {result.score.overall}/100</span>}
+                      {result.score?.overall && <span className="text-brand-start font-bold">Score: {result.score.overall}/100</span>}
                     </span>
-                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 font-mono text-[11px] text-slate-200 leading-relaxed max-h-36 overflow-y-auto whitespace-pre-wrap">
+                    <div className="p-3 rounded-xl bg-white border border-slate-200 font-mono text-[11px] text-slate-800 leading-relaxed max-h-36 overflow-y-auto whitespace-pre-wrap shadow-inner">
                       {activeVariation !== null ? result.variations[activeVariation] : result.improved_text}
                     </div>
                   </div>
                 </div>
 
                 {/* Variations Carousel */}
-                <div className="flex flex-col gap-1 border-t border-slate-900 pt-3">
+                <div className="flex flex-col gap-1 border-t border-slate-100 pt-3">
                   <span className="text-[9px] uppercase font-bold text-slate-500">Select Variation style</span>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setActiveVariation(null)}
                       className={`px-3 py-1.5 rounded-lg border text-xs font-semibold ${
                         activeVariation === null
-                          ? "border-indigo-500 bg-indigo-500/10 text-white"
-                          : "border-slate-900 bg-slate-900/30 text-slate-400"
+                          ? "border-brand-start bg-brand-start/10 text-brand-start"
+                          : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
                       }`}
                     >
                       Default
@@ -526,8 +526,8 @@ export default function ContentScriptUI() {
                         onClick={() => setActiveVariation(idx)}
                         className={`px-3 py-1.5 rounded-lg border text-xs font-semibold ${
                           activeVariation === idx
-                            ? "border-indigo-500 bg-indigo-500/10 text-white"
-                            : "border-slate-900 bg-slate-900/30 text-slate-400"
+                            ? "border-brand-start bg-brand-start/10 text-brand-start"
+                            : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
                         }`}
                       >
                         Option {String.fromCharCode(65 + idx)}
@@ -537,16 +537,16 @@ export default function ContentScriptUI() {
                 </div>
 
                 {/* Apply Actions */}
-                <div className="flex gap-3 justify-end border-t border-slate-900 pt-4 mt-1">
+                <div className="flex gap-3 justify-end border-t border-slate-100 pt-4 mt-1">
                   <button
                     onClick={() => setResult(null)}
-                    className="px-4 py-2 rounded-xl border border-slate-900 bg-slate-900/20 text-slate-400 hover:text-white text-xs font-semibold"
+                    className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 text-xs font-semibold"
                   >
                     Adjust parameters
                   </button>
                   <button
                     onClick={handleApply}
-                    className="px-5 py-2 rounded-xl bg-indigo-650 hover:bg-indigo-550 text-white text-xs font-bold flex items-center gap-1.5"
+                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-brand-start to-brand-mid hover:opacity-90 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm"
                   >
                     <Check className="w-3.5 h-3.5" />
                     <span>Insert Improved Text</span>
@@ -564,7 +564,7 @@ export default function ContentScriptUI() {
                     onChange={(e) => setInputTextVal(e.target.value)}
                     placeholder="Type, edit or paste your prompt/text here..."
                     rows={4}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-600 outline-none resize-none font-mono leading-relaxed transition-all focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20"
+                    className="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs text-slate-800 placeholder-slate-400 outline-none resize-none font-mono leading-relaxed transition-all focus:border-brand-start/50 focus:ring-1 focus:ring-brand-start/20"
                   />
                 </div>
 
@@ -574,7 +574,7 @@ export default function ContentScriptUI() {
                     <select
                       value={tone}
                       onChange={(e) => setTone(e.target.value)}
-                      className="bg-slate-900 border border-slate-900 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none"
+                      className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:border-brand-start/50 focus:ring-1"
                     >
                       <option value="professional">Professional</option>
                       <option value="friendly">Friendly</option>
@@ -590,7 +590,7 @@ export default function ContentScriptUI() {
                     <select
                       value={length}
                       onChange={(e) => setLength(e.target.value)}
-                      className="bg-slate-900 border border-slate-900 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none"
+                      className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:border-brand-start/50 focus:ring-1"
                     >
                       <option value="">Default Length</option>
                       <option value="shorten">Shorten</option>
@@ -605,7 +605,7 @@ export default function ContentScriptUI() {
                     <select
                       value={platform}
                       onChange={(e) => setPlatform(e.target.value)}
-                      className="bg-slate-900 border border-slate-900 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none"
+                      className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:border-brand-start/50 focus:ring-1"
                     >
                       <option value="">General AI</option>
                       <option value="chatgpt">ChatGPT (GPT-4o)</option>
@@ -616,9 +616,9 @@ export default function ContentScriptUI() {
                 </div>
 
                 {/* CTA Action Triggers */}
-                <div className="flex justify-between items-center border-t border-slate-900 pt-4 mt-1">
+                <div className="flex justify-between items-center border-t border-slate-100 pt-4 mt-1">
                   {!session && (
-                    <span className="text-[10px] text-amber-500 font-semibold">
+                    <span className="text-[10px] text-amber-600 font-semibold">
                       * Log in to Web App first to enable operations.
                     </span>
                   )}
@@ -628,7 +628,7 @@ export default function ContentScriptUI() {
                     <button
                       onClick={() => handleAction("rewrite")}
                       disabled={loadingAction !== null || !session}
-                      className="px-4 py-2 rounded-xl border border-indigo-500/20 bg-indigo-500/5 hover:bg-indigo-500/10 text-indigo-400 text-xs font-bold disabled:opacity-50 flex items-center gap-1.5"
+                      className="px-4 py-2 rounded-xl border border-brand-start/20 bg-brand-start/5 hover:bg-brand-start/10 text-brand-start text-xs font-bold disabled:opacity-50 flex items-center gap-1.5"
                     >
                       {loadingAction === "rewrite" ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
                       <span>Rewrite text</span>
@@ -636,7 +636,7 @@ export default function ContentScriptUI() {
                     <button
                       onClick={() => handleAction("optimize")}
                       disabled={loadingAction !== null || !session}
-                      className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-550 text-white text-xs font-bold disabled:opacity-50 flex items-center gap-1.5"
+                      className="px-5 py-2 rounded-xl bg-gradient-to-r from-brand-start to-brand-mid hover:opacity-90 text-white text-xs font-bold disabled:opacity-50 flex items-center gap-1.5 shadow-sm"
                     >
                       {loadingAction === "optimize" ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
                       <span>Optimize Prompt</span>

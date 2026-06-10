@@ -339,9 +339,9 @@ export default function SettingsPage() {
         <div className="lg:col-span-2 flex flex-col gap-8">
           
           {/* Profile Details Card */}
-          <div className="flex flex-col gap-6 xl:gap-8 bg-slate-900/40 border border-slate-900/80 backdrop-blur-md p-6 xl:p-10 rounded-2xl xl:rounded-[2rem]">
-            <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 xl:gap-3 border-b border-slate-800/80 pb-4 xl:pb-6">
-              <User className="w-4 h-4 xl:w-5 xl:h-5 text-violet-400" />
+          <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-10 rounded-2xl xl:rounded-[2rem] shadow-sm">
+            <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2 xl:gap-3 border-b border-slate-100 pb-4 xl:pb-6">
+              <User className="w-4 h-4 xl:w-5 xl:h-5 text-violet-600" />
               <span>Profile Details</span>
             </h2>
 
@@ -362,17 +362,17 @@ export default function SettingsPage() {
                   type="button"
                   onClick={handleAvatarClick}
                   disabled={uploading}
-                  className="group relative w-24 h-24 rounded-full border border-slate-800 overflow-hidden flex items-center justify-center cursor-pointer shadow-lg shadow-indigo-500/10 hover:border-indigo-500/50 transition-colors disabled:cursor-not-allowed"
+                  className="group relative w-24 h-24 rounded-full border border-slate-200 overflow-hidden flex items-center justify-center cursor-pointer shadow-md shadow-indigo-600/5 hover:border-indigo-500/50 transition-colors disabled:cursor-not-allowed"
                   title="Upload profile picture from local device"
                 >
                   {uploading ? (
-                    <div className="absolute inset-0 bg-slate-950/80 flex items-center justify-center z-10">
-                      <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
+                    <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10">
+                      <Loader2 className="w-6 h-6 text-indigo-600 animate-spin" />
                     </div>
                   ) : (
-                    <div className="absolute inset-0 bg-slate-950/0 group-hover:bg-slate-950/70 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-200 z-10">
-                      <Camera className="w-5 h-5 text-indigo-400 mb-0.5" />
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300">Upload</span>
+                    <div className="absolute inset-0 bg-white/0 group-hover:bg-slate-50/90 flex flex-col items-center justify-center text-slate-800 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10">
+                      <Camera className="w-5 h-5 text-indigo-600 mb-0.5" />
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">Upload</span>
                     </div>
                   )}
 
@@ -384,7 +384,7 @@ export default function SettingsPage() {
                       className="w-full h-full object-cover shadow-inner"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center text-3xl font-extrabold text-white uppercase">
+                    <div className="w-full h-full bg-gradient-to-tr from-violet-650 to-indigo-650 flex items-center justify-center text-3xl font-extrabold text-white uppercase">
                       {name ? name.substring(0, 2) : session?.user?.email?.substring(0, 2)}
                     </div>
                   )}
@@ -392,36 +392,36 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex-1 w-full flex flex-col gap-1.5 xl:gap-2.5">
-                <label className="text-xs xl:text-sm font-semibold text-slate-300">Display Name</label>
+                <label className="text-xs xl:text-sm font-semibold text-slate-750">Display Name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="E.g. Murali"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl xl:rounded-2xl px-4 py-2.5 xl:px-6 xl:py-4 text-sm xl:text-base text-slate-200 outline-none focus:border-indigo-500/50 transition-colors"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2.5 xl:px-6 xl:py-4 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500/50 transition-colors"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 xl:gap-6 pt-2">
               <div className="flex flex-col gap-1.5 xl:gap-2.5">
-                <label className="text-xs xl:text-sm font-semibold text-slate-400">Email Address (Read-only)</label>
-                <div className="flex items-center gap-3 bg-slate-950/40 border border-slate-900 rounded-xl xl:rounded-2xl px-4 py-2.5 xl:px-6 xl:py-4 text-sm xl:text-base text-slate-500 cursor-not-allowed">
-                  <Lock className="w-4 h-4 text-slate-600" />
+                <label className="text-xs xl:text-sm font-semibold text-slate-500">Email Address (Read-only)</label>
+                <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2.5 xl:px-6 xl:py-4 text-sm xl:text-base text-slate-400 cursor-not-allowed">
+                  <Lock className="w-4 h-4 text-slate-400" />
                   <span className="truncate">{session?.user?.email}</span>
                 </div>
               </div>
 
               <div className="flex flex-col gap-1.5 xl:gap-2.5">
-                <label className="text-xs xl:text-sm font-semibold text-slate-400">User UID</label>
-                <div className="flex items-center justify-between bg-slate-950/40 border border-slate-900 rounded-xl xl:rounded-2xl px-4 py-2 xl:px-6 xl:py-3.5 text-sm text-slate-500">
+                <label className="text-xs xl:text-sm font-semibold text-slate-550">User UID</label>
+                <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2 xl:px-6 xl:py-3.5 text-sm text-slate-400">
                   <span className="font-mono text-xs truncate max-w-[200px] xl:max-w-xs">{session?.user?.id}</span>
                   <button
                     onClick={handleCopyUserId}
-                    className="p-1 rounded hover:bg-slate-900 text-slate-400 hover:text-white transition-colors"
+                    className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-800 transition-colors"
                     title="Copy User ID"
                   >
-                    {copiedId ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                    {copiedId ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
@@ -429,20 +429,20 @@ export default function SettingsPage() {
           </div>
 
           {/* Core Preferences Card */}
-          <div className="flex flex-col gap-6 xl:gap-8 bg-slate-900/40 border border-slate-900/80 backdrop-blur-md p-6 xl:p-10 rounded-2xl xl:rounded-[2rem]">
-            <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 xl:gap-3 border-b border-slate-800/80 pb-4 xl:pb-6">
-              <Settings className="w-4 h-4 xl:w-5 xl:h-5 text-violet-400" />
+          <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-10 rounded-2xl xl:rounded-[2rem] shadow-sm">
+            <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-505 flex items-center gap-2 xl:gap-3 border-b border-slate-100 pb-4 xl:pb-6">
+              <Settings className="w-4 h-4 xl:w-5 xl:h-5 text-violet-600" />
               <span>Workspace Preferences</span>
             </h2>
 
             <div className="flex flex-col gap-6 xl:gap-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 xl:gap-8">
                 <div className="flex flex-col gap-1.5 xl:gap-2.5">
-                  <label className="text-xs xl:text-sm font-semibold text-slate-300">Preferred AI Model</label>
+                  <label className="text-xs xl:text-sm font-semibold text-slate-700">Preferred AI Model</label>
                   <select
                     value={model}
                     onChange={(e) => setModel(e.target.value)}
-                    className="bg-slate-950 border border-slate-800 rounded-xl xl:rounded-2xl px-4 py-2.5 xl:px-6 xl:py-4 text-sm xl:text-base text-slate-200 outline-none focus:border-indigo-500/50 transition-colors"
+                    className="bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2.5 xl:px-6 xl:py-4 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500/50 transition-colors"
                   >
                     <optgroup label="Google Gemini (Direct)">
                       <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite (Default)</option>
@@ -476,11 +476,11 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="flex flex-col gap-1.5 xl:gap-2.5">
-                  <label className="text-xs xl:text-sm font-semibold text-slate-300">Default Tone</label>
+                  <label className="text-xs xl:text-sm font-semibold text-slate-700">Default Tone</label>
                   <select
                     value={tone}
                     onChange={(e) => setTone(e.target.value)}
-                    className="bg-slate-950 border border-slate-800 rounded-xl xl:rounded-2xl px-4 py-2.5 xl:px-6 xl:py-4 text-sm xl:text-base text-slate-200 outline-none focus:border-indigo-500/50 transition-colors"
+                    className="bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2.5 xl:px-6 xl:py-4 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500/50 transition-colors"
                   >
                     <option value="professional">Professional</option>
                     <option value="friendly">Friendly</option>
@@ -492,13 +492,13 @@ export default function SettingsPage() {
 
               {model === 'custom' && (
                 <div className="flex flex-col gap-1.5 xl:gap-2.5 animate-fade-in">
-                  <label className="text-xs xl:text-sm font-semibold text-slate-300">Custom Model ID</label>
+                  <label className="text-xs xl:text-sm font-semibold text-slate-700">Custom Model ID</label>
                   <input
                     type="text"
                     value={customModel}
                     onChange={(e) => setCustomModel(e.target.value)}
                     placeholder="E.g. meta-llama/llama-3-8b-instruct or custom-fine-tuned-model"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl xl:rounded-2xl px-4 py-2.5 xl:px-6 xl:py-4 text-sm xl:text-base text-slate-200 outline-none focus:border-indigo-500/50 transition-colors font-mono"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2.5 xl:px-6 xl:py-4 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500/50 transition-colors font-mono"
                   />
                   <span className="text-[10px] xl:text-[11px] text-slate-500">
                     Type the exact model identifier required by your API provider (e.g. OpenAI model ID, OpenRouter route path, etc.).
@@ -509,28 +509,28 @@ export default function SettingsPage() {
           </div>
 
           {/* API Credentials Card */}
-          <div className="flex flex-col gap-6 xl:gap-8 bg-slate-900/40 border border-slate-900/80 backdrop-blur-md p-6 xl:p-10 rounded-2xl xl:rounded-[2rem]">
-            <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 xl:gap-3 border-b border-slate-800/80 pb-4 xl:pb-6">
-              <Key className="w-4 h-4 xl:w-5 xl:h-5 text-violet-400" />
+          <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-10 rounded-2xl xl:rounded-[2rem] shadow-sm">
+            <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-505 flex items-center gap-2 xl:gap-3 border-b border-slate-100 pb-4 xl:pb-6">
+              <Key className="w-4 h-4 xl:w-5 xl:h-5 text-violet-600" />
               <span>API Key Overrides (Optional)</span>
             </h2>
 
             <div className="flex flex-col gap-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-1.5 xl:gap-2.5">
-                  <label className="text-xs xl:text-sm font-semibold text-slate-300">Google Gemini Key</label>
+                  <label className="text-xs xl:text-sm font-semibold text-slate-700">Google Gemini Key</label>
                   <div className="relative flex items-center">
                     <input
                       type={showGemini ? "text" : "password"}
                       value={geminiKey}
                       onChange={(e) => setGeminiKey(e.target.value)}
                       placeholder={geminiKey ? "••••••••••••••••" : "AIzaSy..."}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-200 outline-none font-mono focus:border-indigo-500/50 transition-colors"
+                      className="w-full bg-slate-55 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
                     />
                     <button
                       type="button"
                       onClick={() => setShowGemini(!showGemini)}
-                      className="absolute right-4 p-1 text-slate-500 hover:text-slate-300 transition-colors"
+                      className="absolute right-4 p-1 text-slate-400 hover:text-slate-700 transition-colors"
                     >
                       {showGemini ? <EyeOff className="w-4 h-4 xl:w-5 xl:h-5" /> : <Eye className="w-4 h-4 xl:w-5 xl:h-5" />}
                     </button>
@@ -538,19 +538,19 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="flex flex-col gap-1.5 xl:gap-2.5">
-                  <label className="text-xs xl:text-sm font-semibold text-slate-300">OpenAI API Key</label>
+                  <label className="text-xs xl:text-sm font-semibold text-slate-700">OpenAI API Key</label>
                   <div className="relative flex items-center">
                     <input
                       type={showOpenai ? "text" : "password"}
                       value={openaiKey}
                       onChange={(e) => setOpenaiKey(e.target.value)}
                       placeholder={openaiKey ? "••••••••••••••••" : "sk-proj-..."}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-200 outline-none font-mono focus:border-indigo-500/50 transition-colors"
+                      className="w-full bg-slate-55 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
                     />
                     <button
                       type="button"
                       onClick={() => setShowOpenai(!showOpenai)}
-                      className="absolute right-4 p-1 text-slate-500 hover:text-slate-300 transition-colors"
+                      className="absolute right-4 p-1 text-slate-400 hover:text-slate-700 transition-colors"
                     >
                       {showOpenai ? <EyeOff className="w-4 h-4 xl:w-5 xl:h-5" /> : <Eye className="w-4 h-4 xl:w-5 xl:h-5" />}
                     </button>
@@ -560,19 +560,19 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-1.5 xl:gap-2.5">
-                  <label className="text-xs xl:text-sm font-semibold text-slate-300">Anthropic Key</label>
+                  <label className="text-xs xl:text-sm font-semibold text-slate-700">Anthropic Key</label>
                   <div className="relative flex items-center">
                     <input
                       type={showAnthropic ? "text" : "password"}
                       value={anthropicKey}
                       onChange={(e) => setAnthropicKey(e.target.value)}
                       placeholder={anthropicKey ? "••••••••••••••••" : "sk-ant-..."}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-200 outline-none font-mono focus:border-indigo-500/50 transition-colors"
+                      className="w-full bg-slate-55 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
                     />
                     <button
                       type="button"
                       onClick={() => setShowAnthropic(!showAnthropic)}
-                      className="absolute right-4 p-1 text-slate-500 hover:text-slate-300 transition-colors"
+                      className="absolute right-4 p-1 text-slate-400 hover:text-slate-700 transition-colors"
                     >
                       {showAnthropic ? <EyeOff className="w-4 h-4 xl:w-5 xl:h-5" /> : <Eye className="w-4 h-4 xl:w-5 xl:h-5" />}
                     </button>
@@ -580,19 +580,19 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="flex flex-col gap-1.5 xl:gap-2.5">
-                  <label className="text-xs xl:text-sm font-semibold text-slate-300">OpenRouter Key</label>
+                  <label className="text-xs xl:text-sm font-semibold text-slate-700">OpenRouter Key</label>
                   <div className="relative flex items-center">
                     <input
                       type={showOpenrouter ? "text" : "password"}
                       value={openrouterKey}
                       onChange={(e) => setOpenrouterKey(e.target.value)}
                       placeholder={openrouterKey ? "••••••••••••••••" : "sk-or-v1-..."}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-200 outline-none font-mono focus:border-indigo-500/50 transition-colors"
+                      className="w-full bg-slate-55 border border-slate-200 rounded-xl xl:rounded-2xl pl-4 pr-12 py-2.5 xl:pl-6 xl:pr-14 xl:py-4 text-sm xl:text-base text-slate-800 outline-none font-mono focus:border-indigo-500/50 transition-colors"
                     />
                     <button
                       type="button"
                       onClick={() => setShowOpenrouter(!showOpenrouter)}
-                      className="absolute right-4 p-1 text-slate-500 hover:text-slate-300 transition-colors"
+                      className="absolute right-4 p-1 text-slate-400 hover:text-slate-700 transition-colors"
                     >
                       {showOpenrouter ? <EyeOff className="w-4 h-4 xl:w-5 xl:h-5" /> : <Eye className="w-4 h-4 xl:w-5 xl:h-5" />}
                     </button>
@@ -601,15 +601,15 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-t border-slate-800/80 pt-6 mt-2">
-              {error && <span className="text-xs xl:text-sm text-red-400 font-semibold">{error}</span>}
-              {success && <span className="text-xs xl:text-sm text-emerald-400 flex items-center gap-1.5 font-semibold"><Check className="w-4 h-4" /> Settings Saved!</span>}
+            <div className="flex items-center justify-between border-t border-slate-100 pt-6 mt-2">
+              {error && <span className="text-xs xl:text-sm text-red-500 font-semibold">{error}</span>}
+              {success && <span className="text-xs xl:text-sm text-emerald-600 flex items-center gap-1.5 font-semibold"><Check className="w-4 h-4" /> Settings Saved!</span>}
               {!error && !success && <span />}
               
               <button
                 onClick={handleSaveSettings}
                 disabled={saving}
-                className="inline-flex items-center gap-2 xl:gap-3 px-6 py-2.5 xl:px-8 xl:py-4 rounded-xl xl:rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-sm xl:text-base font-bold text-white transition-all shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/20 disabled:opacity-50"
+                className="inline-flex items-center gap-2 xl:gap-3 px-6 py-2.5 xl:px-8 xl:py-4 rounded-xl xl:rounded-2xl bg-indigo-650 hover:bg-indigo-550 text-sm xl:text-base font-bold text-white transition-all shadow-md shadow-indigo-650/10 hover:shadow-indigo-650/20 disabled:opacity-50"
               >
                 <Save className="w-4 h-4 xl:w-5 xl:h-5" />
                 <span>{saving ? 'Saving...' : 'Save Settings'}</span>
@@ -623,29 +623,29 @@ export default function SettingsPage() {
         <div className="flex flex-col gap-8">
           
           {/* Privacy info card */}
-          <div className="flex flex-col gap-6 xl:gap-8 bg-slate-900/40 border border-slate-900/80 backdrop-blur-md p-6 xl:p-10 rounded-2xl xl:rounded-[2rem] h-fit">
-            <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 xl:gap-3 border-b border-slate-800/80 pb-4 xl:pb-6">
-              <Database className="w-4 h-4 xl:w-5 xl:h-5 text-violet-400" />
+          <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-10 rounded-2xl xl:rounded-[2rem] shadow-sm h-fit">
+            <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-505 flex items-center gap-2 xl:gap-3 border-b border-slate-105 pb-4 xl:pb-6">
+              <Database className="w-4 h-4 xl:w-5 xl:h-5 text-violet-600" />
               <span>Account & Privacy</span>
             </h2>
 
-            <div className="flex flex-col gap-6 xl:gap-8 text-sm xl:text-base text-slate-400">
+            <div className="flex flex-col gap-6 xl:gap-8 text-sm xl:text-base text-slate-655">
               <div className="flex flex-col gap-2.5 xl:gap-4">
-                <span className="font-bold text-white flex items-center gap-1.5 xl:gap-2.5">
-                  <ShieldCheck className="w-4 h-4 xl:w-5 xl:h-5 text-emerald-400" />
+                <span className="font-bold text-slate-900 flex items-center gap-1.5 xl:gap-2.5">
+                  <ShieldCheck className="w-4 h-4 xl:w-5 xl:h-5 text-emerald-600" />
                   <span>Privacy First Architecture</span>
                 </span>
-                <p className="text-xs xl:text-sm leading-relaxed text-slate-400">
+                <p className="text-xs xl:text-sm leading-relaxed text-slate-500">
                   Your data is isolated securely using PostgreSQL Row Level Security (RLS). You hold the authority to export or permanently purge all record data.
                 </p>
               </div>
 
               {/* Export block */}
-              <div className="flex flex-col gap-3 border-t border-slate-800/80 pt-6">
-                <span className="font-semibold text-slate-300 text-xs xl:text-sm">Export Information</span>
+              <div className="flex flex-col gap-3 border-t border-slate-100 pt-6">
+                <span className="font-semibold text-slate-755 text-xs xl:text-sm">Export Information</span>
                 <button
                   onClick={handleExportData}
-                  className="w-full inline-flex items-center justify-center gap-2 xl:gap-3 px-4 py-2.5 xl:py-4 rounded-xl xl:rounded-2xl border border-slate-800 hover:border-slate-700 bg-slate-950/20 hover:bg-slate-950 text-xs xl:text-sm font-semibold text-slate-300 transition-all cursor-pointer"
+                  className="w-full inline-flex items-center justify-center gap-2 xl:gap-3 px-4 py-2.5 xl:py-4 rounded-xl xl:rounded-2xl border border-slate-200 hover:border-slate-350 bg-slate-50 hover:bg-slate-100 text-xs xl:text-sm font-semibold text-slate-700 transition-all cursor-pointer shadow-sm"
                 >
                   <Download className="w-3.5 h-3.5 xl:w-4.5 xl:h-4.5" />
                   <span>Export My Data</span>
@@ -653,36 +653,36 @@ export default function SettingsPage() {
               </div>
 
               {/* Delete Block */}
-              <div className="border-t border-slate-800/80 pt-6 flex flex-col gap-3">
-                <span className="font-semibold text-slate-300 text-xs xl:text-sm">Danger Zone</span>
+              <div className="border-t border-slate-100 pt-6 flex flex-col gap-3">
+                <span className="font-semibold text-slate-755 text-xs xl:text-sm">Danger Zone</span>
                 {!confirmDelete ? (
                   <button
                     onClick={() => setConfirmDelete(true)}
-                    className="w-full inline-flex items-center justify-center gap-2 xl:gap-3 px-4 py-2.5 xl:py-4 rounded-xl xl:rounded-2xl border border-red-900/30 hover:border-red-900/50 hover:bg-red-950/20 text-xs xl:text-sm font-semibold text-red-400 transition-all cursor-pointer"
+                    className="w-full inline-flex items-center justify-center gap-2 xl:gap-3 px-4 py-2.5 xl:py-4 rounded-xl xl:rounded-2xl border border-red-200 hover:border-red-300 hover:bg-red-50 text-xs xl:text-sm font-semibold text-red-650 transition-all cursor-pointer shadow-sm"
                   >
                     <Trash2 className="w-3.5 h-3.5 xl:w-4.5 xl:h-4.5" />
                     <span>Delete My Account</span>
                   </button>
                 ) : (
-                  <div className="p-4 xl:p-5 bg-red-950/25 border border-red-900/40 rounded-xl xl:rounded-2xl flex flex-col gap-4">
-                    <div className="flex gap-2.5 text-red-400 text-xs xl:text-sm leading-relaxed">
+                  <div className="p-4 xl:p-5 bg-red-50/80 border border-red-200 rounded-xl xl:rounded-2xl flex flex-col gap-4 shadow-sm">
+                    <div className="flex gap-2.5 text-red-700 text-xs xl:text-sm leading-relaxed">
                       <AlertTriangle className="w-5 h-5 xl:w-6 xl:h-6 flex-shrink-0 text-red-500" />
                       <div className="flex flex-col gap-1.5">
-                        <span className="font-bold text-red-300">This action is permanent and irreversible!</span>
+                        <span className="font-bold text-red-800">This action is permanent and irreversible!</span>
                         <span>It will delete your display settings, saved prompt library, version history, and optimization logs forever.</span>
                       </div>
                     </div>
 
                     <div className="flex flex-col gap-2 pt-1">
-                      <label className="text-[11px] font-bold text-slate-400 uppercase">
-                        Type <span className="font-mono text-red-400 select-all">{session?.user?.email}</span> to confirm:
+                      <label className="text-[11px] font-bold text-slate-500 uppercase">
+                        Type <span className="font-mono text-red-600 select-all">{session?.user?.email}</span> to confirm:
                       </label>
                       <input
                         type="text"
                         value={deleteConfirmText}
                         onChange={(e) => setDeleteConfirmText(e.target.value)}
                         placeholder="Type your email address"
-                        className="bg-slate-950 border border-red-900/30 rounded-xl px-4 py-2 text-xs xl:text-sm text-slate-200 outline-none focus:border-red-500/50 transition-colors font-mono"
+                        className="bg-white border border-red-200 rounded-xl px-4 py-2 text-xs xl:text-sm text-slate-900 outline-none focus:border-red-500/50 transition-colors font-mono"
                         disabled={deleting}
                       />
                     </div>
@@ -693,7 +693,7 @@ export default function SettingsPage() {
                           setConfirmDelete(false);
                           setDeleteConfirmText('');
                         }}
-                        className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white rounded-xl text-xs xl:text-sm font-semibold transition-colors cursor-pointer"
+                        className="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200 rounded-xl text-xs xl:text-sm font-semibold transition-colors cursor-pointer shadow-sm"
                         disabled={deleting}
                       >
                         Cancel
@@ -701,7 +701,7 @@ export default function SettingsPage() {
                       <button
                         onClick={handleDeleteAccount}
                         disabled={deleteConfirmText !== session?.user?.email || deleting}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 disabled:bg-red-950/10 disabled:text-red-500/40 disabled:border-red-900/20 disabled:shadow-none disabled:scale-100 text-white border border-red-500/20 rounded-xl text-xs xl:text-sm font-extrabold shadow-lg shadow-red-600/10 hover:shadow-red-600/25 active:scale-[0.97] transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-red-650 hover:bg-red-550 disabled:bg-red-50 disabled:text-red-300 disabled:border-red-100 text-white border border-red-650 rounded-xl text-xs xl:text-sm font-extrabold shadow-md active:scale-[0.97] transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
                       >
                         {deleting ? (
                           <>

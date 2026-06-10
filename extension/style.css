@@ -8,9 +8,12 @@
   height: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: #020617;
+  background: #F1F5F9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #CBD5E1;
   border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
 }

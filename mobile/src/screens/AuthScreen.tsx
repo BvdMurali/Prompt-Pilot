@@ -82,7 +82,7 @@ export default function AuthScreen() {
             {/* Header Section */}
             <View style={styles.header}>
               <LinearGradient
-                colors={['#7c3aed', '#4f46e5']}
+                colors={THEME.colors.primaryGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.sparklesIconContainer}
@@ -108,7 +108,7 @@ export default function AuthScreen() {
                   value={emailInput}
                   onChangeText={setEmailInput}
                   placeholder="you@example.com"
-                  placeholderTextColor="#475569"
+                  placeholderTextColor={THEME.colors.textMuted}
                   autoCapitalize="none"
                   keyboardType="email-address"
                   autoCorrect={false}
@@ -126,7 +126,7 @@ export default function AuthScreen() {
                   value={passwordInput}
                   onChangeText={setPasswordInput}
                   placeholder="••••••••"
-                  placeholderTextColor="#475569"
+                  placeholderTextColor={THEME.colors.textMuted}
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -200,7 +200,7 @@ export default function AuthScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#020617', // slate-950
+    backgroundColor: THEME.colors.background,
     position: 'relative',
   },
   glowTop: {
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     width: 320,
     height: 320,
     borderRadius: 160,
-    backgroundColor: 'rgba(99, 102, 241, 0.08)', // indigo-500/8
+    backgroundColor: 'rgba(124, 58, 237, 0.05)', // brand-start subtle glow
     pointerEvents: 'none',
   },
   glowBottom: {
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     width: 320,
     height: 320,
     borderRadius: 160,
-    backgroundColor: 'rgba(124, 58, 237, 0.08)', // violet-600/8
+    backgroundColor: 'rgba(6, 182, 212, 0.05)', // brand-end subtle glow
     pointerEvents: 'none',
   },
   scrollContainer: {
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     padding: THEME.spacing.xl,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: THEME.colors.border,
   },
   header: {
     alignItems: 'center',
@@ -245,21 +245,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
-    shadowColor: '#6366f1',
+    shadowColor: THEME.colors.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 5,
   },
   cardTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#fff',
+    color: THEME.colors.textPrimary,
     marginBottom: 6,
   },
   cardSubtitle: {
     fontSize: 13,
-    color: '#94a3b8', // slate-400
+    color: THEME.colors.textSecondary,
     textAlign: 'center',
   },
   formGroup: {
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#94a3b8',
+    color: THEME.colors.textMuted,
     textTransform: 'uppercase',
     marginBottom: 8,
     letterSpacing: 0.5,
@@ -276,8 +276,8 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#020617', // slate-950
-    borderColor: '#1e293b', // slate-800
+    backgroundColor: THEME.colors.background,
+    borderColor: THEME.colors.border,
     borderWidth: 1,
     borderRadius: 10,
     height: 48,
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: '#fff',
+    color: THEME.colors.textPrimary,
     fontSize: 14,
     height: '100%',
   },
@@ -309,24 +309,24 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: THEME.colors.border,
   },
   dividerText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#475569',
+    color: THEME.colors.textMuted,
     textTransform: 'uppercase',
     paddingHorizontal: 12,
     letterSpacing: 0.5,
   },
   googleButton: {
-    backgroundColor: '#020617', // slate-950
-    borderColor: '#1e293b', // slate-800
+    backgroundColor: THEME.colors.surface,
+    borderColor: THEME.colors.border,
     borderWidth: 1,
     height: 48,
   },
   googleButtonText: {
-    color: '#fff',
+    color: THEME.colors.textPrimary,
   },
   switchModeContainer: {
     alignItems: 'center',
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
   },
   switchModeText: {
     fontSize: 12,
-    color: '#94a3b8',
+    color: THEME.colors.textSecondary,
     fontWeight: '500',
   },
 });

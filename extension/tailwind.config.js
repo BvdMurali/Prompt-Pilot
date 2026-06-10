@@ -11,6 +11,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        brand: {
+          start: "#7C3AED",
+          mid: "#8B5CF6",
+          end: "#06B6D4",
+        },
         slate: {
           950: "#020617",
           900: "#0f172a",

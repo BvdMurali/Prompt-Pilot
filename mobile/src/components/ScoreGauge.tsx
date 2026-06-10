@@ -95,7 +95,7 @@ export default function ScoreGauge({ score, breakdown }: ScoreGaugeProps) {
               cx="55"
               cy="55"
               r={radius}
-              stroke="rgba(255, 255, 255, 0.05)"
+              stroke="rgba(15, 23, 42, 0.05)"
               strokeWidth={strokeWidth}
               fill="transparent"
             />
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     height: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(15, 23, 42, 0.05)',
     borderRadius: THEME.roundness.full,
     overflow: 'hidden',
   },

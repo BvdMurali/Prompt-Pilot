@@ -119,9 +119,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading || checkingSoftDelete || !user) {
     return (
-      <div className="flex-1 bg-slate-950 flex flex-col items-center justify-center min-h-screen">
-        <Loader2 className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
-        <p className="text-slate-400 text-sm">Verifying secure session...</p>
+      <div className="flex-1 bg-slate-50 flex flex-col items-center justify-center min-h-screen">
+        <Loader2 className="w-10 h-10 text-indigo-650 animate-spin mb-4" />
+        <p className="text-slate-600 text-sm font-medium">Verifying secure session...</p>
       </div>
     );
   }
@@ -133,26 +133,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const daysRemaining = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
     return (
-      <div className="flex-1 bg-slate-950 flex items-center justify-center min-h-screen p-4 sm:p-6 relative overflow-hidden">
+      <div className="flex-1 bg-slate-50 flex items-center justify-center min-h-screen p-4 sm:p-6 relative overflow-hidden">
         {/* Background glows */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[35rem] h-[35rem] bg-indigo-900/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute top-1/3 left-1/4 w-[25rem] h-[25rem] bg-red-900/5 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[35rem] h-[35rem] bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/3 left-1/4 w-[25rem] h-[25rem] bg-red-500/5 rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="max-w-md w-full bg-slate-900/40 border border-slate-800/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl sm:rounded-3xl flex flex-col items-center text-center shadow-2xl relative z-10">
-          <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-6 shadow-lg shadow-red-500/5">
-            <AlertTriangle className="w-8 h-8 text-red-400" />
+        <div className="max-w-md w-full bg-white border border-slate-200 p-6 sm:p-8 rounded-2xl sm:rounded-3xl flex flex-col items-center text-center shadow-xl relative z-10">
+          <div className="w-16 h-16 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center mb-6 shadow-md shadow-red-500/5">
+            <AlertTriangle className="w-8 h-8 text-red-500" />
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-black text-white mb-2 tracking-tight">Account Deletion Scheduled</h2>
-          <p className="text-slate-400 text-xs sm:text-sm mb-6 leading-relaxed">
-            Your account is scheduled for deletion. All your prompts, templates, configuration preferences, and history logs will be permanently deleted in <span className="font-bold text-red-400">{daysRemaining} days</span>.
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 mb-2 tracking-tight">Account Deletion Scheduled</h2>
+          <p className="text-slate-650 text-xs sm:text-sm mb-6 leading-relaxed">
+            Your account is scheduled for deletion. All your prompts, templates, configuration preferences, and history logs will be permanently deleted in <span className="font-bold text-red-500">{daysRemaining} days</span>.
           </p>
 
           <div className="w-full flex flex-col gap-3">
             <button
               onClick={handleRestore}
               disabled={restoring}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 disabled:scale-100 text-white rounded-xl text-sm font-extrabold shadow-lg shadow-indigo-500/10 active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-650 to-violet-650 hover:from-indigo-550 hover:to-violet-550 disabled:opacity-50 disabled:scale-100 text-white rounded-xl text-sm font-extrabold shadow-lg shadow-indigo-600/10 active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
             >
               {restoring ? (
                 <>
@@ -166,7 +166,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             <button
               onClick={() => signOut()}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 border border-slate-800 hover:border-slate-700 bg-slate-950/20 hover:bg-slate-950 text-slate-300 rounded-xl text-sm font-semibold transition-all cursor-pointer"
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 hover:border-slate-350 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-sm font-semibold transition-all cursor-pointer shadow-sm"
             >
               <span>Sign Out</span>
             </button>
@@ -185,25 +185,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   ];
 
   return (
-    <div className="flex-1 bg-slate-950 text-slate-100 flex h-full overflow-hidden relative">
+    <div className="flex-1 bg-slate-50 text-slate-900 flex h-full overflow-hidden relative">
       {/* Background radial glows */}
-      <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-indigo-900/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-violet-900/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-violet-500/5 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Mobile Sidebar Backdrop Overlay */}
       {isSidebarOpen && (
         <div 
           onClick={() => setIsSidebarOpen(false)}
-          className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-30 md:hidden"
+          className="fixed inset-0 bg-slate-900/30 backdrop-blur-xs z-30 md:hidden"
         />
       )}
 
       {/* Side Navigation Panel */}
-      <aside className={`w-64 xl:w-72 2xl:w-80 border-r border-slate-900 bg-slate-950/85 backdrop-blur-md flex flex-col z-40 md:z-20 fixed md:sticky top-0 h-full transition-transform duration-300 ease-in-out ${
+      <aside className={`w-64 xl:w-72 2xl:w-80 border-r border-slate-200 bg-white flex flex-col z-40 md:z-20 fixed md:sticky top-0 h-full transition-transform duration-300 ease-in-out ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
       }`}>
-        <div className="h-16 xl:h-20 px-6 border-b border-slate-900 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-lg text-white">
+        <div className="h-16 xl:h-20 px-6 border-b border-slate-200 flex items-center justify-between">
+          <div className="flex items-center gap-2 font-bold text-lg text-slate-900">
             <svg className="w-7 h-7" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="pGradDash" x1="50" y1="165" x2="160" y2="40" gradientUnits="userSpaceOnUse">
@@ -227,11 +227,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <circle cx="119" cy="100" r="5" fill="#0ea5e9"/>
               <path d="M 70 42 H 125 C 158 42, 172 65, 172 90 C 172 115, 158 138, 125 138 H 80 C 70 138, 62 148, 58 165 C 61 146, 70 128, 76 114 H 125 C 140 114, 146 102, 146 90 C 146 78, 140 66, 125 66 H 70 C 63 66, 63 42, 70 42 Z" fill="url(#pGradDash)"/>
             </svg>
-            <span>Prompt<span className="text-indigo-400">Pilot</span></span>
+            <span>Prompt<span className="text-indigo-600">Pilot</span></span>
           </div>
           <button 
             onClick={() => setIsSidebarOpen(false)}
-            className="md:hidden p-1.5 rounded-lg border border-slate-800 hover:bg-slate-900 text-slate-400 hover:text-white"
+            className="md:hidden p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-slate-900"
           >
             <X className="w-4 h-4" />
           </button>
@@ -247,11 +247,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 href={item.href}
                 className={`flex items-center gap-3 px-4 py-3 xl:px-5 xl:py-3.5 rounded-xl text-sm xl:text-base font-semibold transition-all ${
                   isActive
-                    ? 'bg-indigo-600/10 border border-indigo-500/20 text-white'
-                    : 'text-slate-400 hover:bg-slate-900 hover:text-white border border-transparent'
+                    ? 'bg-indigo-50 border border-indigo-100 text-indigo-700'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
                 }`}
               >
-                <Icon className={`w-4 h-4 xl:w-5 xl:h-5 ${isActive ? 'text-indigo-400' : 'text-slate-500'}`} />
+                <Icon className={`w-4 h-4 xl:w-5 xl:h-5 ${isActive ? 'text-indigo-600' : 'text-slate-400'}`} />
                 <span>{item.name}</span>
               </Link>
             );
@@ -259,29 +259,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         {/* User Profile Bar */}
-        <div className="p-4 border-t border-slate-900 flex flex-col gap-3">
+        <div className="p-4 border-t border-slate-200 flex flex-col gap-3">
           <div className="flex items-center gap-3">
             {profile?.avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img 
                 src={profile.avatarUrl} 
                 alt={user.email} 
-                className="w-10 h-10 rounded-full border border-slate-800 object-cover"
+                className="w-10 h-10 rounded-full border border-slate-200 object-cover"
               />
             ) : user.user_metadata?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img 
                 src={user.user_metadata.avatar_url} 
                 alt={user.email} 
-                className="w-10 h-10 rounded-full border border-slate-800 object-cover"
+                className="w-10 h-10 rounded-full border border-slate-200 object-cover"
               />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-bold text-white uppercase border border-slate-800">
+              <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-bold text-white uppercase border border-slate-200">
                 {user.email?.substring(0, 2)}
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white truncate">
+              <p className="text-sm font-bold text-slate-900 truncate">
                 {profile?.name || user.user_metadata?.full_name || user.email?.split('@')[0]}
               </p>
               <p className="text-xs text-slate-500 truncate">{user.email}</p>
@@ -290,24 +290,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           <button
             onClick={() => signOut()}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-900 hover:border-slate-800 hover:bg-slate-900/40 text-sm font-semibold text-slate-400 hover:text-white transition-all"
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 hover:border-slate-350 hover:bg-slate-50 text-sm font-semibold text-slate-650 hover:text-slate-900 transition-all shadow-sm bg-white"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4 text-slate-400" />
             <span>Sign Out</span>
           </button>
         </div>
       </aside>
 
       <main className="flex-1 flex flex-col h-full relative z-10 overflow-y-auto">
-        <header className="h-16 xl:h-20 border-b border-slate-900 flex items-center justify-between p-4 bg-slate-950/40 backdrop-blur-sm sticky top-0 z-30">
+        <header className="h-16 xl:h-20 border-b border-slate-200 flex items-center justify-between p-4 bg-white/80 backdrop-blur-md sticky top-0 z-30 shadow-sm">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="md:hidden p-2 -ml-2 rounded-lg border border-slate-900 bg-slate-950 hover:bg-slate-900 text-slate-400 hover:text-white"
+              className="md:hidden p-2 -ml-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-900"
             >
               <Menu className="w-4.5 h-4.5" />
             </button>
-            <h1 className="text-lg xl:text-xl font-extrabold text-white tracking-tight">
+            <h1 className="text-lg xl:text-xl font-extrabold text-slate-900 tracking-tight">
               {navItems.find(n => n.href === pathname)?.name || 'Dashboard'}
             </h1>
           </div>
@@ -336,12 +336,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     window.location.href = mobileReturnUrl;
                   }
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-600/10 transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-650/10 transition-all cursor-pointer"
               >
                 <span>📱 Open in Mobile App</span>
               </button>
             )}
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>Session active</span>
             </div>

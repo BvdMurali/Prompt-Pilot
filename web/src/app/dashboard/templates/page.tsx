@@ -140,7 +140,7 @@ export default function TemplatesPage() {
           return (
             <span 
               key={index} 
-              className="rounded bg-indigo-500/20 px-1.5 py-0.5 text-indigo-300 font-medium font-sans inline-block"
+              className="rounded bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 text-indigo-700 font-medium font-sans inline-block"
             >
               {val}
             </span>
@@ -150,7 +150,7 @@ export default function TemplatesPage() {
           return (
             <span 
               key={index} 
-              className="rounded bg-slate-800 border border-slate-700/50 px-1.5 py-0.5 text-slate-500 font-medium font-sans inline-block"
+              className="rounded bg-slate-100 border border-slate-200/60 px-1.5 py-0.5 text-slate-400 font-medium font-sans inline-block"
             >
               {displayLabel}
             </span>
@@ -218,13 +218,13 @@ export default function TemplatesPage() {
     <div className="flex-1 flex flex-col gap-8 w-full">
       {/* Header filter */}
       <div className="relative w-full lg:max-w-[320px] xl:max-w-[360px] 2xl:max-w-[400px]">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 xl:w-5 xl:h-5 text-slate-500" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 xl:w-5 xl:h-5 text-slate-400" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search default templates or tags..."
-          className="w-full bg-slate-900/40 border border-slate-900 rounded-xl pl-10 xl:pl-12 pr-4 py-2.5 xl:py-3.5 text-sm xl:text-base text-slate-200 outline-none focus:border-indigo-500 transition-all"
+          className="w-full bg-white border border-slate-200 rounded-xl pl-10 xl:pl-12 pr-4 py-2.5 xl:py-3.5 text-sm xl:text-base text-slate-800 outline-none focus:border-indigo-500 transition-all shadow-sm"
         />
       </div>
 
@@ -256,38 +256,38 @@ export default function TemplatesPage() {
               }}
               className={`p-4 xl:p-5.5 rounded-xl xl:rounded-2xl border text-left transition-all ${
                 selectedId === t.id
-                  ? 'border-indigo-500 bg-indigo-600/5'
-                  : 'border-slate-900 bg-slate-900/10 hover:border-slate-800'
+                  ? 'border-indigo-500 bg-indigo-50'
+                  : 'border-slate-200 bg-white hover:border-slate-300 shadow-sm'
               }`}
             >
               <div className="flex justify-between items-start gap-2 mb-2">
-                <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-550/10 border border-indigo-550/20 text-indigo-400 font-bold uppercase tracking-wider">
+                <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold uppercase tracking-wider">
                   {t.tags[0]}
                 </span>
               </div>
-              <h4 className="text-sm font-bold text-white mb-1.5">{t.title}</h4>
-              <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">{t.description}</p>
+              <h4 className="text-sm font-bold text-slate-900 mb-1.5">{t.title}</h4>
+              <p className="text-xs text-slate-550 leading-relaxed line-clamp-2">{t.description}</p>
             </button>
           ))}
         </div>
 
         {/* TEMPLATE WORKSPACE PANEL */}
-        <div className="lg:col-span-2 xl:col-span-3 flex flex-col gap-6 xl:gap-8 bg-slate-900/40 border border-slate-900 p-6 xl:p-8 rounded-2xl xl:rounded-3xl min-h-[450px]">
+        <div className="lg:col-span-2 xl:col-span-3 flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl min-h-[450px] shadow-sm">
           {selectedTemplate ? (
             <div className="flex flex-col gap-6 h-full">
               
               {/* Workspace Header */}
-              <div className="flex justify-between items-start border-b border-slate-850 pb-4">
+              <div className="flex justify-between items-start border-b border-slate-100 pb-4">
                 <div>
-                  <h3 className="text-base font-bold text-white mb-1">{selectedTemplate.title}</h3>
-                  <p className="text-xs text-slate-400">{selectedTemplate.description}</p>
+                  <h3 className="text-base font-bold text-slate-900 mb-1">{selectedTemplate.title}</h3>
+                  <p className="text-xs text-slate-550">{selectedTemplate.description}</p>
                 </div>
                 
                 <div className="flex gap-2">
                   <button
                     onClick={handleCopy}
                     disabled={!allFieldsCompleted}
-                    className="px-3.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800 hover:bg-slate-900 text-slate-400 hover:text-white transition-all flex items-center gap-1.5 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3.5 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-650 hover:text-slate-900 transition-all flex items-center gap-1.5 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                   >
                     <Copy className="w-3.5 h-3.5" />
                     <span>{copied ? 'Copied' : 'Copy Prompt'}</span>
@@ -295,7 +295,7 @@ export default function TemplatesPage() {
                   <button
                     onClick={handleSaveToLibrary}
                     disabled={saved || !allFieldsCompleted}
-                    className="px-3.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800 hover:bg-slate-900 text-slate-400 hover:text-white transition-all flex items-center gap-1.5 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3.5 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-655 hover:text-slate-900 transition-all flex items-center gap-1.5 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                   >
                     <Save className="w-3.5 h-3.5" />
                     <span>{saved ? 'Saved' : 'Save to Library'}</span>
@@ -303,31 +303,29 @@ export default function TemplatesPage() {
                 </div>
               </div>
 
-              {error && <span className="text-xs text-red-400">{error}</span>}
+              {error && <span className="text-xs text-red-500">{error}</span>}
 
               {/* Progress & Clear All Row */}
-              <div className="flex justify-between items-center bg-slate-950/40 border border-slate-900/60 rounded-xl px-4 py-2 text-xs font-semibold text-slate-400">
+              <div className="flex justify-between items-center bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-semibold text-slate-600">
                 <span>{completedFields} of {totalFields} fields completed</span>
                 <button
                   onClick={handleClearAll}
-                  className="text-indigo-400 hover:text-indigo-300 font-bold transition-colors cursor-pointer"
+                  className="text-indigo-650 hover:text-indigo-750 font-bold transition-colors cursor-pointer"
                 >
                   Clear All
                 </button>
-              </div>
-
-              {/* Workspace contents */}
+              </div>              {/* Workspace contents */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 xl:gap-10 2xl:gap-16 flex-1">
                 {/* Variables Inputs Column */}
                 <div className="flex flex-col gap-4 overflow-y-auto max-h-[350px] xl:max-h-[500px] 2xl:max-h-[650px] pr-2">
-                  <h4 className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Template Variables</h4>
+                  <h4 className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Template Variables</h4>
                   {Object.keys(variables).map((varName) => {
                     const isTextarea = /description|code|text|details|content/i.test(varName);
                     const labelText = varName.replace(/:\s*e\.g\..*$/, '');
                     
                     return (
                       <div key={varName} className="flex flex-col gap-1.5 xl:gap-2">
-                        <label className="text-xs xl:text-sm 2xl:text-base font-semibold text-slate-300 capitalize flex items-center justify-between">
+                        <label className="text-xs xl:text-sm 2xl:text-base font-semibold text-slate-700 capitalize flex items-center justify-between">
                           <span>{labelText}</span>
                           {variables[varName].trim().length === 0 && (
                             <span className="text-[10px] text-red-500 font-bold lowercase">required</span>
@@ -338,7 +336,7 @@ export default function TemplatesPage() {
                             value={variables[varName]}
                             onChange={(e) => handleVariableChange(varName, e.target.value)}
                             placeholder={`Provide details for ${labelText.toLowerCase()}...`}
-                            className="w-full h-24 bg-slate-950 border border-slate-800 rounded-xl xl:rounded-2xl px-4 py-2.5 text-sm text-slate-200 outline-none focus:border-indigo-500 resize-none leading-relaxed transition-all"
+                            className="w-full h-24 bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2.5 text-sm text-slate-800 outline-none focus:border-indigo-500 resize-none leading-relaxed transition-all"
                           />
                         ) : (
                           <input
@@ -346,7 +344,7 @@ export default function TemplatesPage() {
                             value={variables[varName]}
                             onChange={(e) => handleVariableChange(varName, e.target.value)}
                             placeholder={`Provide ${labelText.toLowerCase()}...`}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl xl:rounded-2xl px-4 py-2 xl:py-3.5 text-sm xl:text-base text-slate-200 outline-none focus:border-indigo-500 transition-all"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl px-4 py-2 xl:py-3.5 text-sm xl:text-base text-slate-850 outline-none focus:border-indigo-500 transition-all"
                           />
                         )}
                       </div>
@@ -356,15 +354,15 @@ export default function TemplatesPage() {
 
                 {/* Preview Column */}
                 <div className="flex flex-col gap-2">
-                  <h4 className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Compiled Preview</h4>
-                  <div className="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs xl:text-sm 2xl:text-base font-mono text-slate-350 overflow-y-auto max-h-[350px] xl:max-h-[500px] 2xl:max-h-[650px] leading-relaxed whitespace-pre-wrap select-all">
+                  <h4 className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Compiled Preview</h4>
+                  <div className="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs xl:text-sm 2xl:text-base font-mono text-slate-700 overflow-y-auto max-h-[350px] xl:max-h-[500px] 2xl:max-h-[650px] leading-relaxed whitespace-pre-wrap select-all">
                     {renderHighlightPreview()}
                   </div>
                 </div>
               </div>
 
               {/* Load into Optimizer Link */}
-              <div className="border-t border-slate-850 pt-4 flex justify-end">
+              <div className="border-t border-slate-100 pt-4 flex justify-end">
                 <a
                   href={allFieldsCompleted ? "/dashboard/editor" : "#"}
                   onClick={(e) => {
@@ -378,8 +376,8 @@ export default function TemplatesPage() {
                   }}
                   className={`inline-flex items-center gap-1.5 text-xs font-bold transition-colors ${
                     allFieldsCompleted 
-                      ? 'text-indigo-400 hover:text-indigo-300' 
-                      : 'text-slate-650 cursor-not-allowed opacity-50'
+                      ? 'text-indigo-650 hover:text-indigo-755' 
+                      : 'text-slate-400 cursor-not-allowed opacity-50'
                   }`}
                 >
                   <span>Load into Optimizer Workspace</span>
@@ -389,10 +387,10 @@ export default function TemplatesPage() {
 
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-center text-slate-500">
-              <Layout className="w-10 h-10 text-slate-700 mb-3" />
-              <p className="text-sm font-semibold text-slate-355">Select a template to configure</p>
-              <p className="text-xs max-w-xs mt-1">
+            <div className="flex-1 flex flex-col items-center justify-center text-center text-slate-400">
+              <Layout className="w-10 h-10 text-slate-300 mb-3" />
+              <p className="text-sm font-semibold text-slate-700">Select a template to configure</p>
+              <p className="text-xs text-slate-400 max-w-xs mt-1">
                 Choose a built-in template from the left list to fill variables and generate optimized prompts.
               </p>
             </div>

@@ -174,9 +174,9 @@ export default function EditorPage() {
   };
 
   const getScoreColor = (val: number) => {
-    if (val >= 85) return 'bg-emerald-500 text-emerald-400';
-    if (val >= 60) return 'bg-amber-500 text-amber-400';
-    return 'bg-red-500 text-red-400';
+    if (val >= 85) return 'bg-emerald-50 border-emerald-100 text-emerald-700';
+    if (val >= 60) return 'bg-amber-50 border-amber-100 text-amber-700';
+    return 'bg-red-50 border-red-100 text-red-650';
   };
 
   const currentOutputText = result 
@@ -189,18 +189,18 @@ export default function EditorPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12">
         
         {/* INPUT FORM BLOCK */}
-        <div className="lg:col-span-2 flex flex-col gap-6 xl:gap-8 bg-slate-900/40 border border-slate-900 p-6 xl:p-8 rounded-2xl xl:rounded-3xl">
-          <div className="flex justify-between items-center border-b border-slate-800 pb-4">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-              <Zap className="w-4 h-4 text-violet-400" />
+        <div className="lg:col-span-2 flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl shadow-sm">
+          <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+              <Zap className="w-4 h-4 text-violet-600" />
               <span>Input Draft</span>
             </h2>
             
-            <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
               <button
                 onClick={() => setAction('optimize')}
                 className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  action === 'optimize' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'
+                  action === 'optimize' ? 'bg-white text-indigo-700 shadow-sm border border-slate-200/50' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Optimize Prompt
@@ -208,7 +208,7 @@ export default function EditorPage() {
               <button
                 onClick={() => setAction('rewrite')}
                 className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  action === 'rewrite' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'
+                  action === 'rewrite' ? 'bg-white text-indigo-700 shadow-sm border border-slate-200/50' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Rewrite Text
@@ -224,18 +224,18 @@ export default function EditorPage() {
                 ? 'Type or paste a weak prompt here (e.g. "write a blog post about web development")' 
                 : 'Type or paste your message here (e.g. "hey can u do this draft copy today")'
             }
-            className="w-full h-60 xl:h-80 bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl xl:rounded-2xl p-4 xl:p-6 text-sm xl:text-base text-slate-200 outline-none resize-none leading-relaxed transition-all"
+            className="w-full h-60 xl:h-80 bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl xl:rounded-2xl p-4 xl:p-6 text-sm xl:text-base text-slate-800 outline-none resize-none leading-relaxed transition-all"
           />
 
-          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-800 pt-4">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-100 pt-4">
             <div className="flex flex-wrap items-center gap-3">
               {/* Tone Option */}
               <div className="flex flex-col gap-1 xl:gap-1.5">
-                <label className="text-[10px] xl:text-[11px] uppercase font-bold text-slate-500">Tone</label>
+                <label className="text-[10px] xl:text-[11px] uppercase font-bold text-slate-400">Tone</label>
                 <select
                   value={tone}
                   onChange={(e) => setTone(e.target.value)}
-                  className="bg-slate-950 border border-slate-800 rounded-lg xl:rounded-xl px-3 py-1.5 xl:px-4 xl:py-2.5 text-xs xl:text-sm text-slate-300 outline-none"
+                  className="bg-slate-50 border border-slate-200 rounded-lg xl:rounded-xl px-3 py-1.5 xl:px-4 xl:py-2.5 text-xs xl:text-sm text-slate-700 outline-none focus:border-indigo-555"
                 >
                   {tones.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
@@ -243,11 +243,11 @@ export default function EditorPage() {
 
               {/* Length Option */}
               <div className="flex flex-col gap-1 xl:gap-1.5">
-                <label className="text-[10px] xl:text-[11px] uppercase font-bold text-slate-500">Length</label>
+                <label className="text-[10px] xl:text-[11px] uppercase font-bold text-slate-400">Length</label>
                 <select
                   value={length}
                   onChange={(e) => setLength(e.target.value)}
-                  className="bg-slate-950 border border-slate-800 rounded-lg xl:rounded-xl px-3 py-1.5 xl:px-4 xl:py-2.5 text-xs xl:text-sm text-slate-300 outline-none"
+                  className="bg-slate-50 border border-slate-200 rounded-lg xl:rounded-xl px-3 py-1.5 xl:px-4 xl:py-2.5 text-xs xl:text-sm text-slate-700 outline-none focus:border-indigo-555"
                 >
                   {lengths.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
                 </select>
@@ -255,11 +255,11 @@ export default function EditorPage() {
 
               {/* Target Platform Option */}
               <div className="flex flex-col gap-1 xl:gap-1.5">
-                <label className="text-[10px] xl:text-[11px] uppercase font-bold text-slate-500">Platform</label>
+                <label className="text-[10px] xl:text-[11px] uppercase font-bold text-slate-400">Platform</label>
                 <select
                   value={platform}
                   onChange={(e) => setPlatform(e.target.value)}
-                  className="bg-slate-950 border border-slate-800 rounded-lg xl:rounded-xl px-3 py-1.5 xl:px-4 xl:py-2.5 text-xs xl:text-sm text-slate-300 outline-none"
+                  className="bg-slate-50 border border-slate-200 rounded-lg xl:rounded-xl px-3 py-1.5 xl:px-4 xl:py-2.5 text-xs xl:text-sm text-slate-700 outline-none focus:border-indigo-555"
                 >
                   {platforms.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
                 </select>
@@ -269,7 +269,7 @@ export default function EditorPage() {
             <button
               onClick={handleProcess}
               disabled={loading}
-              className="inline-flex items-center gap-2 px-6 xl:px-8 h-10 xl:h-12 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-sm xl:text-base font-bold text-white transition-all shadow-md shadow-indigo-600/10 disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-6 xl:px-8 h-10 xl:h-12 rounded-xl bg-gradient-to-r from-violet-650 to-indigo-650 hover:from-violet-550 hover:to-indigo-550 text-sm xl:text-base font-bold text-white transition-all shadow-md shadow-indigo-600/10 disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -287,24 +287,24 @@ export default function EditorPage() {
         </div>
 
         {/* CONTROLS INFO BLOCK */}
-        <div className="flex flex-col gap-6 xl:gap-8 bg-slate-900/40 border border-slate-900 p-6 xl:p-8 rounded-2xl xl:rounded-3xl">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 border-b border-slate-800 pb-4">
-            <BarChart2 className="w-4 h-4 text-violet-400" />
+        <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl shadow-sm">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2 border-b border-slate-100 pb-4">
+            <BarChart2 className="w-4 h-4 text-violet-600" />
             <span>Optimization Info</span>
           </h2>
 
-          <div className="flex flex-col gap-4 text-sm text-slate-400 leading-relaxed">
+          <div className="flex flex-col gap-4 text-sm text-slate-605 leading-relaxed">
             <p>
               Select <strong>Optimize Prompt</strong> if you are preparing instructions for LLMs. This will add rich structures, constraints, and outputs tailored to the target platform.
             </p>
             <p>
               Select <strong>Rewrite Text</strong> to clean up drafts, polish grammar, write emails, or adjust tone.
             </p>
-            <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 mt-2 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5" />
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 mt-2 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
               <div className="text-xs">
-                <p className="font-bold text-white mb-1">Low Cost Abstraction</p>
-                <p>PromptPilot handles all calls through server endpoints. Storing custom keys in settings allows unlimited models.</p>
+                <p className="font-bold text-slate-900 mb-1">Low Cost Abstraction</p>
+                <p className="text-slate-500">PromptPilot handles all calls through server endpoints. Storing custom keys in settings allows unlimited models.</p>
               </div>
             </div>
           </div>
@@ -313,7 +313,7 @@ export default function EditorPage() {
 
       {/* Error State */}
       {error && (
-        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400 flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-650 flex items-center gap-2">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <span>{error}</span>
         </div>
@@ -324,17 +324,17 @@ export default function EditorPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12 animate-fade-in">
           
           {/* OUTPUT COMPONENT */}
-          <div className="lg:col-span-2 flex flex-col gap-6 xl:gap-8 bg-slate-900/40 border border-slate-900 p-6 xl:p-8 rounded-2xl xl:rounded-3xl">
-            <div className="flex justify-between items-center border-b border-slate-800 pb-4">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400" />
+          <div className="lg:col-span-2 flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl shadow-sm">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-600" />
                 <span>Optimized Result</span>
               </h3>
               
               <div className="flex gap-2">
                 <button
                   onClick={() => handleCopy(currentOutputText)}
-                  className="p-2 rounded-lg bg-slate-950 border border-slate-800 hover:bg-slate-900 text-slate-400 hover:text-white transition-all flex items-center gap-1.5 text-xs xl:text-sm font-semibold"
+                  className="p-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5 text-xs xl:text-sm font-semibold shadow-sm"
                 >
                   <Copy className="w-3.5 h-3.5" />
                   <span>{copied ? 'Copied' : 'Copy'}</span>
@@ -342,7 +342,7 @@ export default function EditorPage() {
                 <button
                   onClick={handleSaveToLibrary}
                   disabled={saved}
-                  className="p-2 rounded-lg bg-slate-950 border border-slate-800 hover:bg-slate-900 text-slate-400 hover:text-white transition-all flex items-center gap-1.5 text-xs xl:text-sm font-semibold disabled:opacity-50"
+                  className="p-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5 text-xs xl:text-sm font-semibold disabled:opacity-50 shadow-sm"
                 >
                   <Save className="w-3.5 h-3.5" />
                   <span>{saved ? 'Saved' : 'Save to Library'}</span>
@@ -353,19 +353,19 @@ export default function EditorPage() {
             <textarea
               readOnly
               value={currentOutputText}
-              className="w-full h-80 xl:h-100 bg-slate-950 border border-slate-850 rounded-xl p-4 xl:p-6 text-sm xl:text-base text-slate-100 outline-none resize-none leading-relaxed font-mono"
+              className="w-full h-80 xl:h-100 bg-slate-50 border border-slate-200 rounded-xl p-4 xl:p-6 text-sm xl:text-base text-slate-900 outline-none resize-none leading-relaxed font-mono"
             />
 
             {/* Variations Drawer */}
-            <div className="border-t border-slate-800 pt-4">
-              <label className="text-[10px] xl:text-[11px] uppercase font-bold text-slate-500 mb-2.5 block">Alternative Variations</label>
+            <div className="border-t border-slate-100 pt-4">
+              <label className="text-[10px] xl:text-[11px] uppercase font-bold text-slate-400 mb-2.5 block">Alternative Variations</label>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <button
                   onClick={() => setActiveVariation(null)}
                   className={`p-3 xl:p-4.5 rounded-xl xl:rounded-2xl border text-left text-xs xl:text-sm transition-all ${
                     activeVariation === null
-                      ? 'border-indigo-500 bg-indigo-600/5 text-white'
-                      : 'border-slate-850 bg-slate-950 text-slate-400 hover:text-slate-200'
+                      ? 'border-indigo-500 bg-indigo-50 text-indigo-750 font-bold'
+                      : 'border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:border-slate-300 shadow-sm'
                   }`}
                 >
                   <span className="font-bold block mb-1">Standard Version</span>
@@ -377,8 +377,8 @@ export default function EditorPage() {
                     onClick={() => setActiveVariation(idx)}
                     className={`p-3 xl:p-4.5 rounded-xl xl:rounded-2xl border text-left text-xs xl:text-sm transition-all ${
                       activeVariation === idx
-                        ? 'border-indigo-500 bg-indigo-600/5 text-white'
-                        : 'border-slate-850 bg-slate-950 text-slate-400 hover:text-slate-200'
+                        ? 'border-indigo-500 bg-indigo-50 text-indigo-750 font-bold'
+                        : 'border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:border-slate-300 shadow-sm'
                     }`}
                   >
                     <span className="font-bold block mb-1">Variation {String.fromCharCode(65 + idx)}</span>
@@ -393,13 +393,13 @@ export default function EditorPage() {
           <div className="flex flex-col gap-6">
             
             {/* SCORE SYSTEM */}
-            <div className="bg-slate-900/40 border border-slate-900 p-6 xl:p-8 rounded-2xl xl:rounded-3xl flex flex-col gap-4">
-              <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 className="text-sm xl:text-base font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                  <BarChart2 className="w-4 h-4 text-indigo-400" />
+            <div className="bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl flex flex-col gap-4 shadow-sm">
+              <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 className="text-sm xl:text-base font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                  <BarChart2 className="w-4 h-4 text-indigo-600" />
                   <span>Prompt Score</span>
                 </h3>
-                <span className={`text-sm xl:text-base font-extrabold px-2 xl:px-3 py-0.5 xl:py-1 rounded border ${getScoreColor(result.score.overall).split(' ')[1]} ${getScoreColor(result.score.overall).split(' ')[0]}/10`}>
+                <span className={`text-sm xl:text-base font-extrabold px-2 xl:px-3 py-0.5 xl:py-1 rounded border ${getScoreColor(result.score.overall)}`}>
                   {result.score.overall}/100
                 </span>
               </div>
@@ -415,10 +415,10 @@ export default function EditorPage() {
                 ].map((s) => (
                   <div key={s.label} className="flex flex-col gap-1">
                     <div className="flex justify-between text-xs font-semibold">
-                      <span className="text-slate-400">{s.label}</span>
-                      <span className="text-slate-200">{s.val}%</span>
+                      <span className="text-slate-500">{s.label}</span>
+                      <span className="text-slate-850">{s.val}%</span>
                     </div>
-                    <div className="h-2 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-900">
+                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200">
                       <div 
                         className={`h-full rounded-full transition-all duration-550 ${getScoreColor(s.val).split(' ')[0]}`}
                         style={{ width: `${s.val}%` }}
@@ -430,21 +430,21 @@ export default function EditorPage() {
             </div>
 
             {/* EXPLANATIONS LIST */}
-            <div className="bg-slate-900/40 border border-slate-900 p-6 xl:p-8 rounded-2xl xl:rounded-3xl flex flex-col gap-4 flex-1">
-              <h3 className="text-sm xl:text-base font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2 border-b border-slate-800 pb-3">
-                <HelpCircle className="w-4 h-4 text-indigo-400" />
+            <div className="bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl flex flex-col gap-4 flex-1 shadow-sm">
+              <h3 className="text-sm xl:text-base font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2 border-b border-slate-100 pb-3">
+                <HelpCircle className="w-4 h-4 text-indigo-600" />
                 <span>Explain Improvements</span>
               </h3>
 
               <div className="flex flex-col gap-3 overflow-y-auto max-h-[300px] xl:max-h-[400px] 2xl:max-h-[500px] pr-1">
                 {result.explanations.map((exp, idx) => (
-                  <div key={idx} className="p-3 xl:p-4.5 bg-slate-950 border border-slate-900 rounded-xl xl:rounded-2xl flex flex-col gap-1 xl:gap-1.5">
-                    <span className="text-xs xl:text-sm font-bold text-white flex items-center gap-1 xl:gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                  <div key={idx} className="p-3 xl:p-4.5 bg-slate-50 border border-slate-200 rounded-xl xl:rounded-2xl flex flex-col gap-1 xl:gap-1.5">
+                    <span className="text-xs xl:text-sm font-bold text-slate-900 flex items-center gap-1 xl:gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
                       <span>{exp.action}</span>
                     </span>
-                    <span className="text-[11px] xl:text-xs text-slate-400"><strong className="text-slate-500">Why:</strong> {exp.why}</span>
-                    <span className="text-[11px] xl:text-xs text-slate-400"><strong className="text-slate-500">How:</strong> {exp.how}</span>
+                    <span className="text-[11px] xl:text-xs text-slate-650"><strong className="text-slate-400">Why:</strong> {exp.why}</span>
+                    <span className="text-[11px] xl:text-xs text-slate-650"><strong className="text-slate-400">How:</strong> {exp.how}</span>
                   </div>
                 ))}
               </div>

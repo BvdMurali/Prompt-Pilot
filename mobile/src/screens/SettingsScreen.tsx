@@ -441,7 +441,7 @@ export default function SettingsScreen() {
         {/* Profile Card */}
         <GlassCard style={styles.card}>
           <View style={styles.cardHeaderRow}>
-            <Ionicons name="person-outline" size={18} color="#818cf8" style={styles.cardHeaderIcon} />
+            <Ionicons name="person-outline" size={18} color={THEME.colors.primary} style={styles.cardHeaderIcon} />
             <Text style={styles.cardTitle}>Profile Details</Text>
           </View>
 
@@ -489,7 +489,7 @@ export default function SettingsScreen() {
               value={displayName}
               onChangeText={setDisplayName}
               placeholder="E.g. Murali"
-              placeholderTextColor="#475569"
+              placeholderTextColor={THEME.colors.textMuted}
               autoCorrect={false}
               style={styles.textInput}
             />
@@ -527,7 +527,7 @@ export default function SettingsScreen() {
         {/* Workspace Preferences Card */}
         <GlassCard style={styles.card}>
           <View style={styles.cardHeaderRow}>
-            <Ionicons name="settings-outline" size={18} color="#818cf8" style={styles.cardHeaderIcon} />
+            <Ionicons name="settings-outline" size={18} color={THEME.colors.primary} style={styles.cardHeaderIcon} />
             <Text style={styles.cardTitle}>Workspace Preferences</Text>
           </View>
 
@@ -557,7 +557,7 @@ export default function SettingsScreen() {
                     value={customModel}
                     onChangeText={setCustomModel}
                     placeholder="e.g. meta-llama/llama-3-8b-instruct"
-                    placeholderTextColor="#475569"
+                    placeholderTextColor={THEME.colors.textMuted}
                     autoCapitalize="none"
                     autoCorrect={false}
                     style={styles.textInput}
@@ -589,7 +589,7 @@ export default function SettingsScreen() {
         {/* API Credentials Card */}
         <GlassCard style={styles.card}>
           <View style={styles.cardHeaderRow}>
-            <Ionicons name="key-outline" size={18} color="#818cf8" style={styles.cardHeaderIcon} />
+            <Ionicons name="key-outline" size={18} color={THEME.colors.primary} style={styles.cardHeaderIcon} />
             <Text style={styles.cardTitle}>API Key Overrides (Optional)</Text>
           </View>
 
@@ -602,7 +602,7 @@ export default function SettingsScreen() {
                   value={geminiKey}
                   onChangeText={setGeminiKey}
                   placeholder={geminiKey ? "••••••••••••••••" : "AIzaSy..."}
-                  placeholderTextColor="#475569"
+                  placeholderTextColor={THEME.colors.textMuted}
                   secureTextEntry={!showGemini}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -622,7 +622,7 @@ export default function SettingsScreen() {
                   value={openaiKey}
                   onChangeText={setOpenaiKey}
                   placeholder={openaiKey ? "••••••••••••••••" : "sk-proj-..."}
-                  placeholderTextColor="#475569"
+                  placeholderTextColor={THEME.colors.textMuted}
                   secureTextEntry={!showOpenai}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -642,7 +642,7 @@ export default function SettingsScreen() {
                   value={anthropicKey}
                   onChangeText={setAnthropicKey}
                   placeholder={anthropicKey ? "••••••••••••••••" : "sk-ant-..."}
-                  placeholderTextColor="#475569"
+                  placeholderTextColor={THEME.colors.textMuted}
                   secureTextEntry={!showAnthropic}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -662,7 +662,7 @@ export default function SettingsScreen() {
                   value={openrouterKey}
                   onChangeText={setOpenrouterKey}
                   placeholder={openrouterKey ? "••••••••••••••••" : "sk-or-v1-..."}
-                  placeholderTextColor="#475569"
+                  placeholderTextColor={THEME.colors.textMuted}
                   secureTextEntry={!showOpenrouter}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -689,7 +689,7 @@ export default function SettingsScreen() {
         {/* Privacy & Danger Card */}
         <GlassCard style={styles.card}>
           <View style={styles.cardHeaderRow}>
-            <Ionicons name="shield-checkmark-outline" size={18} color="#818cf8" style={styles.cardHeaderIcon} />
+            <Ionicons name="shield-checkmark-outline" size={18} color={THEME.colors.primary} style={styles.cardHeaderIcon} />
             <Text style={styles.cardTitle}>Account & Privacy</Text>
           </View>
 
@@ -762,7 +762,7 @@ export default function SettingsScreen() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Select Preferred Model</Text>
               <TouchableOpacity onPress={() => setModelModalVisible(false)}>
-                <Ionicons name="close" size={20} color="#fff" />
+                <Ionicons name="close" size={20} color={THEME.colors.textPrimary} />
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.modalListScroll}>
@@ -816,7 +816,7 @@ export default function SettingsScreen() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Select Default Tone</Text>
               <TouchableOpacity onPress={() => setToneModalVisible(false)}>
-                <Ionicons name="close" size={20} color="#fff" />
+                <Ionicons name="close" size={20} color={THEME.colors.textPrimary} />
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.modalListScroll}>
@@ -850,7 +850,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#020617', // slate-950
+    backgroundColor: THEME.colors.background,
     position: 'relative',
   },
   glowTop: {
@@ -860,7 +860,7 @@ const styles = StyleSheet.create({
     width: 320,
     height: 320,
     borderRadius: 160,
-    backgroundColor: 'rgba(99, 102, 241, 0.05)', // indigo-500/5
+    backgroundColor: 'rgba(124, 58, 237, 0.04)', // brand-start subtle glow
     pointerEvents: 'none',
   },
   glowBottom: {
@@ -870,7 +870,7 @@ const styles = StyleSheet.create({
     width: 320,
     height: 320,
     borderRadius: 160,
-    backgroundColor: 'rgba(124, 58, 237, 0.05)', // violet-600/5
+    backgroundColor: 'rgba(6, 182, 212, 0.04)', // brand-end subtle glow
     pointerEvents: 'none',
   },
   scrollContent: {
@@ -880,7 +880,7 @@ const styles = StyleSheet.create({
   deleteWarningBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    backgroundColor: 'rgba(239, 68, 68, 0.06)',
     borderColor: THEME.colors.danger,
     borderWidth: 1,
     borderRadius: 12,
@@ -891,11 +891,11 @@ const styles = StyleSheet.create({
   deleteWarningTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#fff',
+    color: THEME.colors.textPrimary,
   },
   deleteWarningDesc: {
     fontSize: 11,
-    color: '#9ca3af',
+    color: THEME.colors.textSecondary,
     lineHeight: 14,
     marginTop: 2,
   },
@@ -915,13 +915,13 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.lg,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: THEME.colors.border,
   },
   cardHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+    borderBottomColor: THEME.colors.borderLight,
     paddingBottom: 12,
     marginBottom: 20,
   },
@@ -931,7 +931,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#cbd5e1', // slate-300
+    color: THEME.colors.textPrimary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
@@ -947,9 +947,9 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     position: 'relative',
     overflow: 'hidden',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    backgroundColor: THEME.colors.borderLight,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: THEME.colors.border,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -960,7 +960,7 @@ const styles = StyleSheet.create({
   avatarFallback: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#6366f1',
+    backgroundColor: THEME.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -975,7 +975,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 20,
-    backgroundColor: 'rgba(15, 23, 42, 0.8)',
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
     zIndex: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -983,7 +983,7 @@ const styles = StyleSheet.create({
   avatarLoadingOverlay: {
     position: 'absolute',
     inset: 0,
-    backgroundColor: 'rgba(15, 23, 42, 0.8)',
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
     zIndex: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -995,12 +995,12 @@ const styles = StyleSheet.create({
   avatarDescTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#fff',
+    color: THEME.colors.textPrimary,
     marginBottom: 2,
   },
   avatarDescSub: {
     fontSize: 11,
-    color: '#64748b', // slate-500
+    color: THEME.colors.textMuted,
     lineHeight: 14,
   },
   formGroup: {
@@ -1009,32 +1009,32 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#94a3b8',
+    color: THEME.colors.textMuted,
     textTransform: 'uppercase',
     marginBottom: 8,
     letterSpacing: 0.5,
   },
   textInput: {
-    backgroundColor: '#020617', // slate-950
-    borderColor: '#1e293b', // slate-800
+    backgroundColor: THEME.colors.surface,
+    borderColor: THEME.colors.border,
     borderWidth: 1,
     borderRadius: 10,
     height: 44,
     paddingHorizontal: 14,
-    color: '#fff',
+    color: THEME.colors.textPrimary,
     fontSize: 14,
   },
   fieldHint: {
     fontSize: 10,
-    color: '#64748b',
+    color: THEME.colors.textMuted,
     marginTop: 6,
     lineHeight: 14,
   },
   readOnlyField: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(2, 6, 23, 0.4)', // transparent slate-950
-    borderColor: '#0f172a', // slate-900
+    backgroundColor: THEME.colors.borderLight,
+    borderColor: THEME.colors.border,
     borderWidth: 1,
     borderRadius: 10,
     height: 44,
@@ -1045,14 +1045,14 @@ const styles = StyleSheet.create({
   },
   readOnlyText: {
     fontSize: 14,
-    color: '#475569', // slate-600
+    color: THEME.colors.textSecondary,
   },
   uidContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(2, 6, 23, 0.4)',
-    borderColor: '#0f172a',
+    backgroundColor: THEME.colors.borderLight,
+    borderColor: THEME.colors.border,
     borderWidth: 1,
     borderRadius: 10,
     height: 44,
@@ -1060,7 +1060,7 @@ const styles = StyleSheet.create({
   },
   uidText: {
     fontSize: 12,
-    color: '#475569',
+    color: THEME.colors.textSecondary,
     fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace',
     flex: 1,
     marginRight: 12,
@@ -1068,14 +1068,14 @@ const styles = StyleSheet.create({
   copyBtn: {
     padding: 6,
     borderRadius: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    backgroundColor: 'rgba(0, 0, 0, 0.03)',
   },
   dropdownBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#020617', // slate-950
-    borderColor: '#1e293b', // slate-800
+    backgroundColor: THEME.colors.surface,
+    borderColor: THEME.colors.border,
     borderWidth: 1,
     borderRadius: 10,
     height: 44,
@@ -1083,13 +1083,13 @@ const styles = StyleSheet.create({
   },
   dropdownBtnText: {
     fontSize: 14,
-    color: '#e2e8f0', // slate-200
+    color: THEME.colors.textPrimary,
   },
   keyInputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#020617', // slate-950
-    borderColor: '#1e293b', // slate-800
+    backgroundColor: THEME.colors.surface,
+    borderColor: THEME.colors.border,
     borderWidth: 1,
     borderRadius: 10,
     height: 44,
@@ -1097,7 +1097,7 @@ const styles = StyleSheet.create({
   },
   keyInput: {
     flex: 1,
-    color: '#e2e8f0',
+    color: THEME.colors.textPrimary,
     fontSize: 13,
     fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace',
     height: '100%',
@@ -1118,17 +1118,17 @@ const styles = StyleSheet.create({
   privacyDescTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#fff',
+    color: THEME.colors.textPrimary,
     marginBottom: 4,
   },
   privacyDescText: {
     fontSize: 11,
-    color: '#64748b',
+    color: THEME.colors.textMuted,
     lineHeight: 16,
   },
   dividerSub: {
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: THEME.colors.border,
   },
   privacyActionRow: {
     flexDirection: 'row',
@@ -1138,29 +1138,29 @@ const styles = StyleSheet.create({
   privacyActionTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#cbd5e1',
+    color: THEME.colors.textPrimary,
   },
   exportBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    backgroundColor: THEME.colors.surface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: THEME.colors.border,
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
   exportBtnText: {
     fontSize: 12,
-    color: '#cbd5e1',
+    color: THEME.colors.textSecondary,
     fontWeight: '600',
   },
   deleteTriggerBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(239, 68, 68, 0.04)',
+    backgroundColor: 'rgba(239, 68, 68, 0.05)',
     borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.15)',
+    borderColor: 'rgba(239, 68, 68, 0.2)',
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -1178,7 +1178,7 @@ const styles = StyleSheet.create({
   // Modal layout
   modalBackdrop: {
     flex: 1,
-    backgroundColor: 'rgba(2, 6, 23, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
@@ -1193,7 +1193,8 @@ const styles = StyleSheet.create({
     padding: THEME.spacing.lg,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: THEME.colors.border,
+    backgroundColor: THEME.colors.surface,
   },
   modalContentSmall: {
     width: '100%',
@@ -1201,21 +1202,22 @@ const styles = StyleSheet.create({
     padding: THEME.spacing.lg,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: THEME.colors.border,
+    backgroundColor: THEME.colors.surface,
   },
   modalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+    borderBottomColor: THEME.colors.border,
     paddingBottom: 12,
     marginBottom: 12,
   },
   modalTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#fff',
+    color: THEME.colors.textPrimary,
   },
   modalListScroll: {
     flexGrow: 0,
@@ -1226,7 +1228,7 @@ const styles = StyleSheet.create({
   modalGroupHeader: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#64748b',
+    color: THEME.colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 6,
@@ -1239,17 +1241,17 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 4,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.02)',
+    borderBottomColor: THEME.colors.borderLight,
   },
   modalItemActive: {
-    backgroundColor: 'rgba(99, 102, 241, 0.04)',
+    backgroundColor: 'rgba(124, 58, 237, 0.08)',
   },
   modalItemText: {
     fontSize: 13,
-    color: '#94a3b8',
+    color: THEME.colors.textSecondary,
   },
   modalItemTextActive: {
-    color: THEME.colors.primaryLight,
+    color: THEME.colors.primary,
     fontWeight: '700',
   },
 });

@@ -1,25 +1,25 @@
 export const THEME = {
   colors: {
-    background: '#020617', // slate-950
-    surface: '#0f172a',    // slate-900
-    surfaceCard: '#1e293b',// slate-800
-    border: '#1e293b',
-    borderLight: '#334155',
-    textPrimary: '#ffffff',
-    textSecondary: '#9ca3af', // slate-400
-    textMuted: '#6b7280',     // slate-500
-    primary: '#4f46e5',    // indigo-600
-    primaryLight: '#818cf8',// indigo-400
-    accent: '#a855f7',     // purple-500
+    background: '#F8FAFC', // slate-50
+    surface: '#FFFFFF',    // white
+    surfaceCard: '#FFFFFF',// white card
+    border: '#E2E8F0',     // slate-200
+    borderLight: '#F1F5F9',// slate-100
+    textPrimary: '#0F172A',// slate-900
+    textSecondary: '#475569', // slate-600
+    textMuted: '#64748B',     // slate-500
+    primary: '#7C3AED',    // brand-start
+    primaryLight: '#8B5CF6',// brand-mid
+    accent: '#06B6D4',     // brand-end
     success: '#10b981',    // emerald-500
     warning: '#f59e0b',    // amber-500
     danger: '#ef4444',     // red-500
     
     // Gradients
-    primaryGradient: ['#4f46e5', '#818cf8'],
-    accentGradient: ['#818cf8', '#a855f7'],
-    dangerGradient: ['#ef4444', '#f87171'],
-    glassGradient: ['rgba(30, 41, 59, 0.7)', 'rgba(15, 23, 42, 0.4)'],
+    primaryGradient: ['#7C3AED', '#8B5CF6'],
+    accentGradient: ['#8B5CF6', '#06B6D4'],
+    dangerGradient: ['#ef4444', '#fca5a5'],
+    glassGradient: ['rgba(255, 255, 255, 0.8)', 'rgba(241, 245, 249, 0.5)'],
   },
   spacing: {
     xs: 4,

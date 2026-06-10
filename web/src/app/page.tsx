@@ -104,22 +104,22 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="flex-1 bg-slate-950 text-slate-100 flex flex-col relative overflow-x-hidden">
+    <div className="flex-1 bg-slate-50 text-slate-900 flex flex-col relative overflow-x-hidden">
       {/* Background Gradients */}
-      <div className="absolute top-[-10%] left-[-20%] w-[80%] h-[60%] rounded-full bg-indigo-900/20 blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-20%] w-[80%] h-[60%] rounded-full bg-violet-900/20 blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] left-[-20%] w-[80%] h-[60%] rounded-full bg-indigo-500/10 blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-20%] w-[80%] h-[60%] rounded-full bg-violet-500/10 blur-[150px] pointer-events-none" />
 
       {/* Grid Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-40 pointer-events-none" />
 
       {/* Navigation Header */}
       <header className={`transition-all duration-350 sticky top-0 z-50 border-b ${
         isScrolled 
-          ? 'border-slate-900 bg-slate-950/80 backdrop-blur-md shadow-lg shadow-slate-950/20' 
-          : 'border-slate-900 bg-slate-950'
+          ? 'border-slate-200 bg-white/80 backdrop-blur-md shadow-sm' 
+          : 'border-slate-200 bg-white'
       }`}>
         <div className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 h-16 xl:h-20 2xl:h-24 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight text-white">
+          <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight text-slate-900">
             <svg className="w-8 h-8" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="pGradNav" x1="50" y1="165" x2="160" y2="40" gradientUnits="userSpaceOnUse">
@@ -143,23 +143,23 @@ export default function LandingPage() {
               <circle cx="119" cy="100" r="5" fill="#0ea5e9"/>
               <path d="M 70 42 H 125 C 158 42, 172 65, 172 90 C 172 115, 158 138, 125 138 H 80 C 70 138, 62 148, 58 165 C 61 146, 70 128, 76 114 H 125 C 140 114, 146 102, 146 90 C 146 78, 140 66, 125 66 H 70 C 63 66, 63 42, 70 42 Z" fill="url(#pGradNav)"/>
             </svg>
-            <span>Prompt<span className="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">Pilot</span></span>
+            <span>Prompt<span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">Pilot</span></span>
           </Link>
 
           <nav className="hidden sm:flex items-center gap-6 2xl:gap-8">
-            <a href="#features" className="text-sm 2xl:text-base text-slate-400 hover:text-white transition-colors">Features</a>
-            <a href="#demo" className="text-sm 2xl:text-base text-slate-400 hover:text-white transition-colors">Interactive Demo</a>
+            <a href="#features" className="text-sm 2xl:text-base text-slate-600 hover:text-slate-900 font-medium transition-colors">Features</a>
+            <a href="#demo" className="text-sm 2xl:text-base text-slate-600 hover:text-slate-900 font-medium transition-colors">Interactive Demo</a>
             {loading ? (
-              <div className="w-20 h-8 2xl:w-24 2xl:h-10 rounded-lg bg-slate-900 animate-pulse" />
+              <div className="w-20 h-8 2xl:w-24 2xl:h-10 rounded-lg bg-slate-100 animate-pulse" />
             ) : user ? (
-              <Link href="/dashboard/editor" className="inline-flex items-center gap-1.5 px-4 h-9 xl:px-5 xl:h-10 2xl:px-6 2xl:h-12 rounded-lg 2xl:rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-sm xl:text-base 2xl:text-lg font-semibold text-white transition-all shadow-md shadow-indigo-600/10">
+              <Link href="/dashboard/editor" className="inline-flex items-center gap-1.5 px-4 h-9 xl:px-5 xl:h-10 2xl:px-6 2xl:h-12 rounded-lg 2xl:rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-sm xl:text-base 2xl:text-lg font-semibold text-white transition-all shadow-md shadow-indigo-650/10">
                 <span>Dashboard</span>
                 <ArrowRight className="w-4 h-4 xl:w-5 xl:h-5 2xl:w-6 2xl:h-6" />
               </Link>
             ) : (
               <button 
                 onClick={() => openAuthModal('signin')}
-                className="px-4 h-9 xl:px-5 xl:h-10 2xl:px-6 2xl:h-12 rounded-lg 2xl:rounded-xl bg-slate-900 hover:bg-slate-800 text-sm xl:text-base 2xl:text-lg font-semibold text-white border border-slate-800 hover:border-slate-700 transition-all flex items-center gap-2"
+                className="px-4 h-9 xl:px-5 xl:h-10 2xl:px-6 2xl:h-12 rounded-lg 2xl:rounded-xl bg-white hover:bg-slate-50 text-sm xl:text-base 2xl:text-lg font-semibold text-slate-800 border border-slate-200 hover:border-slate-300 transition-all flex items-center gap-2"
               >
                 <span>Sign In</span>
               </button>
@@ -168,7 +168,7 @@ export default function LandingPage() {
 
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="sm:hidden p-2 rounded-lg border border-slate-900 bg-slate-950 text-slate-455 hover:text-white"
+            className="sm:hidden p-2 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-900"
           >
             {mobileMenuOpen ? <X className="w-4.5 h-4.5" /> : <Menu className="w-4.5 h-4.5" />}
           </button>
@@ -176,29 +176,29 @@ export default function LandingPage() {
 
         {/* Mobile Navigation Menu Overlay */}
         {mobileMenuOpen && (
-          <div className="sm:hidden fixed inset-x-0 top-16 bg-slate-950/95 backdrop-blur-md border-b border-slate-900 z-45 p-6 flex flex-col gap-4 animate-fade-in shadow-2xl">
+          <div className="sm:hidden fixed inset-x-0 top-16 bg-white/95 backdrop-blur-md border-b border-slate-200 z-45 p-6 flex flex-col gap-4 animate-fade-in shadow-xl">
             <a 
               href="#features" 
               onClick={() => setMobileMenuOpen(false)}
-              className="text-sm text-slate-400 hover:text-white py-2 border-b border-slate-900/60"
+              className="text-sm text-slate-600 hover:text-slate-900 py-2 border-b border-slate-100"
             >
               Features
             </a>
             <a 
               href="#demo" 
               onClick={() => setMobileMenuOpen(false)}
-              className="text-sm text-slate-400 hover:text-white py-2 border-b border-slate-900/60"
+              className="text-sm text-slate-600 hover:text-slate-900 py-2 border-b border-slate-100"
             >
               Interactive Demo
             </a>
             <div className="pt-2">
               {loading ? (
-                <div className="w-full h-10 rounded-lg bg-slate-900 animate-pulse" />
+                <div className="w-full h-10 rounded-lg bg-slate-100 animate-pulse" />
               ) : user ? (
                 <Link 
                   href="/dashboard/editor" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full inline-flex items-center justify-center gap-1.5 px-4 h-10 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-sm font-semibold text-white transition-all shadow-md shadow-indigo-600/10"
+                  className="w-full inline-flex items-center justify-center gap-1.5 px-4 h-10 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-sm font-semibold text-white transition-all shadow-md shadow-indigo-650/10"
                 >
                   <span>Dashboard</span>
                   <ArrowRight className="w-4 h-4" />
@@ -206,7 +206,7 @@ export default function LandingPage() {
               ) : (
                 <button 
                   onClick={() => { setMobileMenuOpen(false); openAuthModal('signin'); }}
-                  className="w-full px-4 h-10 rounded-lg bg-slate-900 hover:bg-slate-800 text-sm font-semibold text-white border border-slate-800 hover:border-slate-700 transition-all flex items-center justify-center gap-2"
+                  className="w-full px-4 h-10 rounded-lg bg-white hover:bg-slate-50 text-sm font-semibold text-slate-800 border border-slate-200 hover:border-slate-300 transition-all flex items-center justify-center gap-2"
                 >
                   <span>Sign In</span>
                 </button>
@@ -218,41 +218,41 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 pt-20 xl:pt-32 2xl:pt-40 pb-16 2xl:pb-24 flex flex-col items-center text-center relative z-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 2xl:px-4 2xl:py-2.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-xs xl:text-sm 2xl:text-base font-semibold text-violet-300 mb-8 2xl:mb-12 animate-fade-in">
-          <Globe className="w-3.5 h-3.5 xl:w-4 xl:h-4 2xl:w-5 2xl:h-5" />
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 2xl:px-4 2xl:py-2.5 rounded-full bg-violet-100 border border-violet-200 text-xs xl:text-sm 2xl:text-base font-semibold text-violet-750 mb-8 2xl:mb-12 animate-fade-in">
+          <Globe className="w-3.5 h-3.5 xl:w-4 xl:h-4 2xl:w-5 2xl:h-5 text-violet-600" />
           <span>Universal Browser Extension Available Now</span>
         </div>
 
-        <h1 className="text-5xl md:text-7xl xl:text-8xl 2xl:text-[7rem] font-extrabold tracking-tight max-w-4xl xl:max-w-6xl 2xl:max-w-7xl leading-tight md:leading-none 2xl:leading-[1.1] text-white mb-6 2xl:mb-8">
+        <h1 className="text-5xl md:text-7xl xl:text-8xl 2xl:text-[7rem] font-extrabold tracking-tight max-w-4xl xl:max-w-6xl 2xl:max-w-7xl leading-tight md:leading-none 2xl:leading-[1.1] text-slate-900 mb-6 2xl:mb-8">
           The Intelligent AI Layer for <br />
-          <span className="bg-gradient-to-r from-violet-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-violet-650 via-indigo-650 to-cyan-550 bg-clip-text text-transparent">
             Every Text Box on the Web
           </span>
         </h1>
 
-        <p className="text-lg md:text-xl xl:text-2xl 2xl:text-3xl text-slate-400 max-w-2xl xl:max-w-4xl 2xl:max-w-5xl mb-10 xl:mb-14 2xl:mb-20 leading-relaxed">
+        <p className="text-lg md:text-xl xl:text-2xl 2xl:text-3xl text-slate-650 max-w-2xl xl:max-w-4xl 2xl:max-w-5xl mb-10 xl:mb-14 2xl:mb-20 leading-relaxed">
           PromptPilot sits invisibly between you and any input field. Instantly rewrite messages, transform tones, and optimize complex prompts without leaving the page.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 xl:gap-6 2xl:gap-8 justify-center items-center w-full max-w-2xl xl:max-w-4xl 2xl:max-w-5xl">
           {user ? (
-            <Link href="/dashboard/editor" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 xl:px-10 2xl:px-12 h-12 xl:h-14 2xl:h-16 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-base xl:text-lg 2xl:text-xl font-bold text-white shadow-xl shadow-indigo-500/20 transition-all">
+            <Link href="/dashboard/editor" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 xl:px-10 2xl:px-12 h-12 xl:h-14 2xl:h-16 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-base xl:text-lg 2xl:text-xl font-bold text-white shadow-lg shadow-indigo-600/10 transition-all">
               <span>Go to Editor Dashboard</span>
               <ArrowRight className="w-4 h-4 xl:w-5 xl:h-5 2xl:w-6 2xl:h-6" />
             </Link>
           ) : (
             <button 
               onClick={() => openAuthModal('signin')}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 xl:px-10 2xl:px-12 h-12 xl:h-14 2xl:h-16 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-white hover:bg-slate-100 text-slate-950 font-bold shadow-lg transition-all text-base xl:text-lg 2xl:text-xl"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 xl:px-10 2xl:px-12 h-12 xl:h-14 2xl:h-16 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-slate-900 hover:bg-slate-800 text-white font-bold shadow-md transition-all text-base xl:text-lg 2xl:text-xl"
             >
               <span>Continue with Google</span>
-              <ChevronRight className="w-5 h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 text-slate-500" />
+              <ChevronRight className="w-5 h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 text-slate-300" />
             </button>
           )}
 
           <a 
             href="#demo"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 xl:px-10 2xl:px-12 h-12 xl:h-14 2xl:h-16 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-base xl:text-lg 2xl:text-xl font-semibold text-slate-350 transition-all"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 xl:px-10 2xl:px-12 h-12 xl:h-14 2xl:h-16 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 text-base xl:text-lg 2xl:text-xl font-semibold text-slate-700 shadow-sm transition-all"
           >
             <span>See Interactive Demo</span>
           </a>
@@ -261,40 +261,40 @@ export default function LandingPage() {
 
       {/* Feature Grid */}
       <section id="features" className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 py-20 xl:py-32 2xl:py-40 relative z-10 w-full scroll-mt-16">
-        <h2 className="text-3xl xl:text-5xl 2xl:text-6xl font-bold text-center text-white mb-16 xl:mb-24 2xl:mb-28">
+        <h2 className="text-3xl xl:text-5xl 2xl:text-6xl font-bold text-center text-slate-900 mb-16 xl:mb-24 2xl:mb-28">
           Powerful Utilities Built for Modern AI Productivity
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 xl:gap-12 2xl:gap-16">
           {/* Card 1 */}
-          <div className="p-8 xl:p-12 2xl:p-16 rounded-2xl xl:rounded-3xl 2xl:rounded-[2rem] bg-slate-900/40 border border-slate-800/80 backdrop-blur-sm hover:border-slate-700/80 transition-all group">
-            <div className="w-12 h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-violet-500/10 flex items-center justify-center mb-6 xl:mb-8 2xl:mb-10 group-hover:scale-110 transition-transform">
-              <Sparkles className="w-6 h-6 xl:w-8 xl:h-8 2xl:w-10 2xl:h-10 text-violet-400" />
+          <div className="p-8 xl:p-12 2xl:p-16 rounded-2xl xl:rounded-3xl 2xl:rounded-[2rem] bg-white border border-slate-200/80 shadow-sm hover:border-slate-300/80 hover:shadow-md transition-all group">
+            <div className="w-12 h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-violet-100 flex items-center justify-center mb-6 xl:mb-8 2xl:mb-10 group-hover:scale-110 transition-transform">
+              <Sparkles className="w-6 h-6 xl:w-8 xl:h-8 2xl:w-10 2xl:h-10 text-violet-600" />
             </div>
-            <h3 className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-white mb-3 xl:mb-4 2xl:mb-5">Prompt Optimization</h3>
-            <p className="text-slate-400 xl:text-lg 2xl:text-xl leading-relaxed">
+            <h3 className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-slate-900 mb-3 xl:mb-4 2xl:mb-5">Prompt Optimization</h3>
+            <p className="text-slate-650 xl:text-lg 2xl:text-xl leading-relaxed">
               Injects context, specificity, and constraints to turn a single-line request into a structured prompt that gets premium results.
             </p>
           </div>
 
           {/* Card 2 */}
-          <div className="p-8 xl:p-12 2xl:p-16 rounded-2xl xl:rounded-3xl 2xl:rounded-[2rem] bg-slate-900/40 border border-slate-800/80 backdrop-blur-sm hover:border-slate-700/80 transition-all group">
-            <div className="w-12 h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-indigo-500/10 flex items-center justify-center mb-6 xl:mb-8 2xl:mb-10 group-hover:scale-110 transition-transform">
-              <Zap className="w-6 h-6 xl:w-8 xl:h-8 2xl:w-10 2xl:h-10 text-indigo-400" />
+          <div className="p-8 xl:p-12 2xl:p-16 rounded-2xl xl:rounded-3xl 2xl:rounded-[2rem] bg-white border border-slate-200/80 shadow-sm hover:border-slate-300/80 hover:shadow-md transition-all group">
+            <div className="w-12 h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-indigo-100 flex items-center justify-center mb-6 xl:mb-8 2xl:mb-10 group-hover:scale-110 transition-transform">
+              <Zap className="w-6 h-6 xl:w-8 xl:h-8 2xl:w-10 2xl:h-10 text-indigo-600" />
             </div>
-            <h3 className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-white mb-3 xl:mb-4 2xl:mb-5">Tone & Length Control</h3>
-            <p className="text-slate-400 xl:text-lg 2xl:text-xl leading-relaxed">
+            <h3 className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-slate-900 mb-3 xl:mb-4 2xl:mb-5">Tone & Length Control</h3>
+            <p className="text-slate-650 xl:text-lg 2xl:text-xl leading-relaxed">
               Instantly rewrite text into professional, persuasive, friendly, or executive tones. Shorten, expand, or simplify on the fly.
             </p>
           </div>
 
           {/* Card 3 */}
-          <div className="p-8 xl:p-12 2xl:p-16 rounded-2xl xl:rounded-3xl 2xl:rounded-[2rem] bg-slate-900/40 border border-slate-800/80 backdrop-blur-sm hover:border-slate-700/80 transition-all group">
-            <div className="w-12 h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-emerald-500/10 flex items-center justify-center mb-6 xl:mb-8 2xl:mb-10 group-hover:scale-110 transition-transform">
-              <Layout className="w-6 h-6 xl:w-8 xl:h-8 2xl:w-10 2xl:h-10 text-emerald-400" />
+          <div className="p-8 xl:p-12 2xl:p-16 rounded-2xl xl:rounded-3xl 2xl:rounded-[2rem] bg-white border border-slate-200/80 shadow-sm hover:border-slate-300/80 hover:shadow-md transition-all group">
+            <div className="w-12 h-12 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 rounded-xl xl:rounded-2xl 2xl:rounded-[1.25rem] bg-emerald-100 flex items-center justify-center mb-6 xl:mb-8 2xl:mb-10 group-hover:scale-110 transition-transform">
+              <Layout className="w-6 h-6 xl:w-8 xl:h-8 2xl:w-10 2xl:h-10 text-emerald-600" />
             </div>
-            <h3 className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-white mb-3 xl:mb-4 2xl:mb-5">Universal Browser Injection</h3>
-            <p className="text-slate-400 xl:text-lg 2xl:text-xl leading-relaxed">
+            <h3 className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-slate-900 mb-3 xl:mb-4 2xl:mb-5">Universal Browser Injection</h3>
+            <p className="text-slate-650 xl:text-lg 2xl:text-xl leading-relaxed">
               Integrates directly with Chrome, Brave, Edge, and Firefox to capture inputs on any page and apply replacements instantly.
             </p>
           </div>
@@ -302,11 +302,11 @@ export default function LandingPage() {
       </section>
 
       {/* Interactive Demo Section */}
-      <section id="demo" className="w-full bg-slate-950 border-t border-slate-900/60 py-20 xl:py-32 2xl:py-40 relative z-10 scroll-mt-16">
+      <section id="demo" className="w-full bg-slate-100/50 border-t border-slate-200 py-20 xl:py-32 2xl:py-40 relative z-10 scroll-mt-16">
         <div className="max-w-5xl xl:max-w-7xl 2xl:max-w-[90rem] mx-auto px-6 xl:px-12 2xl:px-16">
           <div className="text-center mb-12 xl:mb-16 2xl:mb-20">
-            <h2 className="text-3xl xl:text-5xl 2xl:text-6xl font-bold text-white mb-4 xl:mb-6">See PromptPilot in Action</h2>
-            <p className="text-slate-400 xl:text-xl 2xl:text-2xl max-w-xl xl:max-w-2xl 2xl:max-w-4xl mx-auto">
+            <h2 className="text-3xl xl:text-5xl 2xl:text-6xl font-bold text-slate-900 mb-4 xl:mb-6">See PromptPilot in Action</h2>
+            <p className="text-slate-600 xl:text-xl 2xl:text-2xl max-w-xl xl:max-w-2xl 2xl:max-w-4xl mx-auto">
               Compare original text with PromptPilot enhanced outputs. Select a mode below to test.
             </p>
           </div>
@@ -319,8 +319,8 @@ export default function LandingPage() {
                 onClick={() => setSelectedExample(index)}
                 className={`px-5 py-2.5 xl:px-8 xl:py-3.5 2xl:px-10 2xl:py-4.5 rounded-xl xl:rounded-2xl 2xl:rounded-3xl font-semibold text-sm xl:text-base 2xl:text-lg transition-all ${
                   selectedExample === index
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'bg-white text-slate-650 hover:text-slate-900 border border-slate-200 shadow-sm'
                 }`}
               >
                 {ex.label}
@@ -329,21 +329,21 @@ export default function LandingPage() {
           </div>
 
           {/* Interactive Comparison Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 xl:gap-12 2xl:gap-16 bg-slate-900/30 border border-slate-800/80 backdrop-blur-sm rounded-3xl xl:rounded-[2rem] 2xl:rounded-[2.5rem] p-8 xl:p-12 2xl:p-16 relative w-full">
-            <div className="absolute top-3 right-6 2xl:top-4 2xl:right-8 text-xs 2xl:text-sm text-indigo-400 font-bold flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 2xl:w-4 2xl:h-4" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 xl:gap-12 2xl:gap-16 bg-white border border-slate-200 rounded-3xl xl:rounded-[2rem] 2xl:rounded-[2.5rem] p-8 xl:p-12 2xl:p-16 relative w-full shadow-sm">
+            <div className="absolute top-3 right-6 2xl:top-4 2xl:right-8 text-xs 2xl:text-sm text-indigo-600 font-bold flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 2xl:w-4 2xl:h-4 text-indigo-500" />
               <span>{examples[selectedExample].action}</span>
             </div>
 
             {/* Before Column */}
             <div className="flex flex-col w-full">
               <div className="flex items-center justify-between mb-4 xl:mb-6 2xl:mb-8">
-                <span className="text-sm xl:text-base 2xl:text-lg font-semibold text-slate-500 uppercase tracking-wider">Before</span>
-                <span className="text-xs xl:text-sm 2xl:text-base px-2.5 py-1 xl:px-4 xl:py-1.5 2xl:px-5 2xl:py-2 rounded bg-red-500/10 border border-red-500/20 text-red-400 font-bold">
+                <span className="text-sm xl:text-base 2xl:text-lg font-semibold text-slate-400 uppercase tracking-wider">Before</span>
+                <span className="text-xs xl:text-sm 2xl:text-base px-2.5 py-1 xl:px-4 xl:py-1.5 2xl:px-5 2xl:py-2 rounded bg-red-50 border border-red-100 text-red-650 font-bold">
                   Score: {examples[selectedExample].scoreBefore}/100
                 </span>
               </div>
-              <div className="flex-1 p-5 xl:p-8 2xl:p-10 rounded-2xl xl:rounded-[1.5rem] 2xl:rounded-[2rem] bg-slate-950 border border-slate-900 font-mono text-sm xl:text-base 2xl:text-lg text-slate-400 whitespace-pre-line leading-relaxed min-h-[160px] xl:min-h-[240px] 2xl:min-h-[300px] w-full">
+              <div className="flex-1 p-5 xl:p-8 2xl:p-10 rounded-2xl xl:rounded-[1.5rem] 2xl:rounded-[2rem] bg-slate-50 border border-slate-200 font-mono text-sm xl:text-base 2xl:text-lg text-slate-700 whitespace-pre-line leading-relaxed min-h-[160px] xl:min-h-[240px] 2xl:min-h-[300px] w-full">
                 {examples[selectedExample].before}
               </div>
             </div>
@@ -351,15 +351,15 @@ export default function LandingPage() {
             {/* After Column */}
             <div className="flex flex-col w-full">
               <div className="flex items-center justify-between mb-4 xl:mb-6 2xl:mb-8">
-                <span className="text-sm xl:text-base 2xl:text-lg font-semibold text-white flex items-center gap-1.5 2xl:gap-2">
-                  <CheckCircle className="w-4 h-4 xl:w-5 xl:h-5 2xl:w-6 2xl:h-6 text-emerald-400" />
+                <span className="text-sm xl:text-base 2xl:text-lg font-semibold text-slate-900 flex items-center gap-1.5 2xl:gap-2">
+                  <CheckCircle className="w-4 h-4 xl:w-5 xl:h-5 2xl:w-6 2xl:h-6 text-emerald-600" />
                   <span>After (PromptPilot)</span>
                 </span>
-                <span className="text-xs xl:text-sm 2xl:text-base px-2.5 py-1 xl:px-4 xl:py-1.5 2xl:px-5 2xl:py-2 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold animate-pulse">
+                <span className="text-xs xl:text-sm 2xl:text-base px-2.5 py-1 xl:px-4 xl:py-1.5 2xl:px-5 2xl:py-2 rounded bg-emerald-50 border border-emerald-100 text-emerald-700 font-bold">
                   Score: {examples[selectedExample].scoreAfter}/100
                 </span>
               </div>
-              <div className="flex-1 p-5 xl:p-8 2xl:p-10 rounded-2xl xl:rounded-[1.5rem] 2xl:rounded-[2rem] bg-slate-950 border border-slate-800/50 font-mono text-sm xl:text-base 2xl:text-lg text-slate-100 whitespace-pre-line leading-relaxed min-h-[160px] xl:min-h-[240px] 2xl:min-h-[300px] relative overflow-hidden w-full">
+              <div className="flex-1 p-5 xl:p-8 2xl:p-10 rounded-2xl xl:rounded-[1.5rem] 2xl:rounded-[2rem] bg-slate-50 border border-slate-200 font-mono text-sm xl:text-base 2xl:text-lg text-slate-900 whitespace-pre-line leading-relaxed min-h-[160px] xl:min-h-[240px] 2xl:min-h-[300px] relative overflow-hidden w-full">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl pointer-events-none" />
                 {examples[selectedExample].after}
               </div>
@@ -369,13 +369,13 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 py-12 2xl:py-16 mt-auto relative z-10 bg-slate-950 w-full">
+      <footer className="border-t border-slate-200 py-12 mt-auto relative z-10 bg-white w-full">
         <div className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[98rem] mx-auto px-6 xl:px-12 2xl:px-16 flex flex-col md:flex-row items-center justify-between gap-6 xl:gap-8">
           <p className="text-sm 2xl:text-base text-slate-500">&copy; 2026 PromptPilot. Built for elite productivity. Privacy First.</p>
-          <div className="flex gap-6 2xl:gap-8 text-sm 2xl:text-base text-slate-500">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-white transition-colors">Security</a>
+          <div className="flex gap-6 2xl:gap-8 text-sm 2xl:text-base text-slate-550">
+            <a href="#" className="hover:text-slate-900 transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-slate-900 transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-slate-900 transition-colors">Security</a>
           </div>
         </div>
       </footer>
@@ -385,33 +385,33 @@ export default function LandingPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div 
-            className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity duration-300 animate-fade-in"
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300 animate-fade-in"
             onClick={() => setIsAuthModalOpen(false)}
           />
           
           {/* Modal Content */}
-          <div className="relative w-full max-w-md bg-slate-900/90 border border-slate-800/80 rounded-2xl p-8 shadow-2xl backdrop-blur-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="relative w-full max-w-md bg-white border border-slate-200 rounded-2xl p-8 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             {/* Decorative Glow */}
-            <div className="absolute -top-12 -left-12 w-40 h-40 rounded-full bg-violet-600/10 blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-12 -right-12 w-40 h-40 rounded-full bg-indigo-600/10 blur-3xl pointer-events-none" />
+            <div className="absolute -top-12 -left-12 w-40 h-40 rounded-full bg-violet-600/5 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-12 -right-12 w-40 h-40 rounded-full bg-indigo-600/5 blur-3xl pointer-events-none" />
 
             {/* Close button */}
             <button 
               onClick={() => setIsAuthModalOpen(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-lg border border-slate-800/60 text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="absolute top-4 right-4 p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
 
             {/* Header */}
             <div className="text-center mb-6">
-              <div className="inline-flex w-10 h-10 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-500 items-center justify-center shadow-lg shadow-indigo-500/20 mb-3">
+              <div className="inline-flex w-10 h-10 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-500 items-center justify-center shadow-md shadow-indigo-600/10 mb-3">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white">
+              <h3 className="text-2xl font-bold text-slate-900">
                 {authMode === 'signin' ? 'Welcome Back' : 'Create Account'}
               </h3>
-              <p className="text-slate-400 text-sm mt-1">
+              <p className="text-slate-500 text-sm mt-1">
                 {authMode === 'signin' 
                   ? 'Sign in to access your PromptPilot workspace' 
                   : 'Get started with PromptPilot today'}
@@ -419,13 +419,13 @@ export default function LandingPage() {
             </div>
 
             {authError && (
-              <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center font-medium">
+              <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-xs text-center font-medium">
                 {authError}
               </div>
             )}
 
             {message && (
-              <div className="mb-4 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs text-center font-medium">
+              <div className="mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-250 text-emerald-700 text-xs text-center font-medium">
                 {message}
               </div>
             )}
@@ -433,7 +433,7 @@ export default function LandingPage() {
             {/* Form */}
             <form onSubmit={handleAuthSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
                   Email Address
                 </label>
                 <input
@@ -442,12 +442,12 @@ export default function LandingPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="you@example.com"
-                  className="w-full px-4 py-2.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
                   Password
                 </label>
                 <div className="relative">
@@ -457,12 +457,12 @@ export default function LandingPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     placeholder="••••••••"
-                    className="w-full pl-4 pr-10 py-2.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                    className="w-full pl-4 pr-10 py-2.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-350 transition-colors p-1 cursor-pointer flex items-center justify-center"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1 cursor-pointer flex items-center justify-center"
                   >
                     {showPassword ? (
                       <EyeOff className="w-4 h-4" />
@@ -476,7 +476,7 @@ export default function LandingPage() {
               <button
                 type="submit"
                 disabled={authLoading}
-                className="w-full inline-flex items-center justify-center h-10 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-sm font-semibold text-white shadow-md shadow-indigo-600/10 transition-all disabled:opacity-50 cursor-pointer"
+                className="w-full inline-flex items-center justify-center h-10 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-sm font-semibold text-white shadow-md shadow-indigo-650/10 transition-all disabled:opacity-50 cursor-pointer"
               >
                 {authLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -491,10 +491,10 @@ export default function LandingPage() {
             {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-800/60" />
+                <div className="w-full border-t border-slate-200" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-slate-900 px-3 text-slate-500">Or continue with</span>
+                <span className="bg-white px-3 text-slate-405">Or continue with</span>
               </div>
             </div>
 
@@ -502,7 +502,7 @@ export default function LandingPage() {
             <button
               onClick={handleGoogleSignIn}
               disabled={authLoading}
-              className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-lg bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-sm font-semibold text-white transition-all disabled:opacity-50 cursor-pointer"
+              className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-sm font-semibold text-slate-700 transition-all disabled:opacity-50 cursor-pointer shadow-sm"
             >
               <svg className="w-4.5 h-4.5 mr-1" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -520,7 +520,7 @@ export default function LandingPage() {
                   setAuthMode(authMode === 'signin' ? 'signup' : 'signin');
                   setShowPassword(false);
                 }}
-                className="text-xs text-slate-400 hover:text-indigo-400 transition-colors"
+                className="text-xs text-slate-500 hover:text-indigo-600 transition-colors"
               >
                 {authMode === 'signin' 
                   ? "Don't have an account? Sign Up" 
