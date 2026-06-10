@@ -202,7 +202,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <aside className={`w-64 xl:w-72 2xl:w-80 border-r border-slate-200 bg-white flex flex-col z-40 md:z-20 fixed md:sticky top-0 h-full transition-transform duration-300 ease-in-out ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
       }`}>
-        <div className="h-14 xl:h-16 px-6 border-b border-slate-200 flex items-center justify-between">
+        <div className="h-[52px] xl:h-[60px] px-6 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-2 font-extrabold text-lg xl:text-xl tracking-tight text-slate-900">
             <svg className="w-7 h-7 xl:w-8 xl:h-8" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
@@ -299,7 +299,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       <main className="flex-1 flex flex-col h-full relative z-10 overflow-y-auto">
-        <header className="h-14 xl:h-16 border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 xl:px-8 bg-white/80 backdrop-blur-md sticky top-0 z-30 shadow-sm">
+        <header className="h-[60px] xl:h-[68px] border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 xl:px-8 bg-white/80 backdrop-blur-md sticky top-0 z-30 shadow-sm">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsSidebarOpen(true)}

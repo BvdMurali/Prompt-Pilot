@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Sparkles, Copy, Save, AlertCircle, RefreshCw, BarChart2, HelpCircle, Check, Zap } from 'lucide-react';
@@ -24,6 +24,15 @@ export default function EditorPage() {
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(() => globalCache.editor.saved);
   const [activeVariation, setActiveVariation] = useState<number | null>(() => globalCache.editor.activeVariation);
+
+  const resultRef = useRef<HTMLDivElement | null>(null);
+
+  // Auto-scroll to result when it is generated
+  useEffect(() => {
+    if (result && resultRef.current) {
+      resultRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [result]);
 
   // Check for scratch prompt loaded from templates page
   useEffect(() => {
@@ -321,7 +330,7 @@ export default function EditorPage() {
 
       {/* Result Section */}
       {result && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:gap-8 animate-fade-in">
+        <div ref={resultRef} className="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:gap-8 animate-fade-in scroll-mt-20">
           
           {/* OUTPUT COMPONENT */}
           <div className="lg:col-span-2 flex flex-col gap-5 xl:gap-6 bg-white border border-slate-200 p-5 xl:p-6 rounded-2xl xl:rounded-3xl shadow-sm">

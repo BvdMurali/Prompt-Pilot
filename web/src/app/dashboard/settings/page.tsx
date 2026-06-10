@@ -600,21 +600,23 @@ export default function SettingsPage() {
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="flex items-center justify-between border-t border-slate-100 pt-6 mt-2">
+          {/* Settings Save Actions Bar */}
+          <div className="flex items-center justify-between bg-white border border-slate-200 p-5 xl:p-6 rounded-2xl xl:rounded-3xl shadow-sm">
+            <div className="flex-1">
               {error && <span className="text-xs xl:text-sm text-red-500 font-semibold">{error}</span>}
-              {success && <span className="text-xs xl:text-sm text-emerald-600 flex items-center gap-1.5 font-semibold"><Check className="w-4 h-4" /> Settings Saved!</span>}
-              {!error && !success && <span />}
-              
-              <button
-                onClick={handleSaveSettings}
-                disabled={saving}
-                className="inline-flex items-center gap-2 xl:gap-3 px-6 py-2 xl:px-6 xl:py-2 rounded-xl xl:rounded-2xl bg-indigo-650 hover:bg-indigo-750 text-sm xl:text-base font-bold text-white transition-all shadow-md shadow-indigo-650/10 hover:shadow-indigo-650/20 disabled:opacity-50"
-              >
-                <Save className="w-4 h-4 xl:w-5 xl:h-5" />
-                <span>{saving ? 'Saving...' : 'Save Settings'}</span>
-              </button>
+              {success && <span className="text-xs xl:text-sm text-emerald-600 flex items-center gap-1.5 font-semibold"><Check className="w-4 h-4 text-emerald-600" /> Settings Saved!</span>}
             </div>
+            
+            <button
+              onClick={handleSaveSettings}
+              disabled={saving}
+              className="inline-flex items-center gap-2 xl:gap-3 px-6 py-2 xl:px-6 xl:py-2 rounded-xl xl:rounded-2xl bg-indigo-650 hover:bg-indigo-750 text-sm xl:text-base font-bold text-white transition-all shadow-md shadow-indigo-650/10 hover:shadow-indigo-650/20 disabled:opacity-50"
+            >
+              <Save className="w-4 h-4 xl:w-5 xl:h-5" />
+              <span>{saving ? 'Saving...' : 'Save Settings'}</span>
+            </button>
           </div>
 
         </div>
