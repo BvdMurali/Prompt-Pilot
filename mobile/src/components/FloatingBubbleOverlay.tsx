@@ -11,10 +11,15 @@ import {
   ToastAndroid,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../context/AuthContext';
+import * as SecureStore from 'expo-secure-store';
 import { processPromptApi } from '../services/api';
 import { THEME } from '../constants/theme';
 import Logo from './Logo';
+
+// Storage keys must match those used in AuthContext.tsx
+const TOKEN_KEY = 'pp_session_token';
+const API_URL_KEY = 'pp_api_url';
+const DEFAULT_API_URL = 'https://prompt-pilot-ochre.vercel.app';
 
 const { FloatingBubbleModule } = NativeModules;
 
@@ -37,17 +42,37 @@ const PLATFORMS = [
 ];
 
 export default function FloatingBubbleOverlay() {
-  const { apiUrl, token } = useAuth();
+  // This component runs in an isolated ReactRootView (separate from the main
+  // app tree) so it has no access to AuthProvider. We read token + apiUrl
+  // directly from SecureStore using the same keys AuthContext writes to.
+  const [token, setToken] = useState<string | null>(null);
+  const [apiUrl, setApiUrl] = useState(DEFAULT_API_URL);
 
   const [inputText, setInputText] = useState('');
   const [action, setAction] = useState<'optimize' | 'rewrite'>('rewrite');
   const [tone, setTone] = useState('professional');
   const [platform, setPlatform] = useState('');
   const [length, setLength] = useState('');
-  
+
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [selectedVariation, setSelectedVariation] = useState<number | null>(null);
+
+  // Load auth credentials from SecureStore on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const [storedToken, storedUrl] = await Promise.all([
+          SecureStore.getItemAsync(TOKEN_KEY),
+          SecureStore.getItemAsync(API_URL_KEY),
+        ]);
+        if (storedToken) setToken(storedToken);
+        if (storedUrl) setApiUrl(storedUrl);
+      } catch {
+        // SecureStore unavailable — proceed without token (API will reject unauthenticated calls)
+      }
+    })();
+  }, []);
 
   // Retrieve text from clipboard on mount
   useEffect(() => {

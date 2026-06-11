@@ -230,9 +230,15 @@ class FloatingBubbleService : Service() {
         if (!isExpanded) return
         isExpanded = false
 
-        // Remove overlay view
-        overlayView?.let {
-            windowManager.removeView(it)
+        overlayView?.let { container ->
+            // Detach the ReactRootView from its container BEFORE removing the container
+            // from WindowManager. If we skip this, rrv.parent is still set to the old
+            // container, and the next call to container.addView(rrv) will crash with
+            // "The specified child already has a parent. You must call removeView() first."
+            reactRootView?.let { rrv ->
+                container.removeView(rrv)
+            }
+            windowManager.removeView(container)
             overlayView = null
         }
 
