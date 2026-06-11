@@ -25,7 +25,13 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-web-browser"
-    ]
+      "expo-web-browser",
+      "./src/plugins/withFloatingBubble"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "78f57029-e8a7-40e1-bd78-72298b2ff86e"
+      }
+    }
   }
 }

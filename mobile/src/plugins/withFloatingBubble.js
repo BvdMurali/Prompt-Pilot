@@ -1,0 +1,187 @@
+/**
+ * withFloatingBubble.js — Expo Config Plugin
+ *
+ * This plugin sets up the Android Floating Bubble feature entirely from source,
+ * making the project compatible with EAS Cloud Builds triggered from GitHub.
+ *
+ * It performs the following steps at prebuild time:
+ *   1. Copies Kotlin source files from src/native/android/ → the generated android/ directory.
+ *   2. Injects required permissions + service into AndroidManifest.xml.
+ *   3. Adds the androidx.core:core-ktx dependency to app/build.gradle.
+ *   4. Registers FloatingBubblePackage in MainApplication.kt.
+ */
+
+const {
+  withAndroidManifest,
+  withAppBuildGradle,
+  withMainApplication,
+  withDangerousMod,
+} = require('@expo/config-plugins');
+const path = require('path');
+const fs = require('fs');
+
+// ─── Step 1: Copy Kotlin source files ────────────────────────────────────────
+
+function withCopyKotlinFiles(config) {
+  return withDangerousMod(config, [
+    'android',
+    (config) => {
+      const projectRoot = config.modRequest.projectRoot;
+      const sourceDir = path.join(projectRoot, 'src', 'native', 'android');
+      const destDir = path.join(
+        config.modRequest.platformProjectRoot,
+        'app',
+        'src',
+        'main',
+        'java',
+        'com',
+        'promptpilot',
+        'app'
+      );
+
+      // Ensure destination exists
+      fs.mkdirSync(destDir, { recursive: true });
+
+      const filesToCopy = [
+        'FloatingBubbleModule.kt',
+        'FloatingBubblePackage.kt',
+        'FloatingBubbleService.kt',
+      ];
+
+      for (const fileName of filesToCopy) {
+        const src = path.join(sourceDir, fileName);
+        const dest = path.join(destDir, fileName);
+        if (fs.existsSync(src)) {
+          fs.copyFileSync(src, dest);
+          console.log(`[FloatingBubble] Copied ${fileName} → ${dest}`);
+        } else {
+          throw new Error(
+            `[FloatingBubble] Source file not found: ${src}\n` +
+            `Ensure src/native/android/ contains the Kotlin files.`
+          );
+        }
+      }
+
+      return config;
+    },
+  ]);
+}
+
+// ─── Step 2: Inject AndroidManifest permissions + service ────────────────────
+
+function withFloatingBubbleManifest(config) {
+  return withAndroidManifest(config, async (config) => {
+    const androidManifest = config.modResults;
+    const mainApplication = androidManifest.manifest.application[0];
+
+    // Ensure permissions array exists
+    if (!androidManifest.manifest['uses-permission']) {
+      androidManifest.manifest['uses-permission'] = [];
+    }
+
+    const permissions = [
+      'android.permission.SYSTEM_ALERT_WINDOW',
+      'android.permission.FOREGROUND_SERVICE',
+      'android.permission.FOREGROUND_SERVICE_DATA_SYNC',
+    ];
+
+    permissions.forEach((perm) => {
+      const exists = androidManifest.manifest['uses-permission'].some(
+        (p) => p.$['android:name'] === perm
+      );
+      if (!exists) {
+        androidManifest.manifest['uses-permission'].push({
+          $: { 'android:name': perm },
+        });
+      }
+    });
+
+    // Ensure services array exists
+    if (!mainApplication.service) {
+      mainApplication.service = [];
+    }
+
+    // Register our floating bubble service if not present
+    const serviceName = '.FloatingBubbleService';
+    const serviceExists = mainApplication.service.some(
+      (s) =>
+        s.$['android:name'] === serviceName ||
+        s.$['android:name'] === 'com.promptpilot.app.FloatingBubbleService'
+    );
+
+    if (!serviceExists) {
+      mainApplication.service.push({
+        $: {
+          'android:name': serviceName,
+          'android:enabled': 'true',
+          'android:exported': 'false',
+          'android:foregroundServiceType': 'dataSync',
+        },
+      });
+    }
+
+    return config;
+  });
+}
+
+// ─── Step 3: Add core-ktx to app/build.gradle ────────────────────────────────
+
+function withCoreKtxDependency(config) {
+  return withAppBuildGradle(config, (config) => {
+    const ktxDep = `    implementation("androidx.core:core-ktx:1.12.0")`;
+
+    if (!config.modResults.contents.includes('androidx.core:core-ktx')) {
+      // Insert after the react-android implementation line
+      config.modResults.contents = config.modResults.contents.replace(
+        /implementation\("com\.facebook\.react:react-android"\)/,
+        `implementation("com.facebook.react:react-android")\n${ktxDep}`
+      );
+      console.log('[FloatingBubble] Added androidx.core:core-ktx to build.gradle');
+    }
+
+    return config;
+  });
+}
+
+// ─── Step 4: Register FloatingBubblePackage in MainApplication.kt ────────────
+
+function withFloatingBubblePackageRegistration(config) {
+  return withMainApplication(config, (config) => {
+    let contents = config.modResults.contents;
+
+    // Only patch if not already registered
+    if (contents.includes('FloatingBubblePackage()')) {
+      return config;
+    }
+
+    // Insert after the PackageList(this).packages.apply { opening line
+    const applyBlockOpen = 'PackageList(this).packages.apply {';
+    if (contents.includes(applyBlockOpen)) {
+      contents = contents.replace(
+        applyBlockOpen,
+        `${applyBlockOpen}\n              // Packages that cannot be autolinked yet can be added manually here:\n              add(FloatingBubblePackage())`
+      );
+      console.log('[FloatingBubble] Registered FloatingBubblePackage in MainApplication.kt');
+    } else {
+      console.warn(
+        '[FloatingBubble] Could not find PackageList block in MainApplication.kt. ' +
+        'Please register FloatingBubblePackage() manually.'
+      );
+    }
+
+    config.modResults.contents = contents;
+    return config;
+  });
+}
+
+// ─── Compose all mods ─────────────────────────────────────────────────────────
+
+function withFloatingBubble(config) {
+  config = withCopyKotlinFiles(config);
+  config = withFloatingBubbleManifest(config);
+  config = withCoreKtxDependency(config);
+  config = withFloatingBubblePackageRegistration(config);
+  return config;
+}
+
+module.exports = withFloatingBubble;
