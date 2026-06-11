@@ -316,15 +316,17 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   textContainer: {
-    backgroundColor: THEME.colors.borderLight,
+    backgroundColor: THEME.colors.surfaceSecondary,
+    borderWidth: 1,
+    borderColor: THEME.colors.borderLight,
     padding: THEME.spacing.md,
     borderRadius: THEME.roundness.md,
     marginBottom: THEME.spacing.sm,
   },
   optimizedContainer: {
-    backgroundColor: 'rgba(79, 70, 229, 0.04)',
+    backgroundColor: THEME.colors.surfaceSecondary,
     borderWidth: 1,
-    borderColor: 'rgba(129, 140, 248, 0.08)',
+    borderColor: THEME.colors.border,
   },
   detailText: {
     fontSize: THEME.typography.sizes.xs + 1,

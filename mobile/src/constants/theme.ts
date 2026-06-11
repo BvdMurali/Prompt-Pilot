@@ -1,10 +1,11 @@
 export const THEME = {
   colors: {
-    background: '#F8FAFC', // slate-50
-    surface: '#FFFFFF',    // white
+    background: '#FFFFFF', // pure white viewport
+    surface: '#FFFFFF',    // primary surface
     surfaceCard: '#FFFFFF',// white card
-    border: '#E2E8F0',     // slate-200
-    borderLight: '#F1F5F9',// slate-100
+    surfaceSecondary: '#FAFBFC', // secondary surface
+    border: '#EEF2F7',     // card border
+    borderLight: '#EAEFF5',// secondary border
     textPrimary: '#0F172A',// slate-900
     textSecondary: '#475569', // slate-600
     textMuted: '#64748B',     // slate-500
@@ -19,7 +20,7 @@ export const THEME = {
     primaryGradient: ['#7C3AED', '#8B5CF6'],
     accentGradient: ['#8B5CF6', '#06B6D4'],
     dangerGradient: ['#ef4444', '#fca5a5'],
-    glassGradient: ['rgba(255, 255, 255, 0.8)', 'rgba(241, 245, 249, 0.5)'],
+    glassGradient: ['rgba(255, 255, 255, 0.95)', 'rgba(250, 251, 252, 0.9)'],
   },
   spacing: {
     xs: 4,

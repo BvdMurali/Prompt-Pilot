@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   StyleSheet, 
   Text, 
@@ -51,6 +51,7 @@ const PLATFORMS = [
 export default function EditorScreen({ preloadText, onClearPreloadText }: EditorScreenProps) {
   const { apiUrl, token } = useAuth();
   const { addHistoryItem, savePrompt } = useDatabase();
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const [inputText, setInputText] = useState('');
   const [action, setAction] = useState<'optimize' | 'rewrite'>('optimize');
@@ -98,6 +99,9 @@ export default function EditorScreen({ preloadText, onClearPreloadText }: Editor
 
       const data = await processPromptApi(apiUrl, token, payload);
       setResult(data);
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
       
       // Update local execution logs context
       await addHistoryItem(inputText, data.improved_text, action, {
@@ -153,7 +157,7 @@ export default function EditorScreen({ preloadText, onClearPreloadText }: Editor
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+    <ScrollView ref={scrollViewRef} style={styles.container} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
       {/* Action Selector */}
       <View style={styles.actionToggle}>
         <TouchableOpacity

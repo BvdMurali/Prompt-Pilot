@@ -326,13 +326,16 @@ const styles = StyleSheet.create({
     fontFamily: THEME.typography.fontFamily.mono,
     fontSize: THEME.typography.sizes.xs,
     color: THEME.colors.textSecondary,
-    backgroundColor: THEME.colors.borderLight,
+    backgroundColor: THEME.colors.surfaceSecondary,
     padding: THEME.spacing.sm,
     borderRadius: THEME.roundness.md,
     lineHeight: 18,
+    borderWidth: 1,
+    borderColor: THEME.colors.borderLight,
   },
   cardSnippetExpanded: {
-    backgroundColor: 'rgba(15, 23, 42, 0.08)',
+    backgroundColor: THEME.colors.surfaceSecondary,
+    borderColor: THEME.colors.border,
   },
   cardActions: {
     flexDirection: 'row',

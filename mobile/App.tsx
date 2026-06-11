@@ -85,17 +85,6 @@ function AppContent() {
           <Logo size={22} />
           <Text style={styles.headerTitle}>PromptPilot</Text>
         </View>
-        <View style={[
-          styles.headerBadge,
-          { backgroundColor: isLocalMode ? 'rgba(107, 114, 128, 0.1)' : 'rgba(79, 70, 229, 0.1)' }
-        ]}>
-          <Text style={[
-            styles.headerBadgeText,
-            { color: isLocalMode ? THEME.colors.textSecondary : THEME.colors.primaryLight }
-          ]}>
-            {isLocalMode ? 'Sandbox' : 'Synced'}
-          </Text>
-        </View>
       </View>
 
       {/* Screen Workspace */}

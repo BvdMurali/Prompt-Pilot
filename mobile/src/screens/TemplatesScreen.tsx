@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   },
   previewScroll: {
     height: 140,
-    backgroundColor: THEME.colors.borderLight,
+    backgroundColor: THEME.colors.surfaceSecondary,
     borderRadius: THEME.roundness.md,
     padding: THEME.spacing.md,
     borderWidth: 1,

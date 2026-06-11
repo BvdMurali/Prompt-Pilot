@@ -28,15 +28,16 @@ export default function GlassCard({ children, style, useGradient = true }: Glass
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: THEME.roundness.lg,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(15, 23, 42, 0.08)',
+    borderColor: THEME.colors.border,
     padding: THEME.spacing.lg,
     marginBottom: THEME.spacing.lg,
+    backgroundColor: THEME.colors.surface,
     shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
     elevation: 2,
   },
   solidBg: {

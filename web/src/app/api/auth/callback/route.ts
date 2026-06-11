@@ -202,5 +202,11 @@ export async function GET(request: NextRequest) {
   }
 
   // ── Web dashboard redirect (default, non-mobile) ────────────────────────────
+  try {
+    const cookieStore = await cookies();
+    cookieStore.delete('mobile_return_url');
+  } catch (cookieErr) {
+    console.error('[api/auth/callback] Failed to clear mobile_return_url cookie:', cookieErr);
+  }
   return NextResponse.redirect(`${requestUrl.origin}${next}`);
 }

@@ -674,15 +674,6 @@ export default function SettingsScreen() {
               </View>
             </View>
 
-            {/* Save Button */}
-            <CustomButton
-              title={saving ? "Saving Settings..." : "Save Settings"}
-              onPress={handleSaveSettings}
-              loading={saving}
-              variant="gradient"
-              icon="save-outline"
-              style={styles.saveBtn}
-            />
           </View>
         </GlassCard>
 
@@ -734,6 +725,16 @@ export default function SettingsScreen() {
             )}
           </View>
         </GlassCard>
+
+        {/* Save Settings Button */}
+        <CustomButton
+          title={saving ? "Saving Settings..." : "Save Settings"}
+          onPress={handleSaveSettings}
+          loading={saving}
+          variant="gradient"
+          icon="save-outline"
+          style={styles.saveSettingsGlobalBtn}
+        />
 
         {/* Sign Out Button */}
         <CustomButton
@@ -947,7 +948,7 @@ const styles = StyleSheet.create({
     borderRadius: THEME.roundness.full,
     position: 'relative',
     overflow: 'hidden',
-    backgroundColor: THEME.colors.borderLight,
+    backgroundColor: THEME.colors.surfaceSecondary,
     borderWidth: 1,
     borderColor: THEME.colors.border,
     justifyContent: 'center',
@@ -1033,7 +1034,7 @@ const styles = StyleSheet.create({
   readOnlyField: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: THEME.colors.borderLight,
+    backgroundColor: THEME.colors.surfaceSecondary,
     borderColor: THEME.colors.border,
     borderWidth: 1,
     borderRadius: THEME.roundness.lg,
@@ -1051,7 +1052,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: THEME.colors.borderLight,
+    backgroundColor: THEME.colors.surfaceSecondary,
     borderColor: THEME.colors.border,
     borderWidth: 1,
     borderRadius: THEME.roundness.lg,
@@ -1107,9 +1108,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  saveBtn: {
+  saveSettingsGlobalBtn: {
     marginTop: THEME.spacing.md,
-    height: 44,
+    height: 48,
+    marginBottom: THEME.spacing.sm,
   },
   privacyDescRow: {
     flexDirection: 'row',
@@ -1171,7 +1173,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   signOutButton: {
-    marginTop: THEME.spacing.md,
+    marginTop: THEME.spacing.sm,
     height: 48,
     marginBottom: THEME.spacing.xl,
   },
