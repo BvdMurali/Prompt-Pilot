@@ -9,8 +9,7 @@ export async function GET(request: NextRequest) {
   const returnUrl = requestUrl.searchParams.get('return');
   const isMobile = !!returnUrl;
 
-  console.log('[api/auth/callback] GET requestUrl:', request.url);
-  console.log('[api/auth/callback] code present:', !!code, 'isMobile:', isMobile, 'returnUrl:', returnUrl);
+  // Web/Mobile Auth Callback GET parameters verification
 
   let sessionData: any = null;
 
@@ -18,12 +17,10 @@ export async function GET(request: NextRequest) {
     try {
       const cookieStore = await cookies();
       const supabase = createClient(cookieStore);
-      console.log('[api/auth/callback] Exchanging OAuth code for session...');
       const { data, error } = await supabase.auth.exchangeCodeForSession(code);
       if (error) {
         console.error('[api/auth/callback] Code exchange error:', error.message);
       } else {
-        console.log('[api/auth/callback] Code exchange success. Session user:', data.session?.user?.id);
         sessionData = data.session;
       }
     } catch (err) {
@@ -53,7 +50,17 @@ export async function GET(request: NextRequest) {
     const fragmentStr = fragmentParams.toString();
     const deepLink = fragmentStr ? `${returnUrl}#${fragmentStr}` : returnUrl;
 
-    // Set cookie if we have a returnUrl
+    if (access_token) {
+      try {
+        const cookieStore = await cookies();
+        cookieStore.delete('mobile_return_url');
+      } catch (cookieErr) {
+        console.error('[api/auth/callback] Failed to clear mobile_return_url cookie:', cookieErr);
+      }
+      return NextResponse.redirect(deepLink);
+    }
+
+    // Set cookie if we have a returnUrl (fallback/implicit flow)
     try {
       const cookieStore = await cookies();
       cookieStore.set('mobile_return_url', returnUrl, {
@@ -112,7 +119,6 @@ export async function GET(request: NextRequest) {
     }
     .btn:hover { background: #4f46e5; }
     .status { font-size: 12px; color: #64748b; margin-top: 16px; }
-    .debug { font-size: 10px; color: #475569; margin-top: 24px; word-break: break-all; }
   </style>
 </head>
 <body>
@@ -122,7 +128,6 @@ export async function GET(request: NextRequest) {
     <p>You have signed in with Google. Tap the button below to return to PromptPilot.</p>
     <a class="btn" id="openBtn" href="${deepLink}">Open PromptPilot App</a>
     <p class="status" id="status">Attempting to open app automatically...</p>
-    <p class="debug" id="debug"></p>
   </div>
   <script>
     (function() {
@@ -162,10 +167,7 @@ export async function GET(request: NextRequest) {
         openBtn.href = finalDeepLink;
       }
 
-      var debugEl = document.getElementById('debug');
-      if (debugEl) {
-        debugEl.textContent = 'Platform: ' + (isAndroid ? 'Android' : 'Other') + ' | Intent: ' + finalUrl + ' | Raw: ' + finalDeepLink;
-      }
+      // Debug logging removed in production
 
       // Try automatic redirect
       try {

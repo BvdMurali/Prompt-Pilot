@@ -87,30 +87,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   //   - promptpilot://           in standalone build
   // This listener catches both and establishes the session.
   useEffect(() => {
-    console.log('[AuthContext] Registering deep link listener...');
+    // Deep link listener registration
     const handleDeepLink = (event: { url: string }) => {
       const { url } = event;
-      console.log('[AuthContext] Received deep link URL:', url);
       if (!url) return;
 
       // Only handle URLs that contain OAuth tokens (have access_token param)
       if (!url.includes('access_token=')) {
-        console.log('[AuthContext] Deep link ignored: no access_token found in URL.');
         return;
       }
 
-      console.log('[AuthContext] Deep link with tokens received:', url.substring(0, 100) + '...');
       const params = parseUrlParams(url);
       const accessToken = params['access_token'];
       const refreshToken = params['refresh_token'];
 
       if (accessToken && refreshToken) {
-        console.log('[AuthContext] Logging in via deep link tokens...');
         loginWithOAuth(accessToken, refreshToken).catch((e) =>
           console.error('[AuthContext] Deep link login failed:', e)
         );
       } else {
-        console.warn('[AuthContext] Failed to extract accessToken and/or refreshToken from URL.');
+        console.warn('[AuthContext] Failed to extract credentials from URL.');
       }
     };
 
@@ -119,12 +115,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Handle the case where the app was launched via a deep link (cold start)
     Linking.getInitialURL().then((url) => {
-      console.log('[AuthContext] Initial deep link URL:', url);
       if (url) handleDeepLink({ url });
     });
 
     return () => {
-      console.log('[AuthContext] Cleaning up deep link listener...');
       sub.remove();
     };
   }, [supabaseUrl, supabaseAnonKey]);
@@ -133,8 +127,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isLocalMode || !user) return;
 
-    console.log('[AuthContext] Registering real-time listener for user profile changes:', user.id);
-
     const client = updateSupabaseInstance(supabaseUrl, supabaseAnonKey);
     const userChannel = client
       .channel('user-profile-db-changes')
@@ -142,7 +134,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${user.id}` },
         (payload) => {
-          console.log('[AuthContext] Real-time profile database update received:', payload.new);
           setUser(prev => prev ? {
             ...prev,
             name: payload.new.name || prev.name,
@@ -153,7 +144,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .subscribe();
 
     return () => {
-      console.log('[AuthContext] Cleaning up user profile listener...');
       client.removeChannel(userChannel);
     };
   }, [isLocalMode, user, supabaseUrl, supabaseAnonKey]);
@@ -183,11 +173,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           refresh_token: refreshToken || '',
         });
 
-        console.log('[AuthContext] loadSession setSession result error:', sessionError?.message || 'none');
-        console.log('[AuthContext] loadSession sessionData user:', sessionData.user?.id);
-        
-        const { data: { session: globalSession } } = await supabase.auth.getSession();
-        console.log('[AuthContext] loadSession global proxy session user:', globalSession?.user?.id);
+        // Load secure session credentials
 
         if (!sessionError && sessionData.user && sessionData.session) {
           const newAccess = sessionData.session.access_token;
@@ -276,8 +262,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const deviceReturnUrl = Linking.createURL('');
       const callbackUrl = `${WEB_CALLBACK_BASE}?return=${encodeURIComponent(deviceReturnUrl)}`;
 
-      console.log('[AuthContext] Device deep-link URL:', deviceReturnUrl);
-      console.log('[AuthContext] Callback URL:', callbackUrl);
+      // Perform sign in redirect
 
       const { data, error } = await client.auth.signInWithOAuth({
         provider: 'google',
@@ -291,16 +276,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(error?.message || 'Failed to get Google OAuth URL from Supabase');
       }
 
-      console.log('[AuthContext] Opening browser for OAuth...');
-
-      // Open Chrome Custom Tab / Safari — the web callback will show a page
-      // that uses window.location to redirect to deviceReturnUrl#tokens
-      // The Linking listener below catches that deep link and logs the user in.
-      await WebBrowser.openBrowserAsync(data.url);
-
-      console.log('[AuthContext] Browser closed/dismissed.');
-      // Note: loginWithOAuth is called by the deep link listener, not here.
-      // We just stop the loading spinner — authentication completes asynchronously.
+      // Use openAuthSessionAsync to ensure the in-app browser tab automatically closes on redirect
+      const result = await WebBrowser.openAuthSessionAsync(data.url, deviceReturnUrl);
+      
+      if (result.type === 'success' && result.url) {
+        const params = parseUrlParams(result.url);
+        const accessToken = params['access_token'];
+        const refreshToken = params['refresh_token'];
+        
+        if (accessToken && refreshToken) {
+          await loginWithOAuth(accessToken, refreshToken);
+        }
+      }
     } catch (error: any) {
       console.error('[AuthContext] Google Sign-In error:', error?.message);
       throw error;

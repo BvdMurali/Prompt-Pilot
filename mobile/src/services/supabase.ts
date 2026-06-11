@@ -28,8 +28,6 @@ export const updateSupabaseInstance = (url?: string, anonKey?: string) => {
   if (activeClient && currentUrl === targetUrl && currentKey === targetKey) {
     return activeClient;
   }
-  
-  console.log(`[supabase.ts] Creating a new Supabase client instance for URL: ${targetUrl}`);
   currentUrl = targetUrl;
   currentKey = targetKey;
   activeClient = initSupabase(targetUrl, targetKey);

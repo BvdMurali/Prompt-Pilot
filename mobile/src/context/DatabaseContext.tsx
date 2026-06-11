@@ -112,8 +112,6 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isLocalMode || !user) return;
 
-    console.log('[DatabaseContext] Registering real-time listeners for user:', user.id);
-
     // Listen to prompts table modifications
     const promptsChannel = supabase
       .channel('prompts-db-changes')
@@ -121,7 +119,6 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'prompts', filter: `user_id=eq.${user.id}` },
         (payload) => {
-          console.log('[DatabaseContext] Real-time prompts table update:', payload.eventType);
           syncData();
         }
       )
@@ -134,7 +131,6 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'history', filter: `user_id=eq.${user.id}` },
         (payload) => {
-          console.log('[DatabaseContext] Real-time history table update:', payload.eventType);
           syncData();
         }
       )
@@ -147,7 +143,6 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'settings', filter: `user_id=eq.${user.id}` },
         (payload) => {
-          console.log('[DatabaseContext] Real-time settings table update:', payload.eventType);
           syncData();
         }
       )
@@ -160,14 +155,12 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'templates', filter: `user_id=eq.${user.id}` },
         (payload) => {
-          console.log('[DatabaseContext] Real-time templates table update:', payload.eventType);
           syncData();
         }
       )
       .subscribe();
 
     return () => {
-      console.log('[DatabaseContext] Cleaning up real-time listeners...');
       supabase.removeChannel(promptsChannel);
       supabase.removeChannel(historyChannel);
       supabase.removeChannel(settingsChannel);
