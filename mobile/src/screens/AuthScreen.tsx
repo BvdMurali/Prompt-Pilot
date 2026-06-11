@@ -98,7 +98,7 @@ export default function AuthScreen() {
                   </Defs>
                   <Rect x="42" y="75" width="28" height="10" rx="5" fill="url(#speedGradMobile)"/>
                   <Rect x="15" y="95" width="18" height="10" rx="5" fill="#7c3aed"/>
-                  <rect x="38" y="95" width="32" height="10" rx="5" fill="#2563eb"/>
+                  <Rect x="38" y="95" width="32" height="10" rx="5" fill="#2563eb"/>
                   <Rect x="15" y="115" width="10" height="8" rx="4" fill="#1d4ed8"/>
                   <Rect x="29" y="115" width="18" height="8" rx="4" fill="#2563eb"/>
                   <Circle cx="85" cy="100" r="5" fill="#7c3aed"/>

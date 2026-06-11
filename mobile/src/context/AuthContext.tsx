@@ -312,6 +312,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loginWithOAuth = async (accessToken: string, refreshToken: string): Promise<void> => {
     try {
       setLoading(true);
+      WebBrowser.dismissBrowser();
       const client = updateSupabaseInstance(supabaseUrl, supabaseAnonKey);
 
       const { data: sessionData, error: sessionError } = await client.auth.setSession({
