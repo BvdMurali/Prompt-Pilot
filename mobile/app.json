@@ -26,7 +26,8 @@
     },
     "plugins": [
       "expo-web-browser",
-      "./src/plugins/withFloatingBubble"
+      "./src/plugins/withFloatingBubble",
+      "expo-font"
     ],
     "extra": {
       "eas": {

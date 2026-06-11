@@ -20,6 +20,7 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactRootView
 import com.facebook.react.ReactNativeHost
@@ -55,13 +56,17 @@ class FloatingBubbleService : Service() {
         createNotificationChannel()
         startForeground(notificationId, createNotification())
 
-        // Register listener for minimize events from JS
+        // Register listener for minimize events from JS.
+        // ContextCompat.registerReceiver handles the API 33+ RECEIVER_NOT_EXPORTED flag
+        // internally and is backward-compatible to API 16, avoiding a direct reference
+        // to Context.RECEIVER_NOTEXPORTED which may not resolve in all EAS environments.
         val filter = IntentFilter("com.promptpilot.app.ACTION_MINIMIZE")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(minimizeReceiver, filter, Context.RECEIVER_NOTEXPORTED)
-        } else {
-            registerReceiver(minimizeReceiver, filter)
-        }
+        ContextCompat.registerReceiver(
+            this,
+            minimizeReceiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
 
         setupBubbleView()
     }
