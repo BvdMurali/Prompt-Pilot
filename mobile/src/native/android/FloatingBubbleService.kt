@@ -193,15 +193,16 @@ class FloatingBubbleService : Service() {
             gravity = Gravity.CENTER
         }
 
-        // Initialize ReactRootView if null (handling Kotlin smart casting safely via local variable)
-        var rrv = reactRootView
-        if (rrv == null) {
+        // Use Elvis operator so `rrv` is guaranteed non-null (val, not var).
+        // The Kotlin compiler can smart-cast a var local only in very limited cases;
+        // the Elvis / run pattern gives us a definite non-null val instead.
+        val rrv: ReactRootView = reactRootView ?: run {
             val reactApplication = application as ReactApplication
             val instanceManager = reactApplication.reactNativeHost.reactInstanceManager
-            rrv = ReactRootView(context).apply {
-                startReactApplication(instanceManager, "FloatingBubbleOverlay", null)
+            ReactRootView(context).also { newView ->
+                newView.startReactApplication(instanceManager, "FloatingBubbleOverlay", null)
+                reactRootView = newView
             }
-            reactRootView = rrv
         }
 
         container.addView(rrv)

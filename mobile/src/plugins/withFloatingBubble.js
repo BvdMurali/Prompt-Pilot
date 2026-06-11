@@ -130,15 +130,35 @@ function withCoreKtxDependency(config) {
   return withAppBuildGradle(config, (config) => {
     const ktxDep = `    implementation("androidx.core:core-ktx:1.12.0")`;
 
-    if (!config.modResults.contents.includes('androidx.core:core-ktx')) {
-      // Insert after the react-android implementation line
-      config.modResults.contents = config.modResults.contents.replace(
-        /implementation\("com\.facebook\.react:react-android"\)/,
-        `implementation("com.facebook.react:react-android")\n${ktxDep}`
-      );
-      console.log('[FloatingBubble] Added androidx.core:core-ktx to build.gradle');
+    if (config.modResults.contents.includes('androidx.core:core-ktx')) {
+      // Already present — nothing to do
+      return config;
     }
 
+    // Expo prebuild can generate either single or double-quoted dependency strings.
+    // Try double-quote variant first, then single-quote fallback.
+    const doubleQuote = `implementation("com.facebook.react:react-android")`;
+    const singleQuote = `implementation 'com.facebook.react:react-android'`;
+
+    if (config.modResults.contents.includes(doubleQuote)) {
+      config.modResults.contents = config.modResults.contents.replace(
+        doubleQuote,
+        `${doubleQuote}\n${ktxDep}`
+      );
+    } else if (config.modResults.contents.includes(singleQuote)) {
+      config.modResults.contents = config.modResults.contents.replace(
+        singleQuote,
+        `${singleQuote}\n${ktxDep}`
+      );
+    } else {
+      // Last resort: insert at the start of the dependencies block
+      config.modResults.contents = config.modResults.contents.replace(
+        /dependencies\s*\{/,
+        `dependencies {\n${ktxDep}`
+      );
+    }
+
+    console.log('[FloatingBubble] Added androidx.core:core-ktx to build.gradle');
     return config;
   });
 }
@@ -154,18 +174,35 @@ function withFloatingBubblePackageRegistration(config) {
       return config;
     }
 
-    // Insert after the PackageList(this).packages.apply { opening line
-    const applyBlockOpen = 'PackageList(this).packages.apply {';
-    if (contents.includes(applyBlockOpen)) {
-      contents = contents.replace(
-        applyBlockOpen,
-        `${applyBlockOpen}\n              // Packages that cannot be autolinked yet can be added manually here:\n              add(FloatingBubblePackage())`
-      );
-      console.log('[FloatingBubble] Registered FloatingBubblePackage in MainApplication.kt');
-    } else {
+    // Expo prebuild generates the packages block in one of two forms.
+    // Try both patterns to maximise compatibility across SDK versions.
+    const patterns = [
+      // SDK 50+ form: PackageList(this).packages.apply {
+      {
+        search: 'PackageList(this).packages.apply {',
+        replacement: `PackageList(this).packages.apply {\n              // Custom native packages:\n              add(FloatingBubblePackage())`,
+      },
+      // Alternative form with explicit comment already present
+      {
+        search: 'PackageList(this).packages.also {',
+        replacement: `PackageList(this).packages.also {\n              // Custom native packages:\n              add(FloatingBubblePackage())`,
+      },
+    ];
+
+    let patched = false;
+    for (const { search, replacement } of patterns) {
+      if (contents.includes(search)) {
+        contents = contents.replace(search, replacement);
+        patched = true;
+        console.log('[FloatingBubble] Registered FloatingBubblePackage in MainApplication.kt');
+        break;
+      }
+    }
+
+    if (!patched) {
       console.warn(
-        '[FloatingBubble] Could not find PackageList block in MainApplication.kt. ' +
-        'Please register FloatingBubblePackage() manually.'
+        '[FloatingBubble] WARNING: Could not find PackageList block in MainApplication.kt.\n' +
+        'Please register FloatingBubblePackage() manually in getPackages().'
       );
     }
 
@@ -173,6 +210,7 @@ function withFloatingBubblePackageRegistration(config) {
     return config;
   });
 }
+
 
 // ─── Compose all mods ─────────────────────────────────────────────────────────
 
