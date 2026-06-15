@@ -46,6 +46,7 @@ function withCopyKotlinFiles(config) {
         'FloatingBubbleModule.kt',
         'FloatingBubblePackage.kt',
         'FloatingBubbleService.kt',
+        'FloatingBubbleActivity.kt',
       ];
 
       for (const fileName of filesToCopy) {
@@ -101,7 +102,7 @@ function withFloatingBubbleManifest(config) {
       mainApplication.service = [];
     }
 
-    // Register our floating bubble service if not present
+    // Register FloatingBubbleService
     const serviceName = '.FloatingBubbleService';
     const serviceExists = mainApplication.service.some(
       (s) =>
@@ -118,6 +119,32 @@ function withFloatingBubbleManifest(config) {
           'android:foregroundServiceType': 'dataSync',
         },
       });
+    }
+
+    // Register FloatingBubbleActivity with a translucent theme so it appears
+    // as a floating dialog over whatever app the user currently has open.
+    if (!mainApplication.activity) {
+      mainApplication.activity = [];
+    }
+    const activityName = '.FloatingBubbleActivity';
+    const activityExists = mainApplication.activity.some(
+      (a) =>
+        a.$['android:name'] === activityName ||
+        a.$['android:name'] === 'com.promptpilot.app.FloatingBubbleActivity'
+    );
+    if (!activityExists) {
+      mainApplication.activity.push({
+        $: {
+          'android:name': activityName,
+          'android:exported': 'false',
+          'android:excludeFromRecents': 'true',
+          // Theme.Translucent.NoTitleBar: hardware-acceleration-compatible
+          // transparent window — makes the underlying app visible behind
+          // the overlay card. Supported on API 21+ (React Native minimum).
+          'android:theme': '@android:style/Theme.Translucent.NoTitleBar',
+        },
+      });
+      console.log('[FloatingBubble] Registered FloatingBubbleActivity in AndroidManifest');
     }
 
     return config;

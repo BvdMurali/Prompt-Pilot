@@ -4,10 +4,8 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.GradientDrawable
@@ -15,72 +13,57 @@ import android.os.Build
 import android.os.IBinder
 import android.view.Gravity
 import android.view.MotionEvent
-import android.view.View
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
-import com.facebook.react.ReactApplication
-import com.facebook.react.ReactRootView
-import com.facebook.react.ReactNativeHost
-import com.facebook.react.ReactInstanceManager
 
+/**
+ * Foreground Service that draws the PromptPilot floating bubble on screen.
+ *
+ * Responsibility: manage ONLY the draggable bubble widget via WindowManager.
+ * When the user taps the bubble, this service starts FloatingBubbleActivity
+ * (a translucent dialog-style Activity) to host the React overlay UI.
+ *
+ * Why we no longer create a ReactRootView here:
+ * --
+ * React Native's ReactInstanceManager is lifecycle-coupled to an Activity.
+ * Calling startReactApplication() from a Service while the main Activity is
+ * backgrounded causes an IllegalStateException crash. The Activity approach
+ * eliminates this entirely — the OS handles the window stacking, and the
+ * ReactInstanceManager receives proper onHostResume/Pause signals.
+ */
 class FloatingBubbleService : Service() {
 
     private lateinit var windowManager: WindowManager
-    private var bubbleView: View? = null
-    private var overlayView: FrameLayout? = null
-    private var reactRootView: ReactRootView? = null
+    private var bubbleView: FrameLayout? = null
 
-    private var isExpanded = false
     private val notificationId = 8899
     private val channelId = "promptpilot_overlay_channel"
 
-    private val minimizeReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == "com.promptpilot.app.ACTION_MINIMIZE") {
-                collapseOverlay()
-            }
-        }
-    }
-
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
+    override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-
         createNotificationChannel()
         startForeground(notificationId, createNotification())
-
-        // Register listener for minimize events from JS.
-        // ContextCompat.registerReceiver handles the API 33+ RECEIVER_NOT_EXPORTED flag
-        // internally and is backward-compatible to API 16, avoiding a direct reference
-        // to Context.RECEIVER_NOTEXPORTED which may not resolve in all EAS environments.
-        val filter = IntentFilter("com.promptpilot.app.ACTION_MINIMIZE")
-        ContextCompat.registerReceiver(
-            this,
-            minimizeReceiver,
-            filter,
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
-
         setupBubbleView()
     }
 
+    // ── Notification (required by Foreground Service) ────────────────────────
+
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "PromptPilot Overlay Helper"
-            val descriptionText = "Displays the PromptPilot floating action bubble."
-            val importance = NotificationManager.IMPORTANCE_LOW
-            val channel = NotificationChannel(channelId, name, importance).apply {
-                description = descriptionText
+            val channel = NotificationChannel(
+                channelId,
+                "PromptPilot Overlay Helper",
+                NotificationManager.IMPORTANCE_LOW
+            ).apply {
+                description = "Displays the PromptPilot floating action bubble."
             }
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+            (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                .createNotificationChannel(channel)
         }
     }
 
@@ -93,17 +76,19 @@ class FloatingBubbleService : Service() {
             .build()
     }
 
+    // ── Floating Bubble Widget ───────────────────────────────────────────────
+
     private fun setupBubbleView() {
         val context = this
         val size = dpToPx(56)
 
-        // Create container
         val frameLayout = FrameLayout(context)
         val params = WindowManager.LayoutParams(
             size,
             size,
             getLayoutType(),
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.START
@@ -111,30 +96,30 @@ class FloatingBubbleService : Service() {
             y = resources.displayMetrics.heightPixels / 2
         }
 
-        // White circular background with a subtle border — lets the app icon show cleanly
+        // White circle with subtle border — the app icon fills the interior
         val circle = GradientDrawable().apply {
             shape = GradientDrawable.OVAL
             setColor(Color.WHITE)
             setStroke(dpToPx(1), Color.parseColor("#E5E7EB"))
         }
         frameLayout.background = circle
-        // Elevation gives a floating card shadow on API 21+
         frameLayout.elevation = dpToPx(6).toFloat()
 
-        // Use the app's own round launcher icon (generated by expo prebuild from
-        // the adaptiveIcon config in app.json — always available in the APK).
+        // App launcher icon (generated by expo prebuild from app.json adaptiveIcon)
         val icon = ImageView(context).apply {
             setImageResource(R.mipmap.ic_launcher_round)
             scaleType = ImageView.ScaleType.FIT_CENTER
         }
         val pad = dpToPx(6)
-        val iconParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
-        ).apply { setMargins(pad, pad, pad, pad) }
-        frameLayout.addView(icon, iconParams)
+        frameLayout.addView(
+            icon,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            ).also { it.setMargins(pad, pad, pad, pad) }
+        )
 
-        // Drag and click mechanics
+        // ── Drag + tap mechanics ─────────────────────────────────────────────
         var initialX = 0
         var initialY = 0
         var initialTouchX = 0f
@@ -152,19 +137,27 @@ class FloatingBubbleService : Service() {
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    val deltaX = event.rawX - initialTouchX
-                    val deltaY = event.rawY - initialTouchY
-                    if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
-                        isClick = false
-                    }
-                    params.x = initialX + deltaX.toInt()
-                    params.y = initialY + deltaY.toInt()
+                    val dx = event.rawX - initialTouchX
+                    val dy = event.rawY - initialTouchY
+                    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) isClick = false
+                    params.x = initialX + dx.toInt()
+                    params.y = initialY + dy.toInt()
                     windowManager.updateViewLayout(frameLayout, params)
                     true
                 }
                 MotionEvent.ACTION_UP -> {
                     if (isClick) {
-                        expandOverlay()
+                        // Launch the translucent overlay Activity instead of
+                        // mounting a ReactRootView inside this Service.
+                        // FLAG_ACTIVITY_NEW_TASK is required when starting an
+                        // Activity from a non-Activity context (Service).
+                        val intent = Intent(context, FloatingBubbleActivity::class.java).apply {
+                            addFlags(
+                                Intent.FLAG_ACTIVITY_NEW_TASK or
+                                        Intent.FLAG_ACTIVITY_SINGLE_TOP
+                            )
+                        }
+                        startActivity(intent)
                     }
                     true
                 }
@@ -176,106 +169,22 @@ class FloatingBubbleService : Service() {
         windowManager.addView(frameLayout, params)
     }
 
-    private fun expandOverlay() {
-        if (isExpanded) return
-        isExpanded = true
+    // ── Helpers ──────────────────────────────────────────────────────────────
 
-        // Hide bubble
-        bubbleView?.visibility = View.GONE
-
-        // Set up overlay container (wraps the ReactRootView)
-        val context = this
-        val container = FrameLayout(context)
-
-        // Full width overlay with height of 480dp
-        val width = resources.displayMetrics.widthPixels - dpToPx(32)
-        val height = dpToPx(480)
-
-        val params = WindowManager.LayoutParams(
-            width,
-            height,
-            getLayoutType(),
-            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-            PixelFormat.TRANSLUCENT
-        ).apply {
-            gravity = Gravity.CENTER
-        }
-
-        // Use Elvis operator so `rrv` is guaranteed non-null (val, not var).
-        // The Kotlin compiler can smart-cast a var local only in very limited cases;
-        // the Elvis / run pattern gives us a definite non-null val instead.
-        val rrv: ReactRootView = reactRootView ?: run {
-            val reactApplication = application as ReactApplication
-            val instanceManager = reactApplication.reactNativeHost.reactInstanceManager
-            ReactRootView(context).also { newView ->
-                newView.startReactApplication(instanceManager, "FloatingBubbleOverlay", null)
-                reactRootView = newView
-            }
-        }
-
-        container.addView(rrv)
-        overlayView = container
-
-        // Tap outside layout handler
-        container.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_OUTSIDE) {
-                collapseOverlay()
-                true
-            } else {
-                false
-            }
-        }
-
-        windowManager.addView(container, params)
+    private fun getLayoutType(): Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+    } else {
+        @Suppress("DEPRECATION")
+        WindowManager.LayoutParams.TYPE_PHONE
     }
 
-    private fun collapseOverlay() {
-        if (!isExpanded) return
-        isExpanded = false
-
-        overlayView?.let { container ->
-            // Detach the ReactRootView from its container BEFORE removing the container
-            // from WindowManager. If we skip this, rrv.parent is still set to the old
-            // container, and the next call to container.addView(rrv) will crash with
-            // "The specified child already has a parent. You must call removeView() first."
-            reactRootView?.let { rrv ->
-                container.removeView(rrv)
-            }
-            windowManager.removeView(container)
-            overlayView = null
-        }
-
-        // Show bubble
-        bubbleView?.visibility = View.VISIBLE
-    }
-
-    private fun getLayoutType(): Int {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-        } else {
-            @Suppress("DEPRECATION")
-            WindowManager.LayoutParams.TYPE_PHONE
-        }
-    }
-
-    private fun dpToPx(dp: Int): Int {
-        val density = resources.displayMetrics.density
-        return (dp * density).toInt()
-    }
+    private fun dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(minimizeReceiver)
-
         bubbleView?.let {
             windowManager.removeView(it)
             bubbleView = null
         }
-        overlayView?.let {
-            windowManager.removeView(it)
-            overlayView = null
-        }
-        reactRootView?.unmountReactApplication()
-        reactRootView = null
     }
 }
