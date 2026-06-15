@@ -138,10 +138,10 @@ function withFloatingBubbleManifest(config) {
           'android:name': activityName,
           'android:exported': 'false',
           'android:excludeFromRecents': 'true',
-          // Theme.Translucent.NoTitleBar: hardware-acceleration-compatible
-          // transparent window — makes the underlying app visible behind
-          // the overlay card. Supported on API 21+ (React Native minimum).
-          'android:theme': '@android:style/Theme.Translucent.NoTitleBar',
+          // Theme.AppCompat.Dialog: floating dialog window, AppCompat-compatible.
+          // We make the background transparent programmatically in onCreate()
+          // so only the React card is visible (no dialog chrome/frame).
+          'android:theme': '@style/Theme.AppCompat.Dialog',
         },
       });
       console.log('[FloatingBubble] Registered FloatingBubbleActivity in AndroidManifest');

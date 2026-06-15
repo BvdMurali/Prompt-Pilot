@@ -1,12 +1,14 @@
 package com.promptpilot.app
 
-import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactInstanceManager
@@ -14,22 +16,19 @@ import com.facebook.react.ReactRootView
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler
 
 /**
- * A translucent, dialog-style Activity that hosts the FloatingBubbleOverlay
- * React component. Launched by FloatingBubbleService when the user taps the
- * floating bubble.
+ * A dialog-style Activity that hosts the FloatingBubbleOverlay React component.
+ * Launched by FloatingBubbleService when the user taps the floating bubble.
  *
- * Why an Activity instead of a WindowManager ReactRootView in the Service?
- * --
- * React Native's ReactInstanceManager lifecycle is tightly coupled to an
- * Activity (onHostResume / onHostPause). Trying to mount a ReactRootView
- * from a Foreground Service while the main Activity is backgrounded causes
- * an IllegalStateException crash. An Activity avoids this entirely: it has
- * its own lifecycle callbacks that the instance manager expects.
+ * Why AppCompatActivity (not plain Activity):
+ * expo-modules-core's AppContext.onHostResume() casts the Activity to
+ * AppCompatActivity and throws IllegalStateException if it isn't one.
  *
- * The translucent theme (Theme.Translucent.NoTitleBar) lets the underlying
- * app (Gmail, WhatsApp, etc.) remain visible behind the overlay card.
+ * Window style:
+ * Theme.AppCompat.Dialog (set in AndroidManifest) makes this Activity appear
+ * as a floating dialog over other apps. We then set a transparent background
+ * drawable so only the React card content is visible — no dialog chrome.
  */
-class FloatingBubbleActivity : Activity(), DefaultHardwareBackBtnHandler {
+class FloatingBubbleActivity : AppCompatActivity(), DefaultHardwareBackBtnHandler {
 
     private var mReactRootView: ReactRootView? = null
     private var mInstanceManager: ReactInstanceManager? = null
@@ -43,10 +42,15 @@ class FloatingBubbleActivity : Activity(), DefaultHardwareBackBtnHandler {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // ⚠️ setTheme MUST be called before super.onCreate so the window is
-        // created with the translucent surface type from the start.
-        setTheme(android.R.style.Theme_Translucent_NoTitleBar)
         super.onCreate(savedInstanceState)
+
+        // Hide the action bar — this is an overlay panel, not a full screen
+        supportActionBar?.hide()
+
+        // Make the dialog window fully transparent so only the React card is
+        // visible (Theme.AppCompat.Dialog gives us the floating window; the
+        // transparent background removes the dialog chrome/frame around it).
+        window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         // Dim content behind the overlay card (60 % opacity)
         window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
