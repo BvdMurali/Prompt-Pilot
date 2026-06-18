@@ -1,0 +1,39 @@
+# Root-level .easignore for PromptPilot repository
+# EAS Build looks for this file in the root directory of your Git repository.
+# Paths should be relative to the Git repository root.
+
+# ─── Exclude Web & Other Projects (reduces upload size significantly) ─────────
+web/
+supabase/
+extension/
+assets/
+
+# ─── Exclude Mobile dependencies (~600 MB) ────────────────────────────────────
+mobile/node_modules/
+
+# ─── Exclude local Expo / Metro build artifacts ───────────────────────────────
+mobile/.expo/
+mobile/dist/
+mobile/web-build/
+mobile/.metro-health-check*
+
+# ─── Exclude Android local build outputs ──────────────────────────────────────
+mobile/android/.gradle/
+mobile/android/build/
+mobile/android/app/build/
+mobile/android/.kotlin/
+
+# ─── Git internals ────────────────────────────────────────────────────────────
+.git/
+
+# ─── Editor / IDE artifacts ───────────────────────────────────────────────────
+.claude/
+.idea/
+.vscode/
+*.orig.*
+
+# ─── Logs & debug files ───────────────────────────────────────────────────────
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.log

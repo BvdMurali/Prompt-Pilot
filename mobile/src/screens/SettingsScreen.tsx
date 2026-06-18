@@ -26,6 +26,7 @@ import { THEME } from '../constants/theme';
 import GlassCard from '../components/GlassCard';
 import CustomButton from '../components/CustomButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Updates from 'expo-updates';
 
 const STANDARD_MODELS = [
   { id: 'gemini-3.1-flash-lite', name: 'Gemini 3.1 Flash Lite', group: 'Google Gemini' },
@@ -56,6 +57,89 @@ const { FloatingBubbleModule } = NativeModules;
 export default function SettingsScreen() {
   const { user, logout, isLocalMode, apiUrl, refreshUser } = useAuth();
   const { syncData } = useDatabase();
+
+  // Updates Hook & Local State
+  const { currentlyRunning, isUpdateAvailable, isUpdatePending } = Updates.useUpdates();
+  const [checkingForUpdates, setCheckingForUpdates] = useState(false);
+  const [downloadingUpdate, setDownloadingUpdate] = useState(false);
+  const [updateStatusText, setUpdateStatusText] = useState('');
+
+  const handleCheckForUpdates = async () => {
+    if (checkingForUpdates || downloadingUpdate) return;
+
+    // Guard against updates being disabled (e.g. in development client, or if updates.enabled is false in configuration)
+    if (!Updates.isEnabled) {
+      setUpdateStatusText('Updates inactive in this build.');
+      Alert.alert(
+        'Updates Inactive',
+        'Over-the-Air (OTA) updates are not enabled in this build. OTA updates are only active in standalone release builds.'
+      );
+      return;
+    }
+
+    setCheckingForUpdates(true);
+    setUpdateStatusText('Checking server for updates...');
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        setUpdateStatusText('New update found.');
+        Alert.alert(
+          'Update Available',
+          'A new update is available. Would you like to download and install it now?',
+          [
+            { text: 'Later', style: 'cancel' },
+            { 
+              text: 'Download & Apply', 
+              onPress: handleDownloadAndReload 
+            }
+          ]
+        );
+      } else {
+        setUpdateStatusText('App is up to date.');
+        Alert.alert('Up to Date', 'You are running the latest version of PromptPilot.');
+      }
+    } catch (e: any) {
+      console.warn('Check update error:', e);
+      
+      // Provide a clean, helpful message rather than raw native exception stack trace
+      const friendlyMessage = 
+        'Could not complete the update check. This usually happens if the device is offline, or if no update bundles have been published yet for this channel and runtime version.\n\n' +
+        'If this is a new build, publish an update using "eas update" first.';
+        
+      setUpdateStatusText('Check failed.');
+      Alert.alert('Check Failed', friendlyMessage);
+    } finally {
+      setCheckingForUpdates(false);
+    }
+  };
+
+  const handleDownloadAndReload = async () => {
+    if (downloadingUpdate) return;
+    setDownloadingUpdate(true);
+    setUpdateStatusText('Downloading update...');
+    try {
+      await Updates.fetchUpdateAsync();
+      setUpdateStatusText('Update downloaded. Reloading app...');
+      Alert.alert(
+        'Update Ready',
+        'The update has been downloaded. The application will now restart to apply changes.',
+        [
+          { 
+            text: 'Restart Now', 
+            onPress: async () => {
+              await Updates.reloadAsync();
+            } 
+          }
+        ]
+      );
+    } catch (e: any) {
+      console.error('Fetch update error:', e);
+      setUpdateStatusText('Download failed.');
+      Alert.alert('Download Failed', `Failed to download update: ${e.message || e}`);
+    } finally {
+      setDownloadingUpdate(false);
+    }
+  };
 
   const [displayName, setDisplayName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
@@ -731,6 +815,111 @@ export default function SettingsScreen() {
           </View>
         </GlassCard>
 
+        {/* OTA Updates Card */}
+        <GlassCard style={styles.card}>
+          <View style={styles.cardHeaderRow}>
+            <Ionicons name="cloud-download-outline" size={18} color={THEME.colors.primary} style={styles.cardHeaderIcon} />
+            <Text style={styles.cardTitle}>Over-the-Air Updates</Text>
+          </View>
+
+          <View style={styles.otaContainer}>
+            {/* Status / Badge Row */}
+            <View style={styles.otaBadgeRow}>
+              <View style={styles.otaStatusGroup}>
+                <Text style={styles.otaStatusTitle}>Current Build Type</Text>
+                <View style={[
+                  styles.otaBadge,
+                  currentlyRunning.isEmbeddedLaunch 
+                    ? styles.otaBadgeEmbedded 
+                    : styles.otaBadgeOta
+                ]}>
+                  <Text style={[
+                    styles.otaBadgeText,
+                    currentlyRunning.isEmbeddedLaunch 
+                      ? styles.otaBadgeTextEmbedded 
+                      : styles.otaBadgeTextOta
+                  ]}>
+                    {currentlyRunning.isEmbeddedLaunch ? 'Embedded Base Build' : 'OTA Update Installed'}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.otaStatusGroup}>
+                <Text style={styles.otaStatusTitle}>Channel</Text>
+                <Text style={styles.otaStatusVal}>
+                  {currentlyRunning.channel || 'development'}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.dividerSub} />
+
+            {/* Build Details Grid */}
+            <View style={styles.otaGrid}>
+              <View style={styles.otaGridItem}>
+                <Text style={styles.otaGridLabel}>Runtime Version</Text>
+                <Text style={styles.otaGridValue}>{currentlyRunning.runtimeVersion || '1.0.0'}</Text>
+              </View>
+              <View style={styles.otaGridItem}>
+                <Text style={styles.otaGridLabel}>Release Date</Text>
+                <Text style={styles.otaGridValue}>
+                  {currentlyRunning.createdAt 
+                    ? new Date(currentlyRunning.createdAt).toLocaleString() 
+                    : 'N/A (Built-in Bundle)'}
+                </Text>
+              </View>
+            </View>
+
+            {/* Active Update ID if applicable */}
+            {currentlyRunning.updateId && (
+              <View style={[styles.formGroup, { marginTop: THEME.spacing.md, marginBottom: 0 }]}>
+                <Text style={styles.label}>Active Update ID</Text>
+                <View style={styles.uidContainer}>
+                  <Text style={styles.uidText} numberOfLines={1}>{currentlyRunning.updateId}</Text>
+                </View>
+              </View>
+            )}
+
+            {updateStatusText ? (
+              <View style={styles.otaStatusTextContainer}>
+                <Ionicons name="information-circle-outline" size={14} color={THEME.colors.textSecondary} />
+                <Text style={styles.otaStatusText}>{updateStatusText}</Text>
+              </View>
+            ) : null}
+
+            {/* Action Buttons */}
+            <View style={styles.otaActionRow}>
+              {isUpdatePending ? (
+                <CustomButton
+                  title="Apply Pending Update"
+                  onPress={() => Updates.reloadAsync()}
+                  variant="gradient"
+                  icon="refresh-outline"
+                  style={styles.otaActionBtn}
+                />
+              ) : isUpdateAvailable ? (
+                <CustomButton
+                  title="Download Update"
+                  onPress={handleDownloadAndReload}
+                  loading={downloadingUpdate}
+                  variant="gradient"
+                  icon="download-outline"
+                  style={styles.otaActionBtn}
+                />
+              ) : (
+                <CustomButton
+                  title={checkingForUpdates ? "Checking..." : "Check for Updates"}
+                  onPress={handleCheckForUpdates}
+                  loading={checkingForUpdates}
+                  variant="secondary"
+                  icon="sync-outline"
+                  style={styles.otaActionBtn}
+                />
+              )}
+            </View>
+          </View>
+        </GlassCard>
+
         {/* Privacy & Danger Card */}
         <GlassCard style={styles.card}>
           <View style={styles.cardHeaderRow}>
@@ -1286,6 +1475,97 @@ const styles = StyleSheet.create({
     marginTop: THEME.spacing.sm,
     height: 48,
     marginBottom: THEME.spacing.xl,
+  },
+  otaContainer: {
+    gap: THEME.spacing.md,
+  },
+  otaBadgeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: THEME.spacing.md,
+  },
+  otaStatusGroup: {
+    flex: 1,
+  },
+  otaStatusTitle: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: THEME.colors.textMuted,
+    textTransform: 'uppercase',
+    marginBottom: 4,
+    letterSpacing: 0.5,
+  },
+  otaStatusVal: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: THEME.colors.textPrimary,
+  },
+  otaBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: THEME.roundness.md,
+    alignSelf: 'flex-start',
+  },
+  otaBadgeEmbedded: {
+    backgroundColor: 'rgba(6, 182, 212, 0.08)',
+    borderColor: 'rgba(6, 182, 212, 0.2)',
+    borderWidth: 1,
+  },
+  otaBadgeOta: {
+    backgroundColor: 'rgba(124, 58, 237, 0.08)',
+    borderColor: 'rgba(124, 58, 237, 0.2)',
+    borderWidth: 1,
+  },
+  otaBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  otaBadgeTextEmbedded: {
+    color: THEME.colors.primaryLight,
+  },
+  otaBadgeTextOta: {
+    color: THEME.colors.primary,
+  },
+  otaGrid: {
+    flexDirection: 'row',
+    gap: THEME.spacing.lg,
+  },
+  otaGridItem: {
+    flex: 1,
+  },
+  otaGridLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: THEME.colors.textMuted,
+    textTransform: 'uppercase',
+    marginBottom: 4,
+    letterSpacing: 0.5,
+  },
+  otaGridValue: {
+    fontSize: 12,
+    color: THEME.colors.textSecondary,
+    fontWeight: '500',
+  },
+  otaStatusTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(15, 23, 42, 0.03)',
+    borderRadius: THEME.roundness.md,
+    padding: THEME.spacing.sm,
+    marginTop: THEME.spacing.xs,
+  },
+  otaStatusText: {
+    fontSize: 11,
+    color: THEME.colors.textSecondary,
+    flex: 1,
+  },
+  otaActionRow: {
+    marginTop: THEME.spacing.sm,
+  },
+  otaActionBtn: {
+    height: 40,
   },
   // Modal layout
   modalBackdrop: {

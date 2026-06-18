@@ -13,7 +13,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#FFFFFF",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -33,6 +33,13 @@
       "eas": {
         "projectId": "78f57029-e8a7-40e1-bd78-72298b2ff86e"
       }
-    }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/78f57029-e8a7-40e1-bd78-72298b2ff86e",
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
+    "runtimeVersion": "1.0.0"
   }
 }
