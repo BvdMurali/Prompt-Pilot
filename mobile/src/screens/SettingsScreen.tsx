@@ -52,7 +52,7 @@ const TONES = [
   { id: 'executive', name: 'Executive' }
 ];
 
-const { FloatingBubbleModule } = NativeModules;
+
 
 export default function SettingsScreen() {
   const { user, logout, isLocalMode, apiUrl, refreshUser } = useAuth();
@@ -171,60 +171,9 @@ export default function SettingsScreen() {
   const [modelModalVisible, setModelModalVisible] = useState(false);
   const [toneModalVisible, setToneModalVisible] = useState(false);
 
-  // Floating bubble overlay controls
-  const [bubbleEnabled, setBubbleEnabled] = useState(false);
-  const [hasOverlayPermission, setHasOverlayPermission] = useState(false);
 
-  useEffect(() => {
-    if (Platform.OS === 'android' && FloatingBubbleModule) {
-      // Check permission
-      FloatingBubbleModule.checkOverlayPermission().then((granted: boolean) => {
-        setHasOverlayPermission(granted);
-      });
-      // Load enabled state
-      AsyncStorage.getItem('pp_bubble_enabled').then((val) => {
-        setBubbleEnabled(val === 'true');
-      });
-    }
-  }, []);
 
-  const handleToggleBubble = async () => {
-    if (Platform.OS !== 'android' || !FloatingBubbleModule) return;
 
-    // Check permission first
-    const granted = await FloatingBubbleModule.checkOverlayPermission();
-    if (!granted) {
-      Alert.alert(
-        'Permission Required',
-        'PromptPilot requires the "Display over other apps" permission to render the floating action bubble. Would you like to grant it now?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { 
-            text: 'Settings', 
-            onPress: () => {
-              FloatingBubbleModule.requestOverlayPermission();
-            }
-          }
-        ]
-      );
-      return;
-    }
-
-    try {
-      const targetState = !bubbleEnabled;
-      if (targetState) {
-        await FloatingBubbleModule.startService();
-        ToastAndroid.show('PromptPilot Overlay Active!', ToastAndroid.SHORT);
-      } else {
-        await FloatingBubbleModule.stopService();
-        ToastAndroid.show('Overlay service stopped.', ToastAndroid.SHORT);
-      }
-      setBubbleEnabled(targetState);
-      await AsyncStorage.setItem('pp_bubble_enabled', targetState ? 'true' : 'false');
-    } catch (e: any) {
-      Alert.alert('Error', e.message || 'Failed to toggle overlay service.');
-    }
-  };
 
   useEffect(() => {
     loadUserSettings();
@@ -823,37 +772,6 @@ export default function SettingsScreen() {
           </View>
 
           <View style={styles.otaContainer}>
-            {/* Status / Badge Row */}
-            <View style={styles.otaBadgeRow}>
-              <View style={styles.otaStatusGroup}>
-                <Text style={styles.otaStatusTitle}>Current Build Type</Text>
-                <View style={[
-                  styles.otaBadge,
-                  currentlyRunning.isEmbeddedLaunch 
-                    ? styles.otaBadgeEmbedded 
-                    : styles.otaBadgeOta
-                ]}>
-                  <Text style={[
-                    styles.otaBadgeText,
-                    currentlyRunning.isEmbeddedLaunch 
-                      ? styles.otaBadgeTextEmbedded 
-                      : styles.otaBadgeTextOta
-                  ]}>
-                    {currentlyRunning.isEmbeddedLaunch ? 'Embedded Base Build' : 'OTA Update Installed'}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.otaStatusGroup}>
-                <Text style={styles.otaStatusTitle}>Channel</Text>
-                <Text style={styles.otaStatusVal}>
-                  {currentlyRunning.channel || 'development'}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.dividerSub} />
-
             {/* Build Details Grid */}
             <View style={styles.otaGrid}>
               <View style={styles.otaGridItem}>
@@ -869,16 +787,6 @@ export default function SettingsScreen() {
                 </Text>
               </View>
             </View>
-
-            {/* Active Update ID if applicable */}
-            {currentlyRunning.updateId && (
-              <View style={[styles.formGroup, { marginTop: THEME.spacing.md, marginBottom: 0 }]}>
-                <Text style={styles.label}>Active Update ID</Text>
-                <View style={styles.uidContainer}>
-                  <Text style={styles.uidText} numberOfLines={1}>{currentlyRunning.updateId}</Text>
-                </View>
-              </View>
-            )}
 
             {updateStatusText ? (
               <View style={styles.otaStatusTextContainer}>
@@ -969,61 +877,7 @@ export default function SettingsScreen() {
           </View>
         </GlassCard>
 
-        {/* Universal Floating Helper Card (Android Only) */}
-        {Platform.OS === 'android' && (
-          <GlassCard style={styles.card}>
-            <View style={styles.cardHeaderRow}>
-              <Ionicons name="sparkles-outline" size={18} color={THEME.colors.primary} style={styles.cardHeaderIcon} />
-              <Text style={styles.cardTitle}>Universal Floating Helper</Text>
-            </View>
 
-            <View style={{ gap: 16 }}>
-              <View style={styles.privacyDescRow}>
-                <Ionicons name="phone-portrait-outline" size={18} color={THEME.colors.primaryLight} style={{ marginRight: 8, marginTop: 2 }} />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.privacyDescTitle}>System Overlay Widget</Text>
-                  <Text style={styles.privacyDescText}>
-                    Enables a system-wide floating bubble that stays accessible over any app. Tap it to optimize prompts and rewrite text inline using your synced library.
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.dividerSub} />
-
-              <View style={styles.privacyActionRow}>
-                <View style={{ flex: 1, marginRight: 8 }}>
-                  <Text style={styles.privacyActionTitle}>
-                    {bubbleEnabled ? 'Floating Helper Active' : 'Floating Helper Inactive'}
-                  </Text>
-                  <Text style={[styles.fieldHint, { marginTop: 2, paddingLeft: 0 }]}>
-                    {!hasOverlayPermission 
-                      ? 'Requires "Draw over other apps" permission.' 
-                      : 'Toggle the helper overlay bubble.'}
-                  </Text>
-                </View>
-
-                <TouchableOpacity 
-                  onPress={handleToggleBubble} 
-                  style={[
-                    styles.exportBtn, 
-                    bubbleEnabled ? { borderColor: THEME.colors.primary, backgroundColor: 'rgba(124, 58, 237, 0.05)' } : {}
-                  ]}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons 
-                    name={bubbleEnabled ? "eye-outline" : "eye-off-outline"} 
-                    size={15} 
-                    color={bubbleEnabled ? THEME.colors.primary : THEME.colors.textSecondary} 
-                    style={{ marginRight: 6 }} 
-                  />
-                  <Text style={[styles.exportBtnText, bubbleEnabled && { color: THEME.colors.primary }]}>
-                    {bubbleEnabled ? 'Disable' : 'Enable'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </GlassCard>
-        )}
 
         {/* Save Settings Button */}
         <CustomButton

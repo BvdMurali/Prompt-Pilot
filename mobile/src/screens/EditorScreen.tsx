@@ -62,7 +62,7 @@ export default function EditorScreen({ preloadText, onClearPreloadText }: Editor
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [selectedVariation, setSelectedVariation] = useState<number | null>(null);
-  const [showOptions, setShowOptions] = useState(false);
+  const [showOptions, setShowOptions] = useState(true);
   
   // Modal visibility states
   const [showToneModal, setShowToneModal] = useState(false);
@@ -87,6 +87,7 @@ export default function EditorScreen({ preloadText, onClearPreloadText }: Editor
     setLoading(true);
     setResult(null);
     setSelectedVariation(null);
+    setShowOptions(false);
 
     try {
       const payload = {
