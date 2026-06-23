@@ -11,10 +11,10 @@ export const metadata: Metadata = {
   description: "Improve your writing, transform tone, optimize prompts, and analyze scores anywhere you write.",
   icons: {
     icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon.png?v=2", type: "image/png" },
     ],
-    shortcut: "/icon.svg",
-    apple: "/icon.svg",
+    shortcut: "/icon.png?v=2",
+    apple: "/icon.png?v=2",
   },
 };
 

@@ -9,7 +9,17 @@ import { globalCache } from '@/lib/cache';
 
 export default function EditorPage() {
   const { session } = useAuth();
-  const [text, setText] = useState(() => globalCache.editor.text);
+  const [text, setText] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const scratch = localStorage.getItem('promptpilot_scratch');
+      if (scratch) {
+        localStorage.removeItem('promptpilot_scratch');
+        globalCache.editor.text = scratch;
+        return scratch;
+      }
+    }
+    return globalCache.editor.text;
+  });
   const [action, setAction] = useState<'optimize' | 'rewrite'>(() => globalCache.editor.action);
   
   // Custom optimization options
@@ -34,17 +44,7 @@ export default function EditorPage() {
     }
   }, [result]);
 
-  // Check for scratch prompt loaded from templates page
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const scratch = localStorage.getItem('promptpilot_scratch');
-      if (scratch) {
-        setText(scratch);
-        globalCache.editor.text = scratch;
-        localStorage.removeItem('promptpilot_scratch');
-      }
-    }
-  }, []);
+
 
   // Load settings default tone if not already cached
   useEffect(() => {
@@ -186,6 +186,12 @@ export default function EditorPage() {
     if (val >= 85) return 'bg-emerald-50 border-emerald-100 text-emerald-700';
     if (val >= 60) return 'bg-amber-50 border-amber-100 text-amber-700';
     return 'bg-red-50 border-red-100 text-red-650';
+  };
+
+  const getProgressBarColor = (val: number) => {
+    if (val >= 85) return 'bg-emerald-500';
+    if (val >= 60) return 'bg-amber-500';
+    return 'bg-red-500';
   };
 
   const currentOutputText = result 
@@ -429,7 +435,7 @@ export default function EditorPage() {
                     </div>
                     <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200">
                       <div 
-                        className={`h-full rounded-full transition-all duration-550 ${getScoreColor(s.val).split(' ')[0]}`}
+                        className={`h-full rounded-full transition-all duration-550 ${getProgressBarColor(s.val)}`}
                         style={{ width: `${s.val}%` }}
                       />
                     </div>
