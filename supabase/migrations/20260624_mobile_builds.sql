@@ -25,6 +25,11 @@ create policy "Anyone can view mobile builds" on public.mobile_builds
 create policy "Authenticated users can manage mobile builds" on public.mobile_builds
   for all using (auth.role() = 'authenticated');
 
+-- Grant standard permissions to database roles
+grant all privileges on public.mobile_builds to postgres, service_role;
+grant select on public.mobile_builds to anon, authenticated;
+
+
 -- Create storage bucket for mobile builds if it doesn't exist
 insert into storage.buckets (id, name, public)
 values ('builds', 'builds', true)
