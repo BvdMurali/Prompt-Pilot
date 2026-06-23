@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { History, Calendar, Copy, AlertCircle, ChevronRight } from 'lucide-react';
+import { History, Calendar, Copy, AlertCircle, ChevronRight, Check } from 'lucide-react';
 import { globalCache } from '@/lib/cache';
 
 type HistoryItem = {
@@ -39,6 +39,7 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(() => globalCache.history.historyList.length === 0);
   const [selectedId, setSelectedId] = useState<string | null>(() => globalCache.history.selectedId);
   const [copied, setCopied] = useState(false);
+  const [copiedAll, setCopiedAll] = useState(false);
   const [error, setError] = useState('');
 
   // Sync selected item selection back to cache
@@ -85,6 +86,47 @@ export default function HistoryPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleCopyAll = () => {
+    if (historyList.length === 0) return;
+    
+    const formatted = historyList.map((h, index) => {
+      const date = new Date(h.created_at).toLocaleString();
+      const action = h.action_used.replace('rewrite_', 'Rewrite: ').replace('optimize_prompt', 'Optimize');
+      const score = h.metadata?.score?.overall ? `${h.metadata.score.overall}%` : 'N/A';
+      const model = h.metadata?.model || 'Gemini';
+      const platform = h.metadata?.platform || 'General';
+      
+      let explanationsText = '';
+      if (h.metadata?.explanations && h.metadata.explanations.length > 0) {
+        explanationsText = '\n\n[EXPLANATIONS]\n' + h.metadata.explanations.map(exp => `- ${exp.action}\n  Why: ${exp.why}\n  How: ${exp.how}`).join('\n');
+      }
+
+      return `Entry #${index + 1}
+Date: ${date}
+Action: ${action}
+Model: ${model}
+Platform: ${platform}
+Overall Score: ${score}
+
+[ORIGINAL INPUT]
+${h.original_input}
+
+[OPTIMIZED OUTPUT]
+${h.optimized_output}${explanationsText}
+==================================================`;
+    }).join('\n\n');
+
+    const header = `==================================================
+PROMPT PILOT - OPTIMIZATION HISTORY LOGS EXPORT
+Total Entries: ${historyList.length}
+Exported on: ${new Date().toLocaleString()}
+==================================================\n\n`;
+
+    navigator.clipboard.writeText(header + formatted);
+    setCopiedAll(true);
+    setTimeout(() => setCopiedAll(false), 2000);
+  };
+
   const getScoreColor = (val: number) => {
     if (val >= 85) return 'text-emerald-700 border-emerald-200 bg-emerald-50';
     if (val >= 60) return 'text-amber-700 border-amber-200 bg-amber-50';
@@ -113,7 +155,41 @@ export default function HistoryPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:gap-8">
+        <div className="flex flex-col gap-6 xl:gap-8">
+          {/* Top Info & Action Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200 p-4 sm:p-5 rounded-2xl shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-indigo-50 border border-indigo-150 rounded-xl text-indigo-650">
+                <History className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-slate-950">Audit History & Logs</h2>
+                <p className="text-xs text-slate-500">Review your past prompt optimizations, scores, and change histories. Total {historyList.length} logs found.</p>
+              </div>
+            </div>
+            <button
+              onClick={handleCopyAll}
+              className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all shadow-xs cursor-pointer ${
+                copiedAll
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                  : 'bg-indigo-650 hover:bg-indigo-600 border-indigo-700 text-white hover:shadow-md'
+              }`}
+            >
+              {copiedAll ? (
+                <>
+                  <Check className="w-4 h-4 text-emerald-600" />
+                  <span>All Logs Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4 text-white/95" />
+                  <span>Copy All Logs</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:gap-8">
           
           {/* HISTORY LOGS LIST PANEL */}
           <div className="lg:col-span-1 flex flex-col gap-3 max-h-[250px] lg:max-h-[600px] xl:max-h-[750px] 2xl:max-h-[850px] overflow-y-auto pr-1">
@@ -254,6 +330,7 @@ export default function HistoryPage() {
           </div>
 
         </div>
+      </div>
       )}
     </div>
   );
