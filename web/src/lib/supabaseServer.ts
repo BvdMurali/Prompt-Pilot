@@ -19,3 +19,17 @@ export function getSupabaseServerClient(authHeader?: string | null) {
   // Fallback to standard client
   return createClient(supabaseUrl, supabaseAnonKey);
 }
+
+export function getSupabaseAdminClient() {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceKey) {
+    console.warn('Warning: SUPABASE_SERVICE_ROLE_KEY is not set in environment variables.');
+  }
+  return createClient(supabaseUrl, serviceKey || supabaseAnonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    }
+  });
+}
+

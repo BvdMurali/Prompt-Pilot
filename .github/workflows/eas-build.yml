@@ -1,0 +1,39 @@
+name: EAS Mobile Build Trigger
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'mobile/**' # Only trigger when changes are made to the mobile project to save resources
+
+jobs:
+  build:
+    name: Trigger EAS Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: 'mobile/package-lock.json'
+
+      - name: 3. Install EAS CLI
+        run: npm install -g eas-cli
+
+      - name: 4. Install Dependencies
+        working-directory: mobile
+        run: npm ci
+
+      - name: 5. Trigger EAS Android Build
+        working-directory: mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          eas build --platform android --profile production --non-interactive --no-wait

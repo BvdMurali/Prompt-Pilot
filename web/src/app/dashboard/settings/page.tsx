@@ -5,7 +5,8 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { 
   Settings, Save, Key, Database, Trash2, Check, AlertTriangle, 
-  ShieldCheck, Download, User, Lock, Eye, EyeOff, Copy, Camera, Loader2 
+  ShieldCheck, Download, User, Lock, Eye, EyeOff, Copy, Camera, Loader2,
+  Smartphone, QrCode
 } from 'lucide-react';
 
 const STANDARD_MODELS = [
@@ -62,6 +63,34 @@ export default function SettingsPage() {
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [copiedId, setCopiedId] = useState(false);
+
+  // Mobile app build settings
+  const [latestBuild, setLatestBuild] = useState<{
+    version: string;
+    build_number: number;
+    file_size: number;
+    created_at: string;
+    download_url: string;
+    release_notes?: string;
+  } | null>(null);
+  const [loadingBuild, setLoadingBuild] = useState(true);
+
+  useEffect(() => {
+    async function fetchLatestBuild() {
+      try {
+        const response = await fetch('/api/mobile/latest');
+        if (response.ok) {
+          const data = await response.json();
+          setLatestBuild(data);
+        }
+      } catch (err) {
+        console.error('Failed to load latest mobile build:', err);
+      } finally {
+        setLoadingBuild(false);
+      }
+    }
+    fetchLatestBuild();
+  }, []);
 
   useEffect(() => {
     async function loadSettings() {
@@ -721,6 +750,111 @@ export default function SettingsPage() {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* Mobile Application Card */}
+          <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl shadow-sm h-fit">
+            <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2 xl:gap-3 border-b border-slate-200 pb-4 xl:pb-6">
+              <Smartphone className="w-4 h-4 xl:w-5 xl:h-5 text-violet-600" />
+              <span>Mobile Application</span>
+            </h2>
+
+            <div className="flex flex-col gap-6 text-sm xl:text-base text-slate-650">
+              <p className="text-xs xl:text-sm leading-relaxed text-slate-500">
+                Get the latest version of the PromptPilot Android mobile app to use AI-powered optimizations directly on your phone.
+              </p>
+
+              {loadingBuild ? (
+                <div className="flex flex-col items-center justify-center py-6 gap-3">
+                  <Loader2 className="w-6 h-6 text-violet-600 animate-spin" />
+                  <span className="text-xs text-slate-400">Fetching latest build details...</span>
+                </div>
+              ) : latestBuild ? (
+                <div className="flex flex-col gap-4">
+                  {/* Build metadata */}
+                  <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col gap-2 text-xs xl:text-sm">
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-slate-500">Version</span>
+                      <span className="font-bold text-slate-800">v{latestBuild.version} ({latestBuild.build_number})</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-slate-500">File Size</span>
+                      <span className="font-bold text-slate-800">
+                        {(latestBuild.file_size / (1024 * 1024)).toFixed(1)} MB
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-slate-500">Released</span>
+                      <span className="font-bold text-slate-800">
+                        {new Date(latestBuild.created_at).toLocaleDateString(undefined, {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                  </div>
+
+                  {latestBuild.release_notes && (
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-xs font-semibold text-slate-500">Changelog</span>
+                      <p className="text-xs bg-slate-50 border border-slate-100 rounded-lg p-3 text-slate-600 font-mono max-h-24 overflow-y-auto whitespace-pre-wrap">
+                        {latestBuild.release_notes}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* QR Code section */}
+                  <div className="flex flex-col items-center gap-3 border-t border-slate-100 pt-5">
+                    <span className="text-xs font-semibold text-slate-500">Scan to Download APK</span>
+                    <div className="p-2 border border-slate-200 rounded-2xl bg-white shadow-sm hover:scale-[1.02] transition-transform duration-200">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(
+                          typeof window !== 'undefined' ? `${window.location.origin}/api/mobile/latest?download=true` : ''
+                        )}&color=4f46e5`}
+                        alt="Download QR Code" 
+                        className="w-40 h-40"
+                      />
+                    </div>
+                    <span className="text-[10px] text-center text-slate-400 max-w-[200px] leading-relaxed">
+                      Point your phone camera here to download directly.
+                    </span>
+                  </div>
+
+                  {/* Download Button */}
+                  <a
+                    href="/api/mobile/latest?download=true"
+                    className="w-full inline-flex items-center justify-center gap-2 xl:gap-3 px-4 py-3 rounded-xl xl:rounded-2xl bg-indigo-650 hover:bg-indigo-750 text-white font-bold text-sm xl:text-base shadow-md shadow-indigo-650/10 hover:shadow-indigo-650/20 transition-all text-center"
+                  >
+                    <Download className="w-4 h-4 xl:w-5 xl:h-5" />
+                    <span>Download Latest APK</span>
+                  </a>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {/* Fallback showing Awaiting builds */}
+                  <div className="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-6 text-center flex flex-col items-center gap-3">
+                    <QrCode className="w-12 h-12 text-slate-300 stroke-[1.5]" />
+                    <div className="flex flex-col gap-1">
+                      <span className="font-semibold text-slate-700 text-xs xl:text-sm">No builds deployed yet</span>
+                      <p className="text-[11px] xl:text-xs text-slate-400 max-w-[220px] leading-relaxed">
+                        To activate downloads, trigger a mobile build in your EAS deployment pipeline. Deployed builds will appear here automatically.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Disabled Download Button for UI placeholder */}
+                  <button
+                    disabled
+                    className="w-full inline-flex items-center justify-center gap-2 xl:gap-3 px-4 py-3 rounded-xl xl:rounded-2xl bg-slate-100 text-slate-450 font-bold text-sm xl:text-base cursor-not-allowed border border-slate-200"
+                  >
+                    <Download className="w-4 h-4 xl:w-5 xl:h-5 text-slate-400" />
+                    <span>Awaiting Pipeline Upload</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
