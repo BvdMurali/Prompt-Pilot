@@ -1,4 +1,4 @@
-import { AIResult } from '@/lib/ai';
+import { AIResultV2 } from '@/lib/ai';
 
 export interface PromptItem {
   id: string;
@@ -41,7 +41,7 @@ export const globalCache = {
     tone: '',
     length: '',
     platform: '',
-    result: null as AIResult | null,
+    result: null as AIResultV2 | null,
     activeVariation: null as number | null,
     saved: false,
   },

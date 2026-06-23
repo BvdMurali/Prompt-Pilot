@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createClient as createServerClient } from '@/utils/supabase/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { callLLM } from '@/lib/ai';
+import { callLLM, callLLMV2 } from '@/lib/ai';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,9 +16,7 @@ export async function POST(request: NextRequest) {
         process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
         {
           global: {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           },
         }
       );
@@ -39,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     // 2. Parse request payload
     const body = await request.json();
-    const { text, action, tone, length, platform } = body;
+    const { text, action, tone, length, platform, version = 'v2' } = body;
 
     if (!text || !action) {
       return NextResponse.json(
@@ -59,42 +57,67 @@ export async function POST(request: NextRequest) {
       console.error('Error fetching settings:', settingsError);
     }
 
-    const preferredModel = settings?.preferred_model || 'gemini-3.1-flash-lite';
+    const preferredModel = settings?.preferred_model || 'gemini-2.0-flash-lite';
     const apiKeys = settings?.api_key_override || {};
 
-    // 4. Invoke LLM layer
-    const result = await callLLM({
-      text,
-      action,
-      tone,
-      length,
-      platform,
-      preferredModel,
-      apiKeys,
-    });
+    const callParams = { text, action, tone, length, platform, preferredModel, apiKeys };
 
-    // 5. Store in history (DB writing)
-    const { error: historyError } = await supabase
-      .from('history')
-      .insert({
-        user_id: user.id,
-        original_input: text,
-        optimized_output: result.improved_text,
-        action_used: action === 'optimize' ? 'optimize_prompt' : `rewrite_${tone || 'default'}`,
-        metadata: {
-          score: result.score,
-          explanations: result.explanations,
-          variations: result.variations,
-          suggestions: result.suggestions,
-          platform: platform || 'general',
-          tone: tone || null,
-          length: length || null,
-          model: preferredModel,
-        },
-      });
+    // 4. Invoke LLM — V2 (default) or V1 (legacy fallback)
+    let result;
+    let isV2 = version !== 'v1';
 
-    if (historyError) {
-      console.error('Error writing optimization history:', historyError);
+    if (isV2) {
+      result = await callLLMV2(callParams);
+    } else {
+      result = await callLLM(callParams);
+    }
+
+    // 5. Store in history
+    // V2: only write to history when the result is a successful optimization
+    const shouldWriteHistory = isV2
+      ? (result as any).status === 'optimized'
+      : true;
+
+    if (shouldWriteHistory) {
+      const outputText = isV2
+        ? (result as any).optimized_text
+        : (result as any).improved_text;
+
+      const actionUsed = action === 'optimize'
+        ? 'optimize_prompt'
+        : `rewrite_${tone || 'default'}`;
+
+      const { error: historyError } = await supabase
+        .from('history')
+        .insert({
+          user_id: user.id,
+          original_input: text,
+          optimized_output: outputText,
+          action_used: actionUsed,
+          metadata: {
+            // V1 fields (kept for existing history viewers)
+            score: isV2 ? undefined : (result as any).score,
+            explanations: (result as any).explanations,
+            variations: (result as any).variations,
+            suggestions: (result as any).suggestions,
+            // V2 enriched fields
+            v2_status: isV2 ? (result as any).status : undefined,
+            confidence: isV2 ? (result as any).confidence : undefined,
+            intent: isV2 ? (result as any).intent : undefined,
+            domain: isV2 ? (result as any).domain : undefined,
+            improvements: isV2 ? (result as any).improvements : undefined,
+            // Common fields
+            platform: platform || 'general',
+            tone: tone || null,
+            length: length || null,
+            model: preferredModel,
+            api_version: isV2 ? 'v2' : 'v1',
+          },
+        });
+
+      if (historyError) {
+        console.error('Error writing optimization history:', historyError);
+      }
     }
 
     // 6. Record analytics event
@@ -109,6 +132,9 @@ export async function POST(request: NextRequest) {
           length,
           platform,
           model: preferredModel,
+          api_version: isV2 ? 'v2' : 'v1',
+          v2_status: isV2 ? (result as any).status : undefined,
+          confidence: isV2 ? (result as any).confidence : undefined,
         },
       });
 
