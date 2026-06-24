@@ -31,9 +31,11 @@ grant select on public.mobile_builds to anon, authenticated;
 
 
 -- Create storage bucket for mobile builds if it doesn't exist
-insert into storage.buckets (id, name, public)
-values ('builds', 'builds', true)
-on conflict (id) do nothing;
+insert into storage.buckets (id, name, public, file_size_limit)
+values ('builds', 'builds', true, 209715200) -- 200MB in bytes (200 * 1024 * 1024)
+on conflict (id) do update set
+  file_size_limit = excluded.file_size_limit;
+
 
 -- Drop existing storage policies if they exist
 drop policy if exists "Public Access to Builds" on storage.objects;
