@@ -302,7 +302,7 @@ Features pre-built system templates (e.g., Resume Builder, Cover Letter Generato
 ---
 
 ### Account Settings and Credentials Override
-Users configure display names, upload profile avatars, choose default models, and configure custom API keys.
+Users configure display names, upload profile avatars, choose default models, configure custom API keys, and download companion clients.
 
 #### Account Settings Page
 Provides general settings including profile name update, avatar upload, and account deletion options.
@@ -311,6 +311,10 @@ Provides general settings including profile name update, avatar upload, and acco
 #### API Credentials Override
 Allows configuring custom API keys for Google Gemini, OpenAI, Anthropic, and OpenRouter directly in local settings.
 ![API Keys Override](../assets/settings_keys.png)
+
+#### Mobile Application Download
+Renders details about the companion mobile client (version release numbers, file sizes, and release dates) along with an APK download button and a dynamic, scannable QR code for instant phone installation.
+![Mobile App Section](../assets/mobile_settings_card.png)
 
 ---
 
@@ -427,7 +431,60 @@ Orchestrates prompt optimization or rewriting.
     { "error": "No API key configured. Please add your API key in Settings..." }
     ```
 
+### GET `/api/mobile/latest`
+
+Retrieves metadata about the latest mobile APK build or redirects to download.
+
+* **Parameters**:
+  * `download` (Optional Query Parameter): Set `?download=true` to redirect (`307 Temporary Redirect`) to the direct APK file URL.
+
+* **Successful Response (`200 OK` without `download` param)**:
+  ```json
+  {
+    "id": "7b524cd-6921-403b-8562-c8e41d9bf011",
+    "version": "1.0.12",
+    "build_number": 12,
+    "platform": "android",
+    "file_url": "https://expo.dev/artifacts/eas/abc.apk",
+    "file_size_bytes": 93623912,
+    "release_notes": "- Add settings UI overrides\n- Full key management support",
+    "created_at": "2026-06-24T13:21:29Z"
+  }
+  ```
+
+* **Response with `?download=true`**:
+  * Status: `307 Temporary Redirect`
+  * Header `Location`: Direct download URL (Expo CDN/Supabase Storage)
+
 ---
+
+### POST `/api/mobile/webhook`
+
+Registers new mobile builds. Deletes all previous builds from storage and database records automatically to save space.
+
+* **Headers**:
+  * `Authorization: Bearer <MOBILE_BUILD_WEBHOOK_SECRET>`
+  * `Content-Type: application/json`
+
+* **Request Body Schema**:
+  ```json
+  {
+    "version": "1.0.12",
+    "build_number": 12,
+    "platform": "android",
+    "file_url": "https://expo.dev/artifacts/eas/abc.apk",
+    "file_size_bytes": 93623912,
+    "release_notes": "Initial release"
+  }
+  ```
+
+* **Successful Response (`200 OK`)**:
+  ```json
+  { "success": true, "message": "Successfully recorded mobile build" }
+  ```
+
+---
+
 
 ## 8. Database & Storage Design
 

@@ -86,11 +86,25 @@ graph TD
 
 ## 📸 Visual Proof
 
-Below are placeholders for the visual demonstration of PromptPilot across all platforms:
+Here are the official user interface screens of the PromptPilot workspace ecosystem:
 
-| Next.js Web Dashboard | Chrome Extension Overlay | React Native Mobile App |
-| :---: | :---: | :---: |
-| ![Web Dashboard Preview](assets/dashboard_preview.png) | ![Extension Preview](assets/extension_preview.png) | ![Mobile App Preview](assets/mobile_preview.png) |
+### Web Application Dashboard
+| **Welcome / Login Portal** | **Landing Page Hero** |
+| :---: | :---: |
+| ![Auth Welcome Portal](assets/auth_modal.png) | ![Landing Page Hero](assets/landing_page.png) |
+
+| **AI Prompt Optimizer & Rewrite** | **Audit History & Logs** |
+| :---: | :---: |
+| ![AI Prompt Optimizer UI](assets/dashboard_editor.png) | ![History & Audit Logs UI](assets/dashboard_history.png) |
+
+| **Structured System Templates** | **Saved Prompt Library** |
+| :---: | :---: |
+| ![System Templates Grid](assets/dashboard_templates.png) | ![Saved Prompt Library](assets/dashboard_library.png) |
+
+| **Dashboard Settings & Mobile App Card** |
+| :---: |
+| ![Workspace Settings & Mobile App QR Code](assets/settings_keys.png) |
+
 
 ---
 
