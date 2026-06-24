@@ -74,59 +74,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let finalFilePath = file_path || `android/promptpilot-v${version}-${build_number}.apk`;
+    let finalFilePath = file_url || file_path;
     let finalFileSize = file_size || 0;
 
-    // 3. Handle APK download & upload if file_url is provided
-    if (file_url) {
-      console.log(`Fetching build from: ${file_url}`);
-      const fileResponse = await fetch(file_url);
-      if (!fileResponse.ok) {
-        throw new Error(`Failed to fetch build from url: ${fileResponse.statusText}`);
-      }
-      
-      const arrayBuffer = await fileResponse.arrayBuffer();
-      const fileBuffer = Buffer.from(arrayBuffer);
-      finalFileSize = fileBuffer.length;
-
-      console.log(`Uploading build to Supabase Storage: ${finalFilePath} (${finalFileSize} bytes)`);
-      const { error: uploadError } = await supabase.storage
-        .from('builds')
-        .upload(finalFilePath, fileBuffer, {
-          contentType: 'application/vnd.android.package-archive',
-          upsert: true
-        });
-
-      if (uploadError) {
-        throw uploadError;
-      }
-    }
-
-    // 4. Implement Retention Option A: Delete older APK files from storage
-    // Query all existing builds for the same platform
-    const { data: existingBuilds, error: fetchBuildsError } = await supabase
-      .from('mobile_builds')
-      .select('file_path')
-      .eq('platform', platform);
-
-    if (fetchBuildsError) {
-      console.error('Failed to fetch existing builds for cleanup:', fetchBuildsError);
-    } else if (existingBuilds && existingBuilds.length > 0) {
-      const filesToDelete = existingBuilds
-        .map(b => b.file_path)
-        .filter(path => path !== finalFilePath); // Do not delete the one we just uploaded
-
-      if (filesToDelete.length > 0) {
-        console.log(`Cleaning up old build files from storage:`, filesToDelete);
-        const { error: deleteStorageError } = await supabase.storage
-          .from('builds')
-          .remove(filesToDelete);
-
-        if (deleteStorageError) {
-          console.error('Failed to delete old builds from storage:', deleteStorageError);
+    // 3. If file size is not provided, fetch it using a fast HEAD request to prevent timeouts
+    if (file_url && !file_size) {
+      try {
+        console.log(`Fetching file size for: ${file_url}`);
+        const headRes = await fetch(file_url, { method: 'HEAD' });
+        const contentLength = headRes.headers.get('content-length');
+        if (contentLength) {
+          finalFileSize = parseInt(contentLength, 10);
+          console.log(`Resolved file size: ${finalFileSize} bytes`);
         }
+      } catch (e) {
+        console.warn('Failed to fetch file size via HEAD request:', e instanceof Error ? e.message : String(e));
       }
     }
+
 
     // 5. Delete old database records
     const { error: deleteDbError } = await supabase

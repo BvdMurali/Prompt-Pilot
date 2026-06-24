@@ -23,17 +23,23 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get the public URL for the APK file
-    const { data: { publicUrl } } = supabase.storage
-      .from('builds')
-      .getPublicUrl(build.file_path);
+    // Get the download URL (support external URLs directly or fall back to Supabase Storage)
+    let downloadUrl = '';
+    if (build.file_path.startsWith('http://') || build.file_path.startsWith('https://')) {
+      downloadUrl = build.file_path;
+    } else {
+      const { data: { publicUrl } } = supabase.storage
+        .from('builds')
+        .getPublicUrl(build.file_path);
+      downloadUrl = publicUrl;
+    }
 
     // If query parameter download=true is passed, redirect to the direct file URL
     const searchParams = request.nextUrl.searchParams;
     const isDownload = searchParams.get('download') === 'true';
 
     if (isDownload) {
-      return NextResponse.redirect(publicUrl, { status: 307 });
+      return NextResponse.redirect(downloadUrl, { status: 307 });
     }
 
     // Otherwise return metadata
@@ -46,7 +52,7 @@ export async function GET(request: NextRequest) {
       file_size: build.file_size,
       release_notes: build.release_notes,
       created_at: build.created_at,
-      download_url: publicUrl,
+      download_url: downloadUrl,
     });
   } catch (err) {
     console.error('Error fetching latest build:', err);
