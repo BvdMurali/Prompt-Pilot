@@ -16,6 +16,10 @@ This directory contains the core **PromptPilot Web Application**. Built on Next.
 
 ## 📸 Product Walkthrough
 
+### Authentication Portal
+Users sign in via a polished modal overlay using Google OAuth or email/password credentials. The landing page hero section is visible behind the modal.
+![Authentication Login Modal](../assets/auth_modal.png)
+
 ### Interactive Landing Page
 The web entry point features side-by-side prompt comparisons, dynamic score animations, and call-to-actions linking to Google OAuth and email sign-ins.
 ![Landing Page](../assets/landing_page.png)
@@ -324,18 +328,22 @@ Focuses exclusively on the web application directory and Supabase DB configurati
 
 ```
 /web/                             # Next.js Web Application
-├── public/                       # Static UI resources (logos, icons)
+├── public/
+│   └── assets/                   # Public-facing app screenshots & marketing images
 ├── src/
 │   ├── app/                      # App Router pages & API routes
 │   │   ├── api/
 │   │   │   ├── auth/             # Authentication callbacks (Google OAuth)
-│   │   │   └── prompt/process/   # Core completion handler (route.ts)
+│   │   │   ├── prompt/process/   # Core LLM completion handler (route.ts)
+│   │   │   └── mobile/
+│   │   │       ├── latest/       # GET: latest APK metadata & download redirect (route.ts)
+│   │   │       └── webhook/      # POST: register new builds via webhook (route.ts)
 │   │   ├── dashboard/            # Shell Layout & core workspace routes
 │   │   │   ├── editor/           # Workspace editor route (page.tsx)
 │   │   │   ├── library/          # Prompt library component (page.tsx)
 │   │   │   ├── templates/        # Variable binding engine (page.tsx)
 │   │   │   ├── history/          # Historical completion logs (page.tsx)
-│   │   │   └── settings/         # Profile management page (page.tsx)
+│   │   │   └── settings/         # Profile & mobile app download page (page.tsx)
 │   │   ├── globals.css           # Tailwind custom rules
 │   │   ├── layout.tsx            # Root app wrapper
 │   │   └── page.tsx              # Product landing page & Auth modal UI
@@ -350,10 +358,11 @@ Focuses exclusively on the web application directory and Supabase DB configurati
 ├── config.toml                   # Local Supabase dev server ports & config
 └── migrations/                   # Database migrations (Versioned SQL)
     ├── 20260606_init.sql         # Schema definitions, triggers, and RLS policies
-    ├── 20260607_check_email.sql    # RPC function for validating email presence
+    ├── 20260607_check_email.sql  # RPC function for validating email presence
     ├── 20260607_realtime.sql     # Adds users table to realtime publication
     ├── 20260607_soft_delete.sql  # Implements soft-delete column & RLS filters
-    └── 20260607_storage.sql      # Creates avatars bucket & access policies
+    ├── 20260607_storage.sql      # Creates avatars bucket & access policies
+    └── 20260624_mobile_builds.sql # Creates mobile_builds table & builds bucket
 ```
 
 ---
@@ -431,6 +440,8 @@ Orchestrates prompt optimization or rewriting.
     { "error": "No API key configured. Please add your API key in Settings..." }
     ```
 
+---
+
 ### GET `/api/mobile/latest`
 
 Retrieves metadata about the latest mobile APK build or redirects to download.
@@ -484,7 +495,6 @@ Registers new mobile builds. Deletes all previous builds from storage and databa
   ```
 
 ---
-
 
 ## 8. Database & Storage Design
 
@@ -644,9 +654,9 @@ erDiagram
   * **Live URL**: [prompt-pilot-ochre.vercel.app](https://prompt-pilot-ochre.vercel.app)
 * **Database Hosting**: Deployed on Supabase Cloud.
 
-#### Deployed Dashboard Interface
-Allows managing and optimizing prompt requests in the live Vercel cloud environment.
-![Vercel Live Deployment](../assets/vercel_deployment.png)
+#### Live Dashboard Interface
+The fully deployed Next.js web dashboard with multi-model AI optimization and prompt management running live on Vercel.
+![Live Dashboard — Optimizer & Rewrite UI](../assets/dashboard_editor.png)
 
 ### Core Environment Variables (`web/.env.local`)
 ```env
