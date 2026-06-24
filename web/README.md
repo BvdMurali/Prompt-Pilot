@@ -320,13 +320,12 @@ Users configure display names, upload profile avatars, choose default models, co
 Provides general settings including profile name update, avatar upload, and account deletion options.
 ![Account Settings UI](../assets/dashboard_settings.png)
 
-#### API Credentials Override
-Allows configuring custom API keys for Google Gemini, OpenAI, Anthropic, and OpenRouter directly in local settings.
-![API Keys Override](../assets/settings_keys.png)
+#### API Key Overrides & Mobile Application Download
+The lower settings panel combines two companion sections side by side:
+- **API Credentials Override**: Configure custom API keys for Google Gemini, OpenAI, Anthropic, and OpenRouter to use personal quotas and avoid shared rate limits.
+- **Mobile Application Download**: Displays the latest Android APK version, file size, and release date alongside a scannable QR code and direct download button for instant phone installation.
 
-#### Mobile Application Download
-Renders details about the companion mobile client (version release numbers, file sizes, and release dates) along with an APK download button and a dynamic, scannable QR code for instant phone installation.
-![Mobile App Section](../assets/mobile_settings_card.png)
+![API Key Overrides & Mobile App Download](../assets/mobile_settings_card.png)
 
 ---
 
