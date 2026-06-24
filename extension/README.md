@@ -71,7 +71,7 @@ Whenever an input field or text area is focused on any web page, the PromptPilot
 After the AI pipeline completes, PromptPilot renders the **original and improved text side-by-side**, displays a 0–100 quality score, lists all improvements made, and offers 4 variation styles (Default, Option A, Option B, Option C). One click inserts the selected variation directly into the host page's input field.
 
 <p align="center">
-  <img src="assets/extension_panel_score_v2.png" width="560" alt="Universal Panel — Score and Variation Selection"/>
+  <img src="assets/extension_panel_score.png" width="560" alt="Universal Panel — Score and Variation Selection"/>
 </p>
 
 > **Panel shown above**: Input `"hw are u?"` → Improved to `"How are you doing today?"` — Score **90/100** with improvement tags: *Corrected spelling, Added punctuation, Expanded contractions*. Confidence: **95%**.
