@@ -776,7 +776,9 @@ export default function SettingsPage() {
                   <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col gap-2 text-xs xl:text-sm">
                     <div className="flex justify-between">
                       <span className="font-semibold text-slate-500">Version</span>
-                      <span className="font-bold text-slate-800">v{latestBuild.version} ({latestBuild.build_number})</span>
+                      <span className="font-bold text-slate-800">
+                        v{latestBuild.version.split('.').slice(0, 2).join('.')}.{latestBuild.build_number}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="font-semibold text-slate-500">File Size</span>
