@@ -16,13 +16,13 @@ This directory contains the core **PromptPilot Web Application**. Built on Next.
 
 ## 📸 Product Walkthrough
 
+### Interactive Landing Page
+The live production site showcases the hero headline, feature callouts, and CTA buttons for sign-in — accessible at [prompt-pilot-ochre.vercel.app](https://prompt-pilot-ochre.vercel.app).
+![Landing Page](../assets/landing_page.png)
+
 ### Authentication Portal
 Users sign in via a polished modal overlay using Google OAuth or email/password credentials. The landing page hero section is visible behind the modal.
 ![Authentication Login Modal](../assets/auth_modal.png)
-
-### Interactive Landing Page
-The web entry point features side-by-side prompt comparisons, dynamic score animations, and call-to-actions linking to Google OAuth and email sign-ins.
-![Landing Page](../assets/landing_page.png)
 
 ---
 
@@ -250,9 +250,17 @@ The central workspace includes a multi-functional editor panel. Users toggle bet
    * **Output Rules**: Enforces exact response formats.
 2. **Rewrite Text**: Modifies professional drafts, casual messages, or executive emails using custom tone settings (Friendly, Professional, Executive, Casual) and length bounds (Shorten, Expand, Simplify).
 
-#### Interface Screenshot
-Allows users to choose tone, length, and platform criteria, running direct optimization operations.
-![Optimizer and Rewrite UI](../assets/dashboard_editor.png)
+#### Empty Pipeline State
+Shows the clean workspace before a prompt is submitted — with tone, platform, and action controls ready for input.
+![Optimizer — Empty Pipeline](../assets/pipeline_empty.png)
+
+#### Contextual Clarification — Question Prompt
+When the AI determines that additional background is needed to fully optimize the prompt, it surfaces a targeted clarification question before proceeding.
+![Context Needed — Clarification Question](../assets/context_needed.png)
+
+#### Contextual Clarification — User Response
+The user provides the missing context directly in the panel, which the AI then folds into the final optimized output for a richer, more accurate result.
+![Context Answered — User Input](../assets/context_answered.png)
 
 ---
 
@@ -655,8 +663,8 @@ erDiagram
 * **Database Hosting**: Deployed on Supabase Cloud.
 
 #### Live Dashboard Interface
-The fully deployed Next.js web dashboard with multi-model AI optimization and prompt management running live on Vercel.
-![Live Dashboard — Optimizer & Rewrite UI](../assets/dashboard_editor.png)
+The live production deployment of PromptPilot captured in-browser at [prompt-pilot-ochre.vercel.app](https://prompt-pilot-ochre.vercel.app) — showing the full hero landing page with the "Universal Browser Extension Available Now" announcement banner.
+![Live Production Landing Page — Browser View](../assets/live_dashboard.png)
 
 ### Core Environment Variables (`web/.env.local`)
 ```env
