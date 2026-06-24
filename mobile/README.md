@@ -167,23 +167,23 @@ The mobile client functions as a synchronized workspace container connecting dir
 
 ```mermaid
 graph TD
-    subgraph Mobile Client (React Native / Expo)
+    subgraph "Mobile Client (React Native / Expo)"
         UI[Workspace Tabs: Editor, Library, Settings]
-        Secure[Expo SecureStore - Encrypted JWTs]
-        Cache[AsyncStorage - Local Cache]
-        subgraph Android Native Layer
-            Service[FloatingBubbleService Kotlin]
-            Overlay[WindowManager Overlay Layout]
+        Secure["Expo SecureStore - Encrypted JWTs"]
+        Cache["AsyncStorage - Local Cache"]
+        subgraph "Android Native Layer"
+            Service["FloatingBubbleService Kotlin"]
+            Overlay["WindowManager Overlay Layout"]
         end
     end
 
-    subgraph PromptPilot Platform
-        DB[(Supabase DB & Auth)]
-        Gateway[Next.js API Router]
+    subgraph "PromptPilot Platform"
+        DB[("Supabase DB & Auth")]
+        Gateway["Next.js API Router"]
     end
 
-    subgraph AI Foundation
-        LLM[Gemini / Claude / OpenAI API]
+    subgraph "AI Foundation"
+        LLM["Gemini / Claude / OpenAI API"]
     end
 
     UI <--> Secure
