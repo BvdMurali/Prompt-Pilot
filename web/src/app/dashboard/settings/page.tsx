@@ -754,13 +754,13 @@ export default function SettingsPage() {
           </div>
 
           {/* Mobile Application Card */}
-          <div className="flex flex-col gap-6 xl:gap-8 bg-white border border-slate-200 p-6 xl:p-8 rounded-2xl xl:rounded-3xl shadow-sm h-fit">
+          <div className="flex flex-col gap-6 bg-white border border-slate-200 p-5 xl:p-6 rounded-2xl xl:rounded-3xl shadow-sm h-fit">
             <h2 className="text-sm xl:text-lg font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2 xl:gap-3 border-b border-slate-200 pb-4 xl:pb-6">
               <Smartphone className="w-4 h-4 xl:w-5 xl:h-5 text-violet-600" />
               <span>Mobile Application</span>
             </h2>
 
-            <div className="flex flex-col gap-6 text-sm xl:text-base text-slate-650">
+            <div className="flex flex-col gap-5 text-sm xl:text-base text-slate-650">
               <p className="text-xs xl:text-sm leading-relaxed text-slate-500">
                 Get the latest version of the PromptPilot Android mobile app to use AI-powered optimizations directly on your phone.
               </p>
@@ -796,17 +796,8 @@ export default function SettingsPage() {
                     </div>
                   </div>
 
-                  {latestBuild.release_notes && (
-                    <div className="flex flex-col gap-1.5">
-                      <span className="text-xs font-semibold text-slate-500">Changelog</span>
-                      <p className="text-xs bg-slate-50 border border-slate-100 rounded-lg p-3 text-slate-600 font-mono max-h-24 overflow-y-auto whitespace-pre-wrap">
-                        {latestBuild.release_notes}
-                      </p>
-                    </div>
-                  )}
-
                   {/* QR Code section */}
-                  <div className="flex flex-col items-center gap-3 border-t border-slate-100 pt-5">
+                  <div className="flex flex-col items-center gap-3 border-t border-slate-100 pt-4">
                     <span className="text-xs font-semibold text-slate-500">Scan to Download APK</span>
                     <div className="p-2 border border-slate-200 rounded-2xl bg-white shadow-sm hover:scale-[1.02] transition-transform duration-200">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -826,20 +817,20 @@ export default function SettingsPage() {
                   {/* Download Button */}
                   <a
                     href="/api/mobile/latest?download=true"
-                    className="w-full inline-flex items-center justify-center gap-2 xl:gap-3 px-4 py-3 rounded-xl xl:rounded-2xl bg-indigo-650 hover:bg-indigo-750 text-white font-bold text-sm xl:text-base shadow-md shadow-indigo-650/10 hover:shadow-indigo-650/20 transition-all text-center"
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-650 hover:bg-indigo-750 text-white font-bold text-xs xl:text-sm shadow-md shadow-indigo-650/10 hover:shadow-indigo-650/20 transition-all text-center"
                   >
-                    <Download className="w-4 h-4 xl:w-5 xl:h-5" />
+                    <Download className="w-3.5 h-3.5 xl:w-4 h-4" />
                     <span>Download Latest APK</span>
                   </a>
                 </div>
               ) : (
                 <div className="flex flex-col gap-4">
                   {/* Fallback showing Awaiting builds */}
-                  <div className="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-6 text-center flex flex-col items-center gap-3">
-                    <QrCode className="w-12 h-12 text-slate-300 stroke-[1.5]" />
+                  <div className="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-5 text-center flex flex-col items-center gap-3">
+                    <QrCode className="w-10 h-10 text-slate-300 stroke-[1.5]" />
                     <div className="flex flex-col gap-1">
                       <span className="font-semibold text-slate-700 text-xs xl:text-sm">No builds deployed yet</span>
-                      <p className="text-[11px] xl:text-xs text-slate-400 max-w-[220px] leading-relaxed">
+                      <p className="text-[10px] xl:text-xs text-slate-400 max-w-[200px] leading-relaxed">
                         To activate downloads, trigger a mobile build in your EAS deployment pipeline. Deployed builds will appear here automatically.
                       </p>
                     </div>
@@ -848,9 +839,9 @@ export default function SettingsPage() {
                   {/* Disabled Download Button for UI placeholder */}
                   <button
                     disabled
-                    className="w-full inline-flex items-center justify-center gap-2 xl:gap-3 px-4 py-3 rounded-xl xl:rounded-2xl bg-slate-100 text-slate-450 font-bold text-sm xl:text-base cursor-not-allowed border border-slate-200"
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 text-slate-450 font-bold text-xs xl:text-sm cursor-not-allowed border border-slate-200"
                   >
-                    <Download className="w-4 h-4 xl:w-5 xl:h-5 text-slate-400" />
+                    <Download className="w-3.5 h-3.5 xl:w-4 h-4 text-slate-400" />
                     <span>Awaiting Pipeline Upload</span>
                   </button>
                 </div>
